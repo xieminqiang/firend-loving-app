@@ -1,0 +1,76 @@
+{
+  "pages": [
+    "pages/tabbar/home/index",
+    "pages/tabbar/friends/index",
+    "pages/tabbar/discover/index",
+    "pages/tabbar/profile/index"
+  ],
+  "subPackages": [
+    {
+      "root": "subPackages/login",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "subPackages/home",
+      "pages": [
+        "detail"
+      ]
+    },
+    {
+      "root": "subPackages/settings",
+      "pages": [
+        "pages/index/index",
+        "pages/account/index",
+        "pages/privacy/index",
+        "pages/about/index"
+      ]
+    },
+    {
+      "root": "subPackages/friend",
+      "pages": [
+        "apply/index"
+      ]
+    }
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "随伴行",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F5F5F5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#7363FF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/tabbar/home/index",
+        "text": "首页",
+        "iconPath": "static/icons/tabbar/home.png",
+        "selectedIconPath": "static/icons/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/tabbar/friends/index",
+        "text": "友伴",
+        "iconPath": "static/icons/tabbar/friends.png",
+        "selectedIconPath": "static/icons/tabbar/friends-active.png"
+      },
+      {
+        "pagePath": "pages/tabbar/discover/index",
+        "text": "发现",
+        "iconPath": "static/icons/tabbar/discover.png",
+        "selectedIconPath": "static/icons/tabbar/discover-active.png"
+      },
+      {
+        "pagePath": "pages/tabbar/profile/index",
+        "text": "我的",
+        "iconPath": "static/icons/tabbar/profile.png",
+        "selectedIconPath": "static/icons/tabbar/profile-active.png"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

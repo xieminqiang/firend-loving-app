@@ -1,0 +1,86 @@
+/**
+ * 样式变量定义
+ */
+
+// 主题色彩 - 根据设计规范更新
+$primary-color: #7363FF;        // 主色（紫蓝渐变起始色）- 主按钮、CTA、头像高亮等
+$primary-hover: #8A7AFF;        // 主色悬浮态
+$highlight-color: #FF69DE;      // 强调色（渐变结束色）- 活跃感 + 情绪点缀（心动值图标、红点提醒）
+$error-color: #F44336;          // 警示色 - 删除、异常提示、风险行为等
+$success-color: #4CAF50;        // 成功色 - 成功支付、预约成功、提现到账提示等
+$warning-color: #FF9500;        // 保留原有警告色
+$info-color: #5AC8FA;           // 保留原有信息色
+
+// 渐变按钮规范设计
+$gradient-primary: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
+$gradient-primary-hover: linear-gradient(135deg, #8A7AFF 0%, #FF7AE5 100%);
+$gradient-secondary: linear-gradient(135deg, rgba(115, 99, 255, 0.1) 0%, rgba(255, 105, 222, 0.1) 100%);
+
+// 按钮色彩规范
+$button-primary-bg: $gradient-primary;    // 主按钮背景色（渐变）
+$button-primary-text: #FFFFFF;  // 主按钮文字色
+$button-secondary-bg: #FFFFFF;  // 次按钮背景色
+$button-secondary-text: #7363FF; // 次按钮文字色
+$button-secondary-border: #7363FF; // 次按钮边框色
+$button-disabled-bg: #F0F0F0;   // 禁用按钮背景色
+$button-disabled-text: #999999; // 禁用按钮文字色
+
+// 文字颜色 - 根据设计规范更新
+$text-color-primary: #1A1A1A;   // 主文字色 - 正文、说明
+$text-color-secondary: #666666; // 二级文字 - 标签说明、时间戳
+$text-color-placeholder: #999999; // 占位符文字色
+$text-color-disabled: #CCCCCC;  // 禁用灰色 - 不可操作按钮、灰掉字段
+$text-color-white: #FFFFFF;     // 白色文字
+
+// 背景色 - 根据设计规范更新
+$bg-color-primary: #FFFFFF;     // 主背景色（白色）
+$bg-color-secondary: #F7F8FA;   // 背景浅灰 - 页面背景分层区域底色
+$bg-color-tertiary: #F0F0F0;    // 三级背景色
+$bg-color-dark: #1C1C1E;        // 深色背景
+
+// 边框色
+$border-color-light: #E5E5E5;
+$border-color-medium: #CCCCCC;
+$border-color-dark: #999999;
+$border-color-primary: #7363FF; // 主色边框
+
+// 字体大小
+$font-size-xs: 20rpx;
+$font-size-sm: 24rpx;
+$font-size-base: 28rpx;
+$font-size-lg: 32rpx;
+$font-size-xl: 36rpx;
+$font-size-xxl: 40rpx;
+
+// 间距
+$spacing-xs: 10rpx;
+$spacing-sm: 20rpx;
+$spacing-base: 30rpx;
+$spacing-lg: 40rpx;
+$spacing-xl: 60rpx;
+$spacing-xxl: 80rpx;
+
+// 圆角
+$border-radius-xs: 4rpx;
+$border-radius-sm: 8rpx;
+$border-radius-base: 12rpx;
+$border-radius-lg: 16rpx;
+$border-radius-xl: 20rpx;
+$border-radius-round: 50%;
+
+// 阴影
+$box-shadow-light: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+$box-shadow-medium: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
+$box-shadow-heavy: 0 8rpx 32rpx rgba(0, 0, 0, 0.2);
+
+// 层级
+$z-index-normal: 1;
+$z-index-tooltip: 10;
+$z-index-fixed: 100;
+$z-index-modal: 1000;
+$z-index-popup: 2000;
+
+// 动画时间
+$animation-duration-fast: 0.2s;
+$animation-duration-base: 0.3s;
+$animation-duration-slow: 0.5s; 
