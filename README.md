@@ -386,3 +386,4 @@ npm run build:app-plus
 
 ---
 *最后更新：2024年*
+# firend-loving-app
