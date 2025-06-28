@@ -28,14 +28,8 @@ export const useUserStore = defineStore('user',{
   },
   // 持久化配置
   persist: {
-    storage: {
-      getItem(key) {
-        return uni.getStorageSync(key)
-      },
-      setItem(key, value) {
-        uni.setStorageSync(key, value)
-      }
-    }
+    key: 'user-store',
+    paths: ['userInfo'] // 只持久化 userInfo 字段
   }
 })
 

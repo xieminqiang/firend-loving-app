@@ -1,0 +1,16 @@
+{
+  "name": "firend-loving-app",
+  "version": "1.0.0",
+  "description": "## 项目简介 爱伴是一个基于 uni-app 框架开发的跨平台社交应用，支持微信小程序、Android 和 iOS 平台。应用专注于为用户提供友伴交流、内容发现和个人管理功能。",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.3.0"
+  }
+}

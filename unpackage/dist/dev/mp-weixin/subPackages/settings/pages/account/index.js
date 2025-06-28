@@ -5,13 +5,12 @@ const _sfc_main = {
   setup(__props) {
     common_vendor.ref({});
     common_vendor.onMounted(() => {
-      common_vendor.index.__f__("log", "at subPackages/settings/pages/account/index.vue:19", "账户设置页面加载完成");
+      console.log("账户设置页面加载完成");
     });
     return (_ctx, _cache) => {
       return {};
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-1e11e3af"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-1e11e3af"], ["__file", "/Users/mac/Documents/firend-loving-app/subPackages/settings/pages/account/index.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/subPackages/settings/pages/account/index.js.map

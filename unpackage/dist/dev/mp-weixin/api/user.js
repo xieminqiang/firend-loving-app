@@ -7,6 +7,13 @@ const wxLogin = (data) => {
     data
   });
 };
+const getServicesByCities = (cityCodes) => {
+  const queryParams = cityCodes.map((code) => `city_codes=${code}`).join("&");
+  return config_http.http({
+    url: `/companion/services/cities?${queryParams}`,
+    method: "GET"
+  });
+};
 const createCompanionApplication = (data) => {
   return config_http.http({
     url: "/companion/application",
@@ -15,5 +22,5 @@ const createCompanionApplication = (data) => {
   });
 };
 exports.createCompanionApplication = createCompanionApplication;
+exports.getServicesByCities = getServicesByCities;
 exports.wxLogin = wxLogin;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/api/user.js.map

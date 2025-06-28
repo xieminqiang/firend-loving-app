@@ -15,6 +15,8 @@
 <style lang="scss">
 	@import "@/styles/variables.scss";
 	@import "@/styles/common.scss";
+      
+	
 	
 	/* 每个页面公共css */
 	page {

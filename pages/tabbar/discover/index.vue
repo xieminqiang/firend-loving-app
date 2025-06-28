@@ -70,22 +70,21 @@
             
             <view class="feed-actions">
               <view class="action-left">
-                <view class="like-btn" @click="handleLike(feed)" :class="{ 'liked': feed.isLiked }">
-                  <image src="@/static/icons/friend/heart.png" class="action-icon" mode="aspectFit" />
+                <view class="like-btn" @click="handleLike(feed)" >
+                  <image src="@/static/icons/friend/aixin.png" class="action-icon" mode="aspectFill" v-if="!feed.isLiked"/>
+                  <image src="@/static/icons/friend/heart.png" class="action-icon" mode="aspectFill" v-else/>
                   <text class="action-text">{{ feed.likes }}</text>
                 </view>
                 <view class="comment-btn" @click="openCommentModal(feed)">
-                  <image src="@/static/icons/friend/message.png" class="action-icon" mode="aspectFit" />
+                  <image src="@/static/icons/friend/pinglun.png" class="action-icon" mode="aspectFit" />
                   <text class="action-text">{{ feed.comments }}</text>
                 </view>
-              </view>
+              </view> 
               <view class="action-right">
                 <view class="reward-btn" @click="openRewardModal(feed)">
-                  <image src="@/static/icons/friend/gift.png" class="action-icon" mode="aspectFit" />
                   <text class="action-text">打赏</text>
                 </view>
                 <view class="invite-btn" @click="navigateToBooking(feed)">
-                  <image src="@/static/icons/friend/calendar.png" class="action-icon" mode="aspectFit" />
                   <text class="action-text">立即邀约</text>
                 </view>
               </view>
@@ -856,14 +855,60 @@ const getCommentPlaceholder = () => {
   letter-spacing: 0.5rpx;
 }
 
-.like-btn:active,
-.comment-btn:active {
-  transform: translateY(1rpx) scale(0.98);
+.like-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  transition: all $animation-duration-base;
+  font-size: $font-size-sm;
+  min-width: 120rpx;
+  min-height: 48rpx;
+  justify-content: flex-start;
+  color: #1a1a1a;
+}
+
+.like-btn .action-icon {
+  width: 32rpx;
+  height: 32rpx;
+  transition: all $animation-duration-base;
+  opacity: 0.8;
+}
+
+.like-btn.liked {
+  color: $highlight-color;
+}
+
+.like-btn.liked .action-icon {
+  opacity: 1;
 }
 
 .reward-btn:active,
 .invite-btn:active {
   transform: translateY(2rpx) scale(0.96);
+}
+
+.comment-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  transition: all $animation-duration-base;
+  font-size: $font-size-sm;
+  min-width: 120rpx;
+  min-height: 48rpx;
+  justify-content: flex-start;
+  color: #1a1a1a;
+}
+
+.comment-btn .action-icon {
+  width: 32rpx;
+  height: 32rpx;
+  transition: all $animation-duration-base;
+  opacity: 0.8;
+}
+
+.like-btn:active,
+.comment-btn:active {
+  transform: translateY(1rpx) scale(0.98);
 }
 
 .no-results {
@@ -1075,36 +1120,24 @@ const getCommentPlaceholder = () => {
   gap: 16rpx;
 }
 
-.like-btn, .comment-btn, .reward-btn, .invite-btn {
+.reward-btn, .invite-btn {
   display: flex;
   align-items: center;
-  gap: 8rpx;
   padding: 12rpx 20rpx;
-  border-radius: 24rpx;
   transition: all $animation-duration-base;
   font-size: $font-size-sm;
-  min-width: 120rpx;
+  box-sizing: border-box;
   justify-content: center;
-}
-
-.like-btn, .comment-btn {
-  background-color: transparent;
-  color: $text-color-secondary;
-  border: 1rpx solid $border-color-light;
-}
-
-.like-btn.liked {
-  color: $highlight-color;
-  background: linear-gradient(135deg, rgba(255, 105, 222, 0.1) 0%, rgba(255, 105, 222, 0.05) 100%);
-  border-color: $highlight-color;
 }
 
 .reward-btn {
   background-color: transparent;
   color: $text-color-secondary;
   font-weight: 500;
-  border: 1rpx solid $border-color-light;
-  border-radius: 24rpx;
+  box-sizing: border-box;
+  border-radius: 99999rpx;
+
+ 
   transition: all $animation-duration-base;
 }
 
@@ -1112,7 +1145,6 @@ const getCommentPlaceholder = () => {
   background-color: rgba($primary-color, 0.05);
   border-color: $primary-color;
   color: $primary-color;
-  transform: translateY(1rpx) scale(0.98);
 }
 
 .invite-btn {
@@ -1120,7 +1152,7 @@ const getCommentPlaceholder = () => {
   color: #ffffff;
   font-weight: 600;
   box-shadow: 0 4rpx 12rpx rgba(115, 99, 255, 0.3);
-  border-radius: 24rpx;
+  border-radius: 99999rpx;
   position: relative;
   overflow: hidden;
 }

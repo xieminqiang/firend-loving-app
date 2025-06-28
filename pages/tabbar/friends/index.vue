@@ -91,7 +91,6 @@
               
             </view>
             <view class="schedule-btn" @click.stop="navigateToBooking(p.id)">
-              <image src="@/static/icons/friend/calendar.png" class="action-icon" mode="aspectFit" />
               <text>立即邀约</text>
             </view>
           </view>
@@ -921,7 +920,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 @import "@/styles/variables.scss";
-@import "@/styles/mixins.scss";
+
 
 .friends-container {
   height: 100vh;
@@ -1291,11 +1290,14 @@ onMounted(() => {
   color: #ffffff;
   font-weight: 600;
   box-shadow: 0 4rpx 12rpx rgba(115, 99, 255, 0.3);
-  border-radius: 20rpx;
+  border-radius: 99999rpx;
   position: relative;
   overflow: hidden;
   gap: 6rpx;
   min-height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
   &:active {
     transform: translateY(1rpx);
@@ -1319,6 +1321,25 @@ onMounted(() => {
   &:active::before {
     left: 100%;
   }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(ellipse at center, rgba(115, 99, 255, 0.2) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    z-index: -1;
+    animation: inviteGlow 3s ease-in-out infinite alternate 1s;
+  }
+}
+
+@keyframes inviteGlow {
+  0% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.8); }
+  100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); }
 }
 
 .action-icon {

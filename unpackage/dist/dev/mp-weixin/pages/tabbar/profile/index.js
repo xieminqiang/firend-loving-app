@@ -3,6 +3,7 @@ const common_vendor = require("../../../common/vendor.js");
 const common_assets = require("../../../common/assets.js");
 const stores_user = require("../../../stores/user.js");
 require("../../../config/http.js");
+require("../../../config/config.js");
 const _sfc_main = {
   __name: "index",
   setup(__props) {
@@ -34,11 +35,11 @@ const _sfc_main = {
       toReview: 3
     });
     const handleLoginSuccess = (data) => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:353", "收到登录成功事件:", data);
+      console.log("收到登录成功事件:", data);
       loadUserData();
     };
     const handleLogoutSuccess = () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:360", "收到退出登录事件");
+      console.log("收到退出登录事件");
       accountBalance.value = "0.00";
       couponsCount.value = 0;
       orderCounts.value = {
@@ -59,8 +60,8 @@ const _sfc_main = {
       common_vendor.index.$off("logoutSuccess", handleLogoutSuccess);
     });
     const loadUserData = async () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:394", "开始加载用户数据 - isLoggedIn:", isLoggedIn.value);
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:395", "当前用户状态:", userStore.userInfo);
+      console.log("开始加载用户数据 - isLoggedIn:", isLoggedIn.value);
+      console.log("当前用户状态:", userStore.userInfo);
     };
     const navigateToLogin = () => {
       common_vendor.index.navigateTo({
@@ -144,7 +145,7 @@ const _sfc_main = {
     };
     const navigateToPartnerRegistration = () => {
       common_vendor.index.navigateTo({
-        url: "/subPackages/friend/apply/index"
+        url: "/subPackages/partner/index"
       });
     };
     const navigateToCooperation = () => {
@@ -238,13 +239,13 @@ const _sfc_main = {
       });
     };
     const onRefresh = async () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:644", "开始下拉刷新");
+      console.log("开始下拉刷新");
       isRefreshing.value = true;
       try {
         await loadUserData();
         await new Promise((resolve) => setTimeout(resolve, 800));
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:655", "刷新失败:", error);
+        console.error("刷新失败:", error);
         common_vendor.index.showToast({
           title: "刷新失败",
           icon: "none",
@@ -255,7 +256,7 @@ const _sfc_main = {
       }
     };
     const onRefreshRestore = () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:667", "刷新动画结束");
+      console.log("刷新动画结束");
       isRefreshing.value = false;
     };
     const formatPhone = (phone) => {
@@ -266,35 +267,35 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       var _a;
       return common_vendor.e({
-        a: isLoggedIn.value
-      }, isLoggedIn.value ? common_vendor.e({
-        b: userInfo.value.avatar
-      }, userInfo.value.avatar ? {
-        c: userInfo.value.avatar
+        a: common_vendor.unref(isLoggedIn)
+      }, common_vendor.unref(isLoggedIn) ? common_vendor.e({
+        b: common_vendor.unref(userInfo).avatar
+      }, common_vendor.unref(userInfo).avatar ? {
+        c: common_vendor.unref(userInfo).avatar
       } : {
-        d: common_vendor.t(((_a = userInfo.value.nickname) == null ? void 0 : _a.charAt(0)) || "用")
+        d: common_vendor.t(((_a = common_vendor.unref(userInfo).nickname) == null ? void 0 : _a.charAt(0)) || "用")
       }, {
-        e: common_vendor.t(userInfo.value.nickname || "随伴行用户"),
-        f: common_vendor.t(formatPhone(userInfo.value.phone) || "未绑定手机号"),
-        g: common_vendor.t(userInfo.value.city || "未设置位置"),
+        e: common_vendor.t(common_vendor.unref(userInfo).nickname || "随伴行用户"),
+        f: common_vendor.t(formatPhone(common_vendor.unref(userInfo).phone) || "未绑定手机号"),
+        g: common_vendor.t(common_vendor.unref(userInfo).city || "未设置位置"),
         h: common_assets._imports_0$2,
-        i: common_vendor.t(userInfo.value.realNameAuth ? "已实名认证" : "未实名认证"),
-        j: userInfo.value.realNameAuth ? 1 : "",
-        k: userInfo.value.levelProgress + "%",
-        l: common_vendor.t(userInfo.value.level || 1),
+        i: common_vendor.t(common_vendor.unref(userInfo).realNameAuth ? "已实名认证" : "未实名认证"),
+        j: common_vendor.unref(userInfo).realNameAuth ? 1 : "",
+        k: common_vendor.unref(userInfo).levelProgress + "%",
+        l: common_vendor.t(common_vendor.unref(userInfo).level || 1),
         m: common_assets._imports_1$3,
         n: common_vendor.o(navigateToUserDetail)
       }) : {
         o: common_assets._imports_2$2,
-        p: common_assets._imports_3,
+        p: common_assets._imports_3$1,
         q: common_assets._imports_4$2,
         r: common_assets._imports_1$3,
         s: common_vendor.o(navigateToLogin)
       }, {
         t: statusBarHeight.value + "px",
-        v: common_assets._imports_5$3,
+        v: common_assets._imports_5$2,
         w: common_vendor.o(($event) => handleActionClick("wallet")),
-        x: common_assets._imports_6$1,
+        x: common_assets._imports_6,
         y: couponsCount.value > 0
       }, couponsCount.value > 0 ? {
         z: common_vendor.t(couponsCount.value)
@@ -302,7 +303,7 @@ const _sfc_main = {
         A: common_vendor.o(($event) => handleActionClick("coupons")),
         B: common_assets._imports_2$2,
         C: common_vendor.o(($event) => handleActionClick("favorites")),
-        D: common_assets._imports_7,
+        D: common_assets._imports_7$1,
         E: common_vendor.o(($event) => handleActionClick("history")),
         F: common_assets._imports_1$3,
         G: common_vendor.o(navigateToBillDetails),
@@ -311,7 +312,7 @@ const _sfc_main = {
         J: common_vendor.o(handleRecharge),
         K: common_assets._imports_1$3,
         L: common_vendor.o(($event) => navigateToOrders("all")),
-        M: common_assets._imports_8$1,
+        M: common_assets._imports_8,
         N: orderCounts.value.pending > 0
       }, orderCounts.value.pending > 0 ? {
         O: common_vendor.t(orderCounts.value.pending)
@@ -319,7 +320,7 @@ const _sfc_main = {
         P: common_vendor.o(($event) => navigateToOrders("pending")),
         Q: common_assets._imports_2$2,
         R: common_vendor.o(($event) => navigateToOrders("to-serve")),
-        S: common_assets._imports_3,
+        S: common_assets._imports_3$1,
         T: orderCounts.value.inProgress > 0
       }, orderCounts.value.inProgress > 0 ? {
         U: common_vendor.t(orderCounts.value.inProgress)
@@ -366,6 +367,5 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-4cb51321"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-4cb51321"], ["__file", "/Users/mac/Documents/firend-loving-app/pages/tabbar/profile/index.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/tabbar/profile/index.js.map

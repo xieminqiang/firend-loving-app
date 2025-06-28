@@ -136,11 +136,11 @@
 
      </view>
 
-    <!-- 自定义城市选择弹窗 -->
+    <!-- 自定义选择弹窗 -->
     <view v-if="showCityPicker" class="city-picker-overlay" @click="showCityPicker = false">
       <view class="city-picker-container" @click.stop>
         <view class="city-picker-header">
-          <text class="picker-title">选择城市</text>
+          <text class="picker-title">请选择服务区域</text>
           <view class="picker-close" @click="showCityPicker = false">
             <text>✕</text>
           </view>
@@ -154,7 +154,9 @@
               @click="selectCity(index)"
             >
               <text class="city-name">{{ cityItem.name }}</text>
-            
+
+              <view v-if="cityIndex === index" class="city-check">✓</view>
+
             </view>
           </view>
         </view>
@@ -237,14 +239,14 @@ const loadCityList = async () => {
       console.warn('获取城市列表失败，使用默认城市列表')
       // 使用默认城市列表作为备选方案
       cityList.value = [
-      
+
       ]
     }
   } catch (error) {
     console.error('获取城市列表失败:', error)
     // 使用默认城市列表作为备选方案
     cityList.value = [
-   
+
     ]
   }
 }
@@ -514,7 +516,7 @@ function selectCity(index) {
 
 <style lang="scss" scoped>
 @import "@/styles/variables.scss";
-@import "@/styles/mixins.scss";
+
 
 
 .home-container {
@@ -1278,27 +1280,18 @@ function selectCity(index) {
   margin-bottom: 40rpx;
   position: relative;
   z-index: 1;
-  padding-bottom: 20rpx;
-  border-bottom: 1rpx solid rgba(130, 160, 216, 0.1);
+ 
+
 }
 
 .picker-title {
-  font-size: 40rpx;
-  font-weight: 700;
+  font-size: 30rpx;
+  font-weight: 400;
   color: $text-color-primary;
-  letter-spacing: 1rpx;
+
   position: relative;
   
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -8rpx;
-    left: 0;
-    width: 60rpx;
-    height: 4rpx;
-    background: linear-gradient(90deg, $primary-color 0%, $highlight-color 100%);
-    border-radius: 4rpx;
-  }
+
 }
 
 .picker-close {
@@ -1359,15 +1352,15 @@ function selectCity(index) {
 
 .city-name {
   flex: 1;
-  font-size: 30rpx;
+  font-size: 26rpx;
   color: $text-color-primary;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 1rpx;
 }
 
 .city-item.active .city-name {
   color: $primary-color;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .city-check {

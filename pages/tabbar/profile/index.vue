@@ -531,9 +531,13 @@ const navigateToReportReward = () => {
 }
 
 const navigateToPartnerRegistration = () => {
+  // uni.navigateTo({
+  //   url: '/subPackages/friend/apply/index'
+  // })
   uni.navigateTo({
-    url: '/subPackages/friend/apply/index'
+    url: '/subPackages/partner/index'
   })
+  // s
 }
 
 const navigateToCooperation = () => {

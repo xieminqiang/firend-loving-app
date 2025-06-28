@@ -13,21 +13,23 @@ if (!Math) {
   "./subPackages/settings/pages/account/index.js";
   "./subPackages/settings/pages/privacy/index.js";
   "./subPackages/settings/pages/about/index.js";
+  "./subPackages/partner/index.js";
   "./subPackages/friend/apply/index.js";
 }
 const _sfc_main = {
   onLaunch: function() {
-    common_vendor.index.__f__("log", "at App.vue:4", "App Launch");
+    console.log("App Launch");
   },
   onShow: function() {
-    common_vendor.index.__f__("log", "at App.vue:7", "App Show");
+    console.log("App Show");
   },
   onHide: function() {
-    common_vendor.index.__f__("log", "at App.vue:10", "App Hide");
+    console.log("App Hide");
   }
 };
+const App = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "/Users/mac/Documents/firend-loving-app/App.vue"]]);
 function createApp() {
-  const app = common_vendor.createSSRApp(_sfc_main);
+  const app = common_vendor.createSSRApp(App);
   app.config.globalProperties.$imgBaseUrl = "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com";
   app.use(stores_index.pinia);
   return {
@@ -36,4 +38,3 @@ function createApp() {
 }
 createApp().app.mount("#app");
 exports.createApp = createApp;
-//# sourceMappingURL=../.sourcemap/mp-weixin/app.js.map

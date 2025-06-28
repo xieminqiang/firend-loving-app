@@ -8,7 +8,7 @@ const _sfc_main = {
     common_vendor.onMounted(() => {
       const systemInfo = common_vendor.index.getSystemInfoSync();
       statusBarHeight.value = systemInfo.statusBarHeight || 0;
-      common_vendor.index.__f__("log", "at pages/tabbar/discover/index.vue:258", "发现页面加载完成");
+      console.log("发现页面加载完成");
     });
     const isSearchActive = common_vendor.ref(false);
     const searchText = common_vendor.ref("");
@@ -403,7 +403,7 @@ const _sfc_main = {
       });
     };
     const playVideo = (feed) => {
-      common_vendor.index.__f__("log", "at pages/tabbar/discover/index.vue:707", "播放视频:", feed.id);
+      console.log("播放视频:", feed.id);
     };
     const getPostPreview = () => {
       if (selectedFeed.value) {
@@ -454,28 +454,30 @@ const _sfc_main = {
             j: common_assets._imports_1$2,
             k: common_vendor.o(($event) => playVideo(feed), feed.id)
           }) : {}, {
-            l: common_vendor.t(feed.likes),
-            m: common_vendor.o(($event) => handleLike(feed), feed.id),
-            n: feed.isLiked ? 1 : "",
-            o: common_vendor.t(feed.comments),
-            p: common_vendor.o(($event) => openCommentModal(feed), feed.id),
-            q: common_vendor.o(($event) => openRewardModal(feed), feed.id),
-            r: common_vendor.o(($event) => navigateToBooking(feed), feed.id),
-            s: feed.id
+            l: !feed.isLiked
+          }, !feed.isLiked ? {
+            m: common_assets._imports_2$1
+          } : {
+            n: common_assets._imports_3
+          }, {
+            o: common_vendor.t(feed.likes),
+            p: common_vendor.o(($event) => handleLike(feed), feed.id),
+            q: common_vendor.t(feed.comments),
+            r: common_vendor.o(($event) => openCommentModal(feed), feed.id),
+            s: common_vendor.o(($event) => openRewardModal(feed), feed.id),
+            t: common_vendor.o(($event) => navigateToBooking(feed), feed.id),
+            v: feed.id
           });
         }),
-        k: common_assets._imports_2$1,
-        l: common_assets._imports_4,
-        m: common_assets._imports_4$1,
-        n: common_assets._imports_5$2,
-        o: isRefreshing.value,
-        p: common_vendor.o(onRefresh),
-        q: showRewardModal.value
+        k: common_assets._imports_4$1,
+        l: isRefreshing.value,
+        m: common_vendor.o(onRefresh),
+        n: showRewardModal.value
       }, showRewardModal.value ? {
-        r: common_assets._imports_2$1,
-        s: common_vendor.t(selectedFeed.value && selectedFeed.value.name || ""),
-        t: common_assets._imports_2$1,
-        v: common_vendor.f(rewardAmounts, (amount, k0, i0) => {
+        o: common_assets._imports_3,
+        p: common_vendor.t(selectedFeed.value && selectedFeed.value.name || ""),
+        q: common_assets._imports_3,
+        r: common_vendor.f(rewardAmounts, (amount, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(amount.value),
             b: common_vendor.t(amount.label),
@@ -486,30 +488,30 @@ const _sfc_main = {
             f: selectedAmount.value === amount.value ? 1 : ""
           });
         }),
-        w: common_vendor.o(($event) => selectAmount(0)),
-        x: customAmount.value,
-        y: common_vendor.o(($event) => customAmount.value = $event.detail.value),
-        z: selectedAmount.value === 0 && customAmount.value ? 1 : "",
-        A: rewardMessage.value,
-        B: common_vendor.o(($event) => rewardMessage.value = $event.detail.value),
-        C: common_vendor.t(rewardMessage.value.length),
-        D: common_vendor.t(finalAmount.value),
-        E: common_assets._imports_2$1,
-        F: common_vendor.o(confirmReward),
-        G: common_vendor.o(() => {
+        s: common_vendor.o(($event) => selectAmount(0)),
+        t: customAmount.value,
+        v: common_vendor.o(($event) => customAmount.value = $event.detail.value),
+        w: selectedAmount.value === 0 && customAmount.value ? 1 : "",
+        x: rewardMessage.value,
+        y: common_vendor.o(($event) => rewardMessage.value = $event.detail.value),
+        z: common_vendor.t(rewardMessage.value.length),
+        A: common_vendor.t(common_vendor.unref(finalAmount)),
+        B: common_assets._imports_3,
+        C: common_vendor.o(confirmReward),
+        D: common_vendor.o(() => {
         }),
-        H: common_vendor.o(closeRewardModal)
+        E: common_vendor.o(closeRewardModal)
       } : {}, {
-        I: showCommentModal.value
+        F: showCommentModal.value
       }, showCommentModal.value ? common_vendor.e({
-        J: common_assets._imports_6,
-        K: common_vendor.o(closeCommentModal),
-        L: selectedFeed.value && selectedFeed.value.avatar || "",
-        M: common_vendor.t(selectedFeed.value && selectedFeed.value.name || ""),
-        N: common_vendor.t(getPostPreview()),
-        O: commentList.value.length > 0
+        G: common_assets._imports_5,
+        H: common_vendor.o(closeCommentModal),
+        I: selectedFeed.value && selectedFeed.value.avatar || "",
+        J: common_vendor.t(selectedFeed.value && selectedFeed.value.name || ""),
+        K: common_vendor.t(getPostPreview()),
+        L: commentList.value.length > 0
       }, commentList.value.length > 0 ? {
-        P: common_vendor.f(commentList.value, (comment, index, i0) => {
+        M: common_vendor.f(commentList.value, (comment, index, i0) => {
           return {
             a: comment.avatar,
             b: common_vendor.t(comment.name),
@@ -520,24 +522,23 @@ const _sfc_main = {
           };
         })
       } : {
-        Q: common_assets._imports_4
+        N: common_assets._imports_4
       }, {
-        R: getCommentPlaceholder(),
-        S: commentText.value,
-        T: common_vendor.o(($event) => commentText.value = $event.detail.value),
-        U: common_vendor.o(sendComment),
-        V: !commentText.value.trim() ? 1 : "",
-        W: common_vendor.o(() => {
+        O: getCommentPlaceholder(),
+        P: commentText.value,
+        Q: common_vendor.o(($event) => commentText.value = $event.detail.value),
+        R: common_vendor.o(sendComment),
+        S: !commentText.value.trim() ? 1 : "",
+        T: common_vendor.o(() => {
         }),
-        X: common_vendor.o(closeCommentModal)
+        U: common_vendor.o(closeCommentModal)
       }) : {}, {
-        Y: showLikeToast.value
+        V: showLikeToast.value
       }, showLikeToast.value ? {
-        Z: common_assets._imports_2$1
+        W: common_assets._imports_3
       } : {});
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-ad07ea5c"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-ad07ea5c"], ["__file", "/Users/mac/Documents/firend-loving-app/pages/tabbar/discover/index.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/tabbar/discover/index.js.map

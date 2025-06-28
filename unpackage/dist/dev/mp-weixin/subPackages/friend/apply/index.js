@@ -2,11 +2,16 @@
 const common_vendor = require("../../../common/vendor.js");
 const common_assets = require("../../../common/assets.js");
 const api_user = require("../../../api/user.js");
+const api_home = require("../../../api/home.js");
+require("../../../config/http.js");
+require("../../../stores/user.js");
+require("../../../config/config.js");
 const _sfc_main = {
   __name: "index",
   setup(__props) {
     common_vendor.ref(false);
     const isSubmitting = common_vendor.ref(false);
+    const agreementAccepted = common_vendor.ref(false);
     const formData = common_vendor.reactive({
       nickname: "",
       gender: "",
@@ -14,40 +19,139 @@ const _sfc_main = {
       height: "",
       weight: "",
       city: "深圳市"
+      // 保留原有字段用于兼容
     });
+    const showCityPicker = common_vendor.ref(false);
+    const selectedCities = common_vendor.ref([]);
+    const tempSelectedCities = common_vendor.ref([]);
+    const cityList = common_vendor.ref([]);
+    const cityLoading = common_vendor.ref(false);
     const photos = common_vendor.ref([]);
-    const serviceSkills = common_vendor.ref([
-      "陪拍写真",
-      "陪护就医",
-      "陪伴购物",
-      "陪同观影",
-      "礼仪模特",
-      "探店体验",
-      "陪诊服务",
-      "陪伴聊天"
-    ]);
+    const serviceSkills = common_vendor.ref([]);
     const selectedSkills = common_vendor.ref([]);
-    const skillToServiceMap = {
-      "陪拍写真": 1,
-      "陪护就医": 2,
-      "陪伴购物": 3,
-      "陪同观影": 4,
-      "礼仪模特": 5,
-      "探店体验": 6,
-      "陪诊服务": 7,
-      "陪伴聊天": 8
+    const servicesLoading = common_vendor.ref(false);
+    const skillCategories = common_vendor.ref([]);
+    const loadServicesByCity = async () => {
+      if (selectedCities.value.length === 0) {
+        serviceSkills.value = [];
+        skillCategories.value = [];
+        return;
+      }
+      servicesLoading.value = true;
+      try {
+        const cityCodes = selectedCities.value.map((cityName) => {
+          const city = cityList.value.find((c) => c.name === cityName);
+          return city ? city.code : null;
+        }).filter((code) => code !== null);
+        if (cityCodes.length === 0) {
+          console.warn("未找到有效的城市代码");
+          serviceSkills.value = [];
+          skillCategories.value = [];
+          return;
+        }
+        const response = await api_user.getServicesByCities(cityCodes);
+        if (response.data && response.data.code === 0 && response.data.data) {
+          serviceSkills.value = response.data.data;
+          groupServicesByCategory();
+          console.log("服务技能列表加载成功:", serviceSkills.value);
+          console.log("服务技能分组:", skillCategories.value);
+        } else {
+          console.warn("获取服务技能列表失败");
+          serviceSkills.value = [];
+          skillCategories.value = [];
+        }
+      } catch (error) {
+        console.error("获取服务技能列表失败:", error);
+        serviceSkills.value = [];
+        skillCategories.value = [];
+      } finally {
+        servicesLoading.value = false;
+      }
+    };
+    const groupServicesByCategory = () => {
+      const categoryMap = {};
+      serviceSkills.value.forEach((service) => {
+        const categoryId = service.category;
+        const categoryName = service.category_name || "其他";
+        if (!categoryMap[categoryId]) {
+          categoryMap[categoryId] = {
+            id: categoryId,
+            name: categoryName,
+            services: []
+          };
+        }
+        categoryMap[categoryId].services.push(service);
+      });
+      skillCategories.value = Object.values(categoryMap).sort((a, b) => a.id - b.id);
+    };
+    const loadCityList = async () => {
+      cityLoading.value = true;
+      try {
+        const response = await api_home.getCityList();
+        if (response.data && response.data.code === 0 && response.data.data) {
+          cityList.value = response.data.data.map((city) => ({
+            name: city.name,
+            code: city.city_code
+            // 保持字段名一致
+          }));
+          console.log("申请页面区域列表加载成功:", cityList.value);
+        } else {
+          console.warn("获取区域列表失败");
+          cityList.value = [];
+        }
+      } catch (error) {
+        console.error("获取区域列表失败:", error);
+        cityList.value = [];
+      } finally {
+        cityLoading.value = false;
+      }
     };
     const selectGender = (gender) => {
       formData.gender = gender;
     };
-    const selectCity = () => {
-      common_vendor.index.showActionSheet({
-        itemList: ["深圳市", "广州市", "上海市", "北京市", "杭州市", "南京市", "苏州市", "成都市", "重庆市", "武汉市", "西安市"],
-        success: (res) => {
-          const cities = ["深圳市", "广州市", "上海市", "北京市", "杭州市", "南京市", "苏州市", "成都市", "重庆市", "武汉市", "西安市"];
-          formData.city = cities[res.tapIndex];
-        }
+    const showCitySelector = () => {
+      tempSelectedCities.value = [...selectedCities.value];
+      showCityPicker.value = true;
+    };
+    const hideCitySelector = () => {
+      tempSelectedCities.value = [];
+      showCityPicker.value = false;
+    };
+    const toggleCitySelection = (cityName) => {
+      const index = tempSelectedCities.value.indexOf(cityName);
+      if (index > -1) {
+        tempSelectedCities.value.splice(index, 1);
+      } else {
+        tempSelectedCities.value.push(cityName);
+      }
+      common_vendor.index.vibrateShort({
+        type: "light"
       });
+    };
+    const removeCityFromSelection = (cityName) => {
+      const index = selectedCities.value.indexOf(cityName);
+      if (index > -1) {
+        selectedCities.value.splice(index, 1);
+        common_vendor.index.vibrateShort({
+          type: "light"
+        });
+      }
+    };
+    const confirmCitySelection = async () => {
+      if (tempSelectedCities.value.length === 0) {
+        common_vendor.index.showToast({
+          title: "请至少选择一个服务区域",
+          icon: "none"
+        });
+        return;
+      }
+      selectedCities.value = [...tempSelectedCities.value];
+      formData.city = selectedCities.value[0];
+      showCityPicker.value = false;
+      tempSelectedCities.value = [];
+      selectedSkills.value = [];
+      skillCategories.value = [];
+      await loadServicesByCity();
     };
     const addPhoto = () => {
       common_vendor.index.chooseImage({
@@ -68,13 +172,23 @@ const _sfc_main = {
     const deletePhoto = (index) => {
       photos.value.splice(index, 1);
     };
-    const toggleSkill = (skill) => {
-      const index = selectedSkills.value.indexOf(skill);
+    const toggleSkill = (service) => {
+      const serviceId = service.id;
+      const index = selectedSkills.value.indexOf(serviceId);
       if (index > -1) {
         selectedSkills.value.splice(index, 1);
       } else {
-        selectedSkills.value.push(skill);
+        selectedSkills.value.push(serviceId);
       }
+      common_vendor.index.vibrateShort({
+        type: "light"
+      });
+    };
+    const toggleAgreement = () => {
+      agreementAccepted.value = !agreementAccepted.value;
+      common_vendor.index.vibrateShort({
+        type: "light"
+      });
     };
     const viewAgreement = () => {
       common_vendor.index.showToast({
@@ -89,6 +203,14 @@ const _sfc_main = {
     };
     const submitApplication = async () => {
       if (isSubmitting.value) {
+        return;
+      }
+      if (!agreementAccepted.value) {
+        common_vendor.index.showToast({
+          title: "请先同意友伴服务协议",
+          icon: "none",
+          duration: 2e3
+        });
         return;
       }
       if (!formData.nickname.trim()) {
@@ -118,8 +240,8 @@ const _sfc_main = {
         common_vendor.index.showToast({ title: "请输入合理的体重", icon: "none" });
         return;
       }
-      if (!formData.city.trim()) {
-        common_vendor.index.showToast({ title: "请选择城市", icon: "none" });
+      if (selectedCities.value.length === 0) {
+        common_vendor.index.showToast({ title: "请至少选择一个服务区域", icon: "none" });
         return;
       }
       if (photos.value.length === 0) {
@@ -147,26 +269,39 @@ const _sfc_main = {
     const doSubmit = async () => {
       isSubmitting.value = true;
       try {
+        const serviceAreaCodes = selectedCities.value.map((cityName) => {
+          const city = cityList.value.find((c) => c.name === cityName);
+          return city ? String(city.code) : null;
+        }).filter((code) => code !== null);
+        if (serviceAreaCodes.length === 0) {
+          common_vendor.index.showToast({
+            title: "服务区域数据异常，请重新选择",
+            icon: "none"
+          });
+          return;
+        }
         const submitData = {
           nickname: formData.nickname.trim(),
           gender: formData.gender === "male" ? "男" : "女",
           age: parseInt(formData.age),
           height: parseInt(formData.height),
-          city: formData.city,
-          photos: photos.value,
-          services: selectedSkills.value.map((skill) => ({
-            service_id: skillToServiceMap[skill],
-            level: 1
-            // 认证等级固定为1
-          }))
+          weight: parseInt(formData.weight),
+          service_areas: serviceAreaCodes,
+          // 服务区域代码字符串数组
+          services: selectedSkills.value,
+          // 服务ID数组
+          can_accept_orders: "N",
+          // 不允许接单
+          photos: photos.value
         };
-        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:495", "提交数据:", submitData);
+        console.log("提交数据:", submitData);
         const response = await api_user.createCompanionApplication(submitData);
-        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:500", "接口响应:", response);
+        console.log("接口响应:", response);
         if (response && response.data && response.data.code === 0) {
+          const successMessage = response.data && response.data.data && response.data.data.message || "恭喜您！入驻申请已通过，您已成功成为友伴师。";
           common_vendor.index.showModal({
-            title: "申请提交成功 🎉",
-            content: "您的友伴入驻申请已成功提交！我们会在3-5个工作日内完成审核，请耐心等待。审核结果将通过消息通知您。",
+            title: "入驻成功 🎉",
+            content: successMessage,
             showCancel: false,
             confirmText: "我知道了",
             success: () => {
@@ -183,7 +318,7 @@ const _sfc_main = {
           });
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:528", "提交失败:", error);
+        console.error("提交失败:", error);
         let errorMessage = "提交失败，请稍后重试";
         if (error && error.message) {
           if (error.message.includes("网络")) {
@@ -206,6 +341,9 @@ const _sfc_main = {
         isSubmitting.value = false;
       }
     };
+    common_vendor.onMounted(async () => {
+      await loadCityList();
+    });
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_assets._imports_0$3,
@@ -224,9 +362,22 @@ const _sfc_main = {
         n: common_vendor.o(($event) => formData.height = $event.detail.value),
         o: formData.weight,
         p: common_vendor.o(($event) => formData.weight = $event.detail.value),
-        q: common_vendor.t(formData.city),
-        r: common_vendor.o(selectCity),
-        s: common_vendor.f(photos.value, (photo, index, i0) => {
+        q: selectedCities.value.length === 0
+      }, selectedCities.value.length === 0 ? {} : {
+        r: common_vendor.t(selectedCities.value.length)
+      }, {
+        s: common_vendor.o(showCitySelector),
+        t: selectedCities.value.length > 0
+      }, selectedCities.value.length > 0 ? {
+        v: common_vendor.f(selectedCities.value, (city, k0, i0) => {
+          return {
+            a: common_vendor.t(city),
+            b: city,
+            c: common_vendor.o(($event) => removeCityFromSelection(city), city)
+          };
+        })
+      } : {}, {
+        w: common_vendor.f(photos.value, (photo, index, i0) => {
           return {
             a: photo,
             b: common_vendor.o(($event) => deletePhoto(index), index),
@@ -234,27 +385,64 @@ const _sfc_main = {
             d: common_vendor.o(($event) => previewPhoto(index), index)
           };
         }),
-        t: photos.value.length < 6
+        x: photos.value.length < 6
       }, photos.value.length < 6 ? {
-        v: common_vendor.o(addPhoto)
+        y: common_vendor.o(addPhoto)
       } : {}, {
-        w: common_vendor.f(serviceSkills.value, (skill, k0, i0) => {
+        z: servicesLoading.value
+      }, servicesLoading.value ? {} : selectedCities.value.length === 0 ? {} : skillCategories.value.length > 0 ? {
+        C: common_vendor.f(skillCategories.value, (category, k0, i0) => {
           return {
-            a: common_vendor.t(skill),
-            b: selectedSkills.value.includes(skill) ? 1 : "",
-            c: skill,
-            d: common_vendor.o(($event) => toggleSkill(skill), skill)
+            a: common_vendor.t(category.name),
+            b: common_vendor.f(category.services, (service, k1, i1) => {
+              return {
+                a: common_vendor.t(service.name),
+                b: selectedSkills.value.includes(service.id) ? 1 : "",
+                c: service.id,
+                d: common_vendor.o(($event) => toggleSkill(service), service.id)
+              };
+            }),
+            c: category.id
           };
-        }),
-        x: common_vendor.o(viewAgreement),
-        y: !isSubmitting.value
+        })
+      } : {}, {
+        A: selectedCities.value.length === 0,
+        B: skillCategories.value.length > 0,
+        D: agreementAccepted.value
+      }, agreementAccepted.value ? {} : {}, {
+        E: agreementAccepted.value ? 1 : "",
+        F: common_vendor.o(viewAgreement),
+        G: common_vendor.o(toggleAgreement),
+        H: !isSubmitting.value
       }, !isSubmitting.value ? {} : {}, {
-        z: isSubmitting.value ? 1 : "",
-        A: common_vendor.o(submitApplication)
-      });
+        I: isSubmitting.value || !agreementAccepted.value ? 1 : "",
+        J: common_vendor.o(submitApplication),
+        K: showCityPicker.value
+      }, showCityPicker.value ? common_vendor.e({
+        L: common_vendor.o(hideCitySelector),
+        M: cityLoading.value
+      }, cityLoading.value ? {} : {
+        N: common_vendor.f(cityList.value, (cityItem, index, i0) => {
+          return common_vendor.e({
+            a: common_vendor.t(cityItem.name),
+            b: tempSelectedCities.value.includes(cityItem.name)
+          }, tempSelectedCities.value.includes(cityItem.name) ? {} : {}, {
+            c: index,
+            d: common_vendor.n({
+              active: tempSelectedCities.value.includes(cityItem.name)
+            }),
+            e: common_vendor.o(($event) => toggleCitySelection(cityItem.name), index)
+          });
+        })
+      }, {
+        O: common_vendor.t(tempSelectedCities.value.length),
+        P: common_vendor.o(confirmCitySelection),
+        Q: common_vendor.o(() => {
+        }),
+        R: common_vendor.o(hideCitySelector)
+      }) : {});
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-eb2c0b40"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-eb2c0b40"], ["__file", "/Users/mac/Documents/firend-loving-app/subPackages/friend/apply/index.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/subPackages/friend/apply/index.js.map

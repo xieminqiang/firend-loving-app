@@ -1,3 +1,4 @@
+/* 项目主题变量 */
 /**
  * 样式变量定义
  */
@@ -110,13 +111,53 @@ to {
   font-weight: 500;
   letter-spacing: 0.5rpx;
 }
-.like-btn.data-v-ad07ea5c:active,
-.comment-btn.data-v-ad07ea5c:active {
-  transform: translateY(1rpx) scale(0.98);
+.like-btn.data-v-ad07ea5c {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  transition: all 0.3s;
+  font-size: 24rpx;
+  min-width: 120rpx;
+  min-height: 48rpx;
+  justify-content: flex-start;
+  color: #1a1a1a;
+}
+.like-btn .action-icon.data-v-ad07ea5c {
+  width: 32rpx;
+  height: 32rpx;
+  transition: all 0.3s;
+  opacity: 0.8;
+}
+.like-btn.liked.data-v-ad07ea5c {
+  color: #FF69DE;
+}
+.like-btn.liked .action-icon.data-v-ad07ea5c {
+  opacity: 1;
 }
 .reward-btn.data-v-ad07ea5c:active,
 .invite-btn.data-v-ad07ea5c:active {
   transform: translateY(2rpx) scale(0.96);
+}
+.comment-btn.data-v-ad07ea5c {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  transition: all 0.3s;
+  font-size: 24rpx;
+  min-width: 120rpx;
+  min-height: 48rpx;
+  justify-content: flex-start;
+  color: #1a1a1a;
+}
+.comment-btn .action-icon.data-v-ad07ea5c {
+  width: 32rpx;
+  height: 32rpx;
+  transition: all 0.3s;
+  opacity: 0.8;
+}
+.like-btn.data-v-ad07ea5c:active,
+.comment-btn.data-v-ad07ea5c:active {
+  transform: translateY(1rpx) scale(0.98);
 }
 .no-results.data-v-ad07ea5c {
   text-align: center;
@@ -300,47 +341,34 @@ to {
   align-items: center;
   gap: 16rpx;
 }
-.like-btn.data-v-ad07ea5c, .comment-btn.data-v-ad07ea5c, .reward-btn.data-v-ad07ea5c, .invite-btn.data-v-ad07ea5c {
+.reward-btn.data-v-ad07ea5c, .invite-btn.data-v-ad07ea5c {
   display: flex;
   align-items: center;
-  gap: 8rpx;
   padding: 12rpx 20rpx;
-  border-radius: 24rpx;
   transition: all 0.3s;
   font-size: 24rpx;
-  min-width: 120rpx;
+  box-sizing: border-box;
   justify-content: center;
-}
-.like-btn.data-v-ad07ea5c, .comment-btn.data-v-ad07ea5c {
-  background-color: transparent;
-  color: #666666;
-  border: 1rpx solid #E5E5E5;
-}
-.like-btn.liked.data-v-ad07ea5c {
-  color: #FF69DE;
-  background: linear-gradient(135deg, rgba(255, 105, 222, 0.1) 0%, rgba(255, 105, 222, 0.05) 100%);
-  border-color: #FF69DE;
 }
 .reward-btn.data-v-ad07ea5c {
   background-color: transparent;
   color: #666666;
   font-weight: 500;
-  border: 1rpx solid #E5E5E5;
-  border-radius: 24rpx;
+  box-sizing: border-box;
+  border-radius: 99999rpx;
   transition: all 0.3s;
 }
 .reward-btn.data-v-ad07ea5c:active {
   background-color: rgba(115, 99, 255, 0.05);
   border-color: #7363FF;
   color: #7363FF;
-  transform: translateY(1rpx) scale(0.98);
 }
 .invite-btn.data-v-ad07ea5c {
   background: linear-gradient(135deg, #7363FF 0%, #667eea 50%, #FF69DE 100%);
   color: #ffffff;
   font-weight: 600;
   box-shadow: 0 4rpx 12rpx rgba(115, 99, 255, 0.3);
-  border-radius: 24rpx;
+  border-radius: 99999rpx;
   position: relative;
   overflow: hidden;
 }

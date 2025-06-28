@@ -695,7 +695,7 @@ const _sfc_main = {
       filters[activeModal.value].value = "all";
     };
     const applyFilter = () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:860", "应用筛选:", {
+      console.log("应用筛选:", {
         gender: genderFilter.value,
         distance: distanceFilter.value,
         sort: sortFilter.value
@@ -716,7 +716,7 @@ const _sfc_main = {
       });
     };
     const loadMore = () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:904", "加载更多数据");
+      console.log("加载更多数据");
     };
     const onRefresh = () => {
       isRefreshing.value = true;
@@ -788,16 +788,15 @@ const _sfc_main = {
           });
         }),
         q: common_assets._imports_5$1,
-        r: common_assets._imports_5$2,
-        s: common_vendor.o(loadMore),
-        t: isRefreshing.value,
-        v: common_vendor.o(onRefresh),
-        w: activeModal.value
+        r: common_vendor.o(loadMore),
+        s: isRefreshing.value,
+        t: common_vendor.o(onRefresh),
+        v: activeModal.value
       }, activeModal.value ? {
-        x: common_vendor.t(getModalTitle.value),
-        y: common_assets._imports_6,
-        z: common_vendor.o(closeModal),
-        A: common_vendor.f(getFilterOptions.value, (option, k0, i0) => {
+        w: common_vendor.t(common_vendor.unref(getModalTitle)),
+        x: common_assets._imports_5,
+        y: common_vendor.o(closeModal),
+        z: common_vendor.f(common_vendor.unref(getFilterOptions), (option, k0, i0) => {
           return common_vendor.e({
             a: option.icon
           }, option.icon ? {
@@ -806,7 +805,7 @@ const _sfc_main = {
             c: common_vendor.t(option.label),
             d: isOptionSelected(option.value)
           }, isOptionSelected(option.value) ? {
-            e: common_assets._imports_8
+            e: common_assets._imports_7
           } : {}, {
             f: option.value,
             g: common_vendor.n({
@@ -815,15 +814,14 @@ const _sfc_main = {
             h: common_vendor.o(($event) => selectOption(option.value), option.value)
           });
         }),
-        B: common_vendor.o(resetFilter),
-        C: common_vendor.o(applyFilter),
-        D: common_vendor.o(() => {
+        A: common_vendor.o(resetFilter),
+        B: common_vendor.o(applyFilter),
+        C: common_vendor.o(() => {
         }),
-        E: common_vendor.o(closeModal)
+        D: common_vendor.o(closeModal)
       } : {});
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5e09aaad"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5e09aaad"], ["__file", "/Users/mac/Documents/firend-loving-app/pages/tabbar/friends/index.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/tabbar/friends/index.js.map

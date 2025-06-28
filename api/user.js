@@ -33,6 +33,19 @@ export const getUserInfo = () => {
 }
 
 /**
+ * 获取指定城市的服务列表
+ * @param {Array} cityCodes - 城市代码列表
+ * @returns {Promise} 返回服务列表
+ */
+export const getServicesByCities = (cityCodes) => {
+  const queryParams = cityCodes.map(code => `city_codes=${code}`).join('&')
+  return http({
+    url: `/companion/services/cities?${queryParams}`,
+    method: 'GET'
+  })
+}
+
+/**
  * 创建伴侣申请
  * @param {Object} data - 申请数据
  * @returns {Promise} 返回创建结果

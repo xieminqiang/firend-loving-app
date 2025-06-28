@@ -72,6 +72,7 @@
 						"navigationBarTitleText": "账户设置"
 					}
 				},
+				
 				{
 					"path": "pages/privacy/index",
 					"style": {
@@ -87,6 +88,18 @@
 			]
 		}
 	,
+	{
+			"root": "subPackages/partner",
+			"pages": [
+				{
+					"path": "index",
+					"style": {
+						"navigationBarTitleText": "友伴端",
+						"navigationStyle": "custom"
+					}
+				}
+			]
+		},
 	{
 		"root": "subPackages/friend",
 		"pages": [
@@ -104,7 +117,7 @@
 	
 	],
 	"tabBar": {
-		"color": "#999999",
+		"color": "#BFBFBF",
 		"selectedColor": "#7363FF",
 		"backgroundColor": "#FFFFFF",
 		"borderStyle": "white",
@@ -113,25 +126,25 @@
 				"pagePath": "pages/tabbar/home/index",
 				"text": "首页",
 				"iconPath": "static/icons/tabbar/home.png",
-				"selectedIconPath": "static/icons/tabbar/home-active.png"
+				"selectedIconPath": "static/icons/tabbar/home-fill.png"
 			},
 			{
 				"pagePath": "pages/tabbar/friends/index",
 				"text": "友伴",
 				"iconPath": "static/icons/tabbar/friends.png",
-				"selectedIconPath": "static/icons/tabbar/friends-active.png"
+				"selectedIconPath": "static/icons/tabbar/friends-fill.png"
 			},
 			{
 				"pagePath": "pages/tabbar/discover/index",
 				"text": "发现",
 				"iconPath": "static/icons/tabbar/discover.png",
-				"selectedIconPath": "static/icons/tabbar/discover-active.png"
+				"selectedIconPath": "static/icons/tabbar/discover-fill.png"
 			},
 			{
 				"pagePath": "pages/tabbar/profile/index",
 				"text": "我的",
 				"iconPath": "static/icons/tabbar/profile.png",
-				"selectedIconPath": "static/icons/tabbar/profile-active.png"
+				"selectedIconPath": "static/icons/tabbar/profile-fill.png"
 			}
 		]
 	},

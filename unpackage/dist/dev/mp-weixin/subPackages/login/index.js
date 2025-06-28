@@ -3,6 +3,8 @@ const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const api_user = require("../../api/user.js");
 const stores_user = require("../../stores/user.js");
+require("../../config/http.js");
+require("../../config/config.js");
 if (!Array) {
   const _component_uni_popup = common_vendor.resolveComponent("uni-popup");
   _component_uni_popup();
@@ -16,7 +18,7 @@ const _sfc_main = {
     const hasAgreed = common_vendor.ref(false);
     common_vendor.onLoad(async () => {
       const systemInfo = common_vendor.index.getSystemInfoSync();
-      common_vendor.index.__f__("log", "at subPackages/login/index.vue:99", "系统信息:", systemInfo);
+      console.log("系统信息:", systemInfo);
       setTimeout(() => {
         if (popup.value) {
           popup.value.open();
@@ -60,7 +62,7 @@ const _sfc_main = {
     };
     const getPhoneNumber = async (e) => {
       var _a;
-      common_vendor.index.__f__("log", "at subPackages/login/index.vue:165", "getPhoneNumber event:", e);
+      console.log("getPhoneNumber event:", e);
       const res = e.detail;
       if (!res.code) {
         common_vendor.index.showToast({
@@ -103,7 +105,7 @@ const _sfc_main = {
         }
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at subPackages/login/index.vue:232", "登录失败:", error);
+        console.error("登录失败:", error);
         common_vendor.index.showToast({
           title: "登录失败，请重试",
           icon: "none"
@@ -114,17 +116,16 @@ const _sfc_main = {
       return {
         a: common_assets._imports_0$3,
         b: common_vendor.o(handleBack),
-        c: common_assets._imports_1$4,
-        d: common_vendor.o(getPhoneNumber),
-        e: common_vendor.o(showUserAgreement),
-        f: common_vendor.o(showPrivacyPolicy),
-        g: common_vendor.o(handleCancel),
-        h: common_vendor.o(handleConfirm),
-        i: common_vendor.sr(popup, "a7cd18e8-0", {
+        c: common_vendor.o(getPhoneNumber),
+        d: common_vendor.o(showUserAgreement),
+        e: common_vendor.o(showPrivacyPolicy),
+        f: common_vendor.o(handleCancel),
+        g: common_vendor.o(handleConfirm),
+        h: common_vendor.sr(popup, "a7cd18e8-0", {
           "k": "popup"
         }),
-        j: common_vendor.o(onPopupChange),
-        k: common_vendor.p({
+        i: common_vendor.o(onPopupChange),
+        j: common_vendor.p({
           safeArea: false,
           type: "center"
         })
@@ -132,6 +133,5 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-a7cd18e8"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-a7cd18e8"], ["__file", "/Users/mac/Documents/firend-loving-app/subPackages/login/index.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/subPackages/login/index.js.map

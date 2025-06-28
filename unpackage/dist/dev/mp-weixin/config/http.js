@@ -31,7 +31,7 @@ const http = (options) => {
       // 响应成功
       success(res) {
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          common_vendor.index.__f__("log", "at config/http.js:73", "222");
+          console.log("222");
           resolve(res);
         } else if (res.statusCode === 401) {
           common_vendor.index.showToast({
@@ -59,4 +59,3 @@ const http = (options) => {
   });
 };
 exports.http = http;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/config/http.js.map
