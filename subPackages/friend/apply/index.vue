@@ -2,6 +2,11 @@
   <view class="apply-container">
     <!-- 顶部横幅 -->
     <view class="header-banner">
+      <!-- 返回按钮 -->
+      <view class="nav-back" @click="handleBack">
+        <image src="@/static/icons/back-simple.png" class="back-icon" mode="aspectFit"></image>
+      </view>
+      
       <view class="banner-bg">
         <view class="bg-gradient"></view>
         <view class="floating-elements">
@@ -12,15 +17,15 @@
         </view>
       </view>
       <view class="banner-content">
-        <view class="banner-icon">
+        <!-- <view class="banner-icon">
           <view class="icon-circle">
             <text class="icon-emoji">🌸</text>
           </view>
-        </view>
+        </view> -->
         <view class="banner-text">
-          <view class="challenge-text">遇见心动的陪伴</view>
+          <!-- <view class="challenge-text">遇见心动的陪伴</view> -->
           <view class="recruit-title">友伴招募</view>
-          <view class="recruit-desc">开启你的陪伴之旅 ✨</view>
+          <view class="recruit-desc">遇见心动的陪伴，开启你的陪伴之旅 ✨</view>
         </view>
       </view>
     </view>
@@ -37,10 +42,8 @@
           <!-- 个人信息卡片 -->
           <view class="info-card modern-card">
             <view class="card-header">
-              <view class="header-left">
-                <view class="header-icon">
-                  <text class="icon-emoji">👤</text>
-                </view>
+              <view class="header-content">
+                <view class="section-indicator"></view>
                 <view class="header-text">
                   <text class="card-title">个人信息</text>
                   <text class="card-subtitle">让大家更了解你</text>
@@ -59,7 +62,7 @@
                     placeholder="给自己起个好听的昵称吧~" 
                     placeholder-class="input-placeholder"
                   />
-                  <view class="input-decoration"></view>
+                  <view class="input-icon">✨</view>
                 </view>
               </view>
 
@@ -72,7 +75,7 @@
                     :class="{ active: formData.gender === 'male' }"
                     @click="selectGender('male')"
                   >
-                    <text class="chip-icon">👨</text>
+                    <image src="@/static/icons/friend/male.png" class="gender-icon" mode="aspectFit" />
                     <text class="chip-text">男生</text>
                   </view>
                   <view 
@@ -80,62 +83,76 @@
                     :class="{ active: formData.gender === 'female' }"
                     @click="selectGender('female')"
                   >
-                    <text class="chip-icon">👩</text>
+                    <image src="@/static/icons/friend/female.png" mode="aspectFit" class="gender-icon" />
                     <text class="chip-text">女生</text>
                   </view>
                 </view>
               </view>
 
-              <!-- 基本信息 -->
-              <view class="info-grid">
-                <view class="info-item">
-                  <text class="info-label">年龄</text>
-                  <input 
-                    class="info-input" 
-                    v-model="formData.age" 
-                    type="number"
-                    placeholder="18" 
-                    placeholder-class="input-placeholder"
-                  />
-                </view>
-                <view class="info-item">
-                  <text class="info-label">身高</text>
-                  <input 
-                    class="info-input" 
-                    v-model="formData.height" 
-                    type="number"
-                    placeholder="165cm" 
-                    placeholder-class="input-placeholder"
-                  />
-                </view>
-                <view class="info-item">
-                  <text class="info-label">体重</text>
-                  <input 
-                    class="info-input" 
-                    v-model="formData.weight" 
-                    type="number"
-                    placeholder="50kg" 
-                    placeholder-class="input-placeholder"
-                  />
-                </view>
-                <view class="info-item">
-                  <text class="info-label">城市</text>
-                  <view class="city-selector" @click="selectCity">
-                    <text class="city-text">{{ formData.city }}</text>
-                    <text class="city-arrow">📍</text>
+              <!-- 基本信息 - 水平布局 -->
+                <!-- 年龄 -->
+                <view class="input-group">
+                  <text class="input-label">年龄</text>
+                  <view class="input-wrapper">
+                    <input 
+                      class="modern-input" 
+                      v-model="formData.age" 
+                      type="number"
+                      placeholder="请输入年龄 (18-65岁)" 
+                      placeholder-class="input-placeholder"
+                    />
+                    <view class="input-icon">🎂</view>
                   </view>
                 </view>
-              </view>
+
+                <!-- 身高 -->
+                <view class="input-group">
+                  <text class="input-label">身高</text>
+                  <view class="input-wrapper">
+                    <input 
+                      class="modern-input" 
+                      v-model="formData.height" 
+                      type="number"
+                      placeholder="请输入身高 (单位:cm)" 
+                      placeholder-class="input-placeholder"
+                    />
+                    <view class="input-icon">📏</view>
+                  </view>
+                </view>
+
+                <!-- 体重 -->
+                <view class="input-group">
+                  <text class="input-label">体重</text>
+                  <view class="input-wrapper">
+                    <input 
+                      class="modern-input" 
+                      v-model="formData.weight" 
+                      type="number"
+                      placeholder="请输入体重 (单位:kg)" 
+                      placeholder-class="input-placeholder"
+                    />
+                    <view class="input-icon">⚖️</view>
+                  </view>
+                </view>
+
+                <!-- 城市 -->
+                <view class="input-group">
+                  <text class="input-label">所在城市</text>
+                  <view class="input-wrapper">
+                    <view class="city-input" @click="selectCity">
+                      <text class="city-display">{{ formData.city }}</text>
+                      <view class="input-icon city-icon">📍</view>
+                    </view>
+                  </view>
+                </view>
             </view>
           </view>
 
           <!-- 生活照片卡片 -->
           <view class="photo-card modern-card">
             <view class="card-header">
-              <view class="header-left">
-                <view class="header-icon photo-icon">
-                  <text class="icon-emoji">📷</text>
-                </view>
+              <view class="header-content">
+                <view class="section-indicator"></view>
                 <view class="header-text">
                   <text class="card-title">生活照片</text>
                   <text class="card-subtitle">展示最真实美好的你 ✨</text>
@@ -163,10 +180,12 @@
                 @click="addPhoto"
               >
                 <view class="add-content">
-                  <text class="add-icon">📸</text>
+                  <view class="add-icon-circle">
+                    <view class="add-plus">+</view>
+                  </view>
                   <text class="add-text">添加照片</text>
                 </view>
-                <view class="add-sparkle">✨</view>
+
               </view>
             </view>
           </view>
@@ -174,10 +193,8 @@
           <!-- 服务技能卡片 -->
           <view class="skills-card modern-card">
             <view class="card-header">
-              <view class="header-left">
-                <view class="header-icon skills-icon">
-                  <text class="icon-emoji">💝</text>
-                </view>
+              <view class="header-content">
+                <view class="section-indicator"></view>
                 <view class="header-text">
                   <text class="card-title">服务技能</text>
                   <text class="card-subtitle">选择你最擅长的陪伴方式</text>
@@ -194,12 +211,9 @@
                 @click="toggleSkill(skill)"
               >
                 <view class="skill-content">
-                  <text class="skill-emoji">{{ getSkillEmoji(skill) }}</text>
                   <text class="skill-name">{{ skill }}</text>
                 </view>
-                <view class="skill-indicator" v-if="selectedSkills.includes(skill)">
-                  <text class="indicator-icon">💖</text>
-                </view>
+             
               </view>
             </view>
           </view>
@@ -226,13 +240,9 @@
         <view class="btn-content">
           <text class="btn-text" v-if="!isSubmitting">开启陪伴之旅</text>
           <text class="btn-text" v-else>提交中...</text>
-          <text class="btn-emoji" v-if="!isSubmitting">🚀</text>
-          <view class="loading-spinner" v-else></view>
+       
         </view>
-        <view class="btn-sparkles" v-if="!isSubmitting">
-          <text class="sparkle sparkle-1">✨</text>
-          <text class="sparkle sparkle-2">💫</text>
-        </view>
+      
       </view>
     </view>
   </view>
@@ -353,6 +363,13 @@ const viewAgreement = () => {
   uni.showToast({
     title: '协议功能待开发',
     icon: 'none'
+  })
+}
+
+// 返回上一页
+const handleBack = () => {
+  uni.navigateBack({
+    delta: 1
   })
 }
 
@@ -551,10 +568,40 @@ const doSubmit = async () => {
 /* 顶部横幅 - 氛围感设计 */
 .header-banner {
   position: relative;
-  height: 260rpx;
+  height: 240rpx;
   overflow: hidden;
   flex-shrink: 0;
   border-radius: 0 0 32rpx 32rpx;
+}
+
+/* 返回按钮 */
+.nav-back {
+  position: absolute;
+  top: 60rpx;
+  top: calc(60rpx + env(safe-area-inset-top));
+  left: 24rpx;
+  width: 60rpx;
+  height: 60rpx;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 30rpx;
+  @include flex-center;
+  backdrop-filter: blur(20rpx);
+  border: 1rpx solid rgba(255, 255, 255, 0.4);
+  z-index: 100;
+  transition: all 0.3s ease;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+  
+  &:active {
+    transform: scale(0.92);
+    background: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+  }
+}
+
+.back-icon {
+  width: 32rpx;
+  height: 32rpx;
+  filter: brightness(0) invert(1);
 }
 
 .banner-bg {
@@ -620,7 +667,7 @@ const doSubmit = async () => {
   height: 100%;
   @include flex;
   align-items: center;
-  padding: 0 32rpx;
+  padding: 0 32rpx 0 110rpx; /* 左侧留出返回按钮的空间 */
 }
 
 .banner-icon {
@@ -644,6 +691,7 @@ const doSubmit = async () => {
 .banner-text {
   flex: 1;
   color: white;
+  margin-top: 40rpx;
 }
 
 .challenge-text {
@@ -655,14 +703,14 @@ const doSubmit = async () => {
 }
 
 .recruit-title {
-  font-size: 42rpx;
-  font-weight: 700;
+  font-size: 36rpx;
+  font-weight: 500;
   margin-bottom: 6rpx;
-  text-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.15);
 }
 
 .recruit-desc {
-  font-size: 22rpx;
+  font-size: 20rpx;
   opacity: 0.8;
 }
 
@@ -685,34 +733,44 @@ const doSubmit = async () => {
 /* 现代卡片样式 */
 .modern-card {
   background: white;
-  border-radius: 20rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 6rpx 24rpx rgba(115, 99, 255, 0.06);
+  border-radius: 18rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 18rpx rgba(115, 99, 255, 0.06);
   border: 1rpx solid rgba(115, 99, 255, 0.08);
   overflow: hidden;
   position: relative;
 }
 
 .card-header {
-  padding: 24rpx 24rpx 20rpx;
+  padding: 26rpx 20rpx 20rpx;
   @include flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 20rpx;
+    right: 20rpx;
+    height: 1rpx;
+    background: linear-gradient(90deg, rgba(115, 99, 255, 0.1) 0%, rgba(255, 105, 222, 0.1) 100%);
+  }
 }
 
-.header-left {
+.header-content {
   @include flex;
   align-items: center;
 }
 
-.header-icon {
-  width: 56rpx;
-  height: 56rpx;
+.section-indicator {
+  width: 6rpx;
+  height: 32rpx;
   background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
-  border-radius: 16rpx;
-  @include flex-center;
-  margin-right: 16rpx;
-  box-shadow: 0 3rpx 12rpx rgba(115, 99, 255, 0.25);
+  border-radius: 3rpx;
+  margin-right: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(115, 99, 255, 0.3);
+  align-self: center;
 }
 
 .header-text {
@@ -720,49 +778,57 @@ const doSubmit = async () => {
 }
 
 .card-title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: $text-color-primary;
-  margin-bottom: 2rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+  margin-bottom: 6rpx;
+  letter-spacing: 0.3rpx;
+  line-height: 1.3;
 }
 
 .card-subtitle {
   font-size: 22rpx;
-  color: $text-color-secondary;
+  color: #666666;
   opacity: 0.8;
+  line-height: 1.4;
   margin-left: 20rpx;
 }
 
 /* 表单内容 */
 .form-content {
-  padding: 0 24rpx 24rpx;
+  padding: 20rpx 20rpx 20rpx;
 }
 
 .input-group {
-  margin-bottom: 24rpx;
+  @include flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  gap: 20rpx;
 }
 
 .input-label {
-  font-size: 26rpx;
-  font-weight: 600;
-  color: $text-color-primary;
-  margin-bottom: 12rpx;
-  display: block;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+  width: 110rpx;
+  flex-shrink: 0;
+  text-align: left;
 }
 
 .input-wrapper {
   position: relative;
+  flex: 1;
 }
 
 .modern-input {
   width: 100%;
-  height: 88rpx;
+  height: 80rpx;
   background: #f8f9fe;
   border: 2rpx solid #e9ecf5;
-  border-radius: 16rpx;
-  padding: 0 24rpx;
-  font-size: 28rpx;
-  color: $text-color-primary;
+  border-radius: 14rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  color: #1A1A1A;
   transition: all 0.3s;
 }
 
@@ -771,116 +837,142 @@ const doSubmit = async () => {
   background: rgba(115, 99, 255, 0.05);
 }
 
-.input-decoration {
-  position: absolute;
-  top: 50%;
-  right: 24rpx;
-  transform: translateY(-50%);
-  width: 32rpx;
-  height: 32rpx;
-  background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
-  border-radius: 50%;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
+/* 移除旧的装饰样式，使用新的图标设计 */
 
-.modern-input:focus + .input-decoration {
-  opacity: 1;
-}
-
-/* 性别选择器 */
+/* 性别选择器 - 水平布局优化 */
 .gender-selector {
   @include flex;
   gap: 16rpx;
+  width: 100%;
 }
 
 .gender-chip {
   flex: 1;
-  height: 88rpx;
+  height: 80rpx;
   @include flex-center;
   background: #f8f9fe;
   border: 2rpx solid #e9ecf5;
-  border-radius: 16rpx;
+  border-radius: 14rpx;
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  /* 添加微妙的渐变背景 */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 249, 254, 0.8) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
   
   &.active {
     border-color: #7363FF;
     background: linear-gradient(135deg, rgba(115, 99, 255, 0.1) 0%, rgba(255, 105, 222, 0.1) 100%);
-    transform: scale(1.02);
-    box-shadow: 0 4rpx 16rpx rgba(115, 99, 255, 0.2);
+    transform: translateY(-2rpx);
+    box-shadow: 0 6rpx 20rpx rgba(115, 99, 255, 0.25);
+    
+    &::before {
+      opacity: 1;
+    }
+    
+    .gender-icon {
+      transform: scale(1.1);
+    }
+    
+    .chip-text {
+      color: #7363FF;
+      font-weight: 500;
+    }
+  }
+  
+  &:active {
+    transform: scale(0.98);
   }
 }
 
-.chip-icon {
-  font-size: 32rpx;
-  margin-right: 8rpx;
+.gender-icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 10rpx;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
 .chip-text {
-  font-size: 28rpx;
-  color: $text-color-primary;
-  font-weight: 500;
-  margin-left: 10rpx;
-}
-
-/* 信息网格 */
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16rpx;
-}
-
-.info-item {
-  @include flex-column;
-  align-items: center;
-  padding: 18rpx 24rpx;
-  background: #f8f9fe;
-  border-radius: 16rpx;
-  border: 2rpx solid #e9ecf5;
-  transition: all 0.3s;
-}
-
-.info-item:active {
-  transform: scale(0.98);
-}
-
-.info-label {
   font-size: 24rpx;
-  color: $text-color-secondary;
-  margin-bottom: 8rpx;
+  color: #1A1A1A;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
-.info-input {
+/* 统一水平布局 - 所有输入项使用相同的input-group样式 */
+
+/* 输入框图标 */
+.input-icon {
+  position: absolute;
+  top: 50%;
+  right: 24rpx;
+  transform: translateY(-50%);
+  font-size: 28rpx;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.modern-input:focus + .input-icon {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* 城市选择器样式 */
+.city-input {
   width: 100%;
-  text-align: center;
-  font-size: 28rpx;
-  color: $text-color-primary;
-  font-weight: 600;
-  background: transparent;
-  border: none;
+  height: 80rpx;
+  background: #f8f9fe;
+  border: 2rpx solid #e9ecf5;
+  border-radius: 14rpx;
+  padding: 0 20rpx;
+  @include flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s;
+  position: relative;
+  
+  &:active {
+    transform: scale(0.98);
+    border-color: #7363FF;
+    background: rgba(115, 99, 255, 0.05);
+  }
 }
 
-.city-selector {
-  @include flex-center;
-  gap: 8rpx;
+.city-display {
+  font-size: 26rpx;
+  color: #1A1A1A;
+  font-weight: 400;
+  flex: 1;
 }
 
-.city-text {
-  font-size: 28rpx;
-  color: $text-color-primary;
-  font-weight: 600;
-}
-
-.city-arrow {
+.city-icon {
+  position: static !important;
+  transform: none !important;
   font-size: 24rpx;
+  opacity: 0.8;
 }
 
 /* 照片画廊 */
 .photo-gallery {
-  padding: 24rpx;
+  padding: 20rpx;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16rpx;
+  gap: 14rpx;
 }
 
 .photo-item {
@@ -944,6 +1036,11 @@ const doSubmit = async () => {
   transform: scale(0.95);
   border-color: #7363FF;
   background: rgba(115, 99, 255, 0.05);
+  
+  .add-icon-circle {
+    transform: scale(1.1);
+    box-shadow: 0 6rpx 20rpx rgba(115, 99, 255, 0.4);
+  }
 }
 
 .add-content {
@@ -952,72 +1049,71 @@ const doSubmit = async () => {
   z-index: 2;
 }
 
-.add-icon {
-  font-size: 40rpx;
-  margin-bottom: 8rpx;
+.add-icon-circle {
+  width: 60rpx;
+  height: 60rpx;
+  background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
+  border-radius: 50%;
+  @include flex-center;
+  margin-bottom: 12rpx;
+  box-shadow: 0 4rpx 16rpx rgba(115, 99, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.add-plus {
+  font-size: 32rpx;
+  color: white;
+  font-weight: 300;
+  line-height: 1;
 }
 
 .add-text {
-  font-size: 22rpx;
-  color: $text-color-secondary;
-  font-weight: 500;
+  font-size: 24rpx;
+  color: #666666;
+  font-weight: 600;
+  letter-spacing: 0.5rpx;
 }
 
-.add-sparkle {
-  position: absolute;
-  top: 16rpx;
-  right: 16rpx;
-  font-size: 20rpx;
-  animation: sparkle 2s ease-in-out infinite;
-}
 
-@keyframes sparkle {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
 
 /* 技能容器 */
 .skills-container {
-  padding: 24rpx;
+  padding: 20rpx;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16rpx;
+  gap: 14rpx;
 }
 
 .skill-item {
   position: relative;
-  padding: 20rpx 16rpx;
+  padding: 16rpx 14rpx;
   background: #f8f9fe;
   border: 2rpx solid #e9ecf5;
-  border-radius: 16rpx;
+  border-radius: 14rpx;
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
   overflow: hidden;
   
   &.selected {
     border-color: #7363FF;
     background: linear-gradient(135deg, rgba(115, 99, 255, 0.1) 0%, rgba(255, 105, 222, 0.1) 100%);
-    transform: translateY(-2rpx);
-    box-shadow: 0 6rpx 18rpx rgba(115, 99, 255, 0.15);
+    transform: translateY(-1rpx);
+    box-shadow: 0 4rpx 14rpx rgba(115, 99, 255, 0.15);
   }
 }
 
 .skill-content {
   @include flex;
   align-items: center;
-  gap: 12rpx;
-}
-
-.skill-emoji {
-  font-size: 32rpx;
-  flex-shrink: 0;
+  justify-content: center;
+  width: 100%;
 }
 
 .skill-name {
-  font-size: 26rpx;
-  color: $text-color-primary;
-  font-weight: 500;
+  font-size: 24rpx;
+  color: #1A1A1A;
+  font-weight: 400;
   line-height: 1.3;
-  flex: 1;
+  text-align: center;
 }
 
 .skill-indicator {
@@ -1057,16 +1153,16 @@ const doSubmit = async () => {
 }
 
 .agreement-text {
-  font-size: 24rpx;
-  color: $text-color-secondary;
+  font-size: 22rpx;
+  color: #666666;
   margin-right: 8rpx;
 }
 
 .agreement-link {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #7363FF;
   text-decoration: underline;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* 底部固定提交按钮 */
@@ -1086,16 +1182,16 @@ const doSubmit = async () => {
 
 .submit-btn {
   position: relative;
-  height: 88rpx;
-  border-radius: 44rpx;
+  height: 80rpx;
+  border-radius: 40rpx;
   overflow: hidden;
-  box-shadow: 0 8rpx 24rpx rgba(115, 99, 255, 0.3);
+  box-shadow: 0 6rpx 20rpx rgba(115, 99, 255, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
   
   &.disabled {
     opacity: 0.6;
     transform: none !important;
-    box-shadow: 0 4rpx 16rpx rgba(115, 99, 255, 0.2);
+    box-shadow: 0 3rpx 12rpx rgba(115, 99, 255, 0.2);
     
     .btn-gradient {
       background: linear-gradient(135deg, #a0a0a0 0%, #808080 100%);
@@ -1127,10 +1223,10 @@ const doSubmit = async () => {
 }
 
 .btn-text {
-  font-size: 30rpx;
+  font-size: 26rpx;
   color: white;
-  font-weight: 700;
-  letter-spacing: 1rpx;
+  font-weight: 500;
+  letter-spacing: 0.5rpx;
 }
 
 .btn-emoji {

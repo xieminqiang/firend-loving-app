@@ -282,13 +282,13 @@ const _sfc_main = {
         j: userInfo.value.realNameAuth ? 1 : "",
         k: userInfo.value.levelProgress + "%",
         l: common_vendor.t(userInfo.value.level || 1),
-        m: common_assets._imports_1$2,
+        m: common_assets._imports_1$3,
         n: common_vendor.o(navigateToUserDetail)
       }) : {
-        o: common_assets._imports_2$1,
-        p: common_assets._imports_3$1,
-        q: common_assets._imports_4$3,
-        r: common_assets._imports_1$2,
+        o: common_assets._imports_2$2,
+        p: common_assets._imports_3,
+        q: common_assets._imports_4$2,
+        r: common_assets._imports_1$3,
         s: common_vendor.o(navigateToLogin)
       }, {
         t: statusBarHeight.value + "px",
@@ -300,16 +300,16 @@ const _sfc_main = {
         z: common_vendor.t(couponsCount.value)
       } : {}, {
         A: common_vendor.o(($event) => handleActionClick("coupons")),
-        B: common_assets._imports_2$1,
+        B: common_assets._imports_2$2,
         C: common_vendor.o(($event) => handleActionClick("favorites")),
         D: common_assets._imports_7,
         E: common_vendor.o(($event) => handleActionClick("history")),
-        F: common_assets._imports_1$2,
+        F: common_assets._imports_1$3,
         G: common_vendor.o(navigateToBillDetails),
         H: common_vendor.t(accountBalance.value),
         I: common_vendor.o(handleWithdraw),
         J: common_vendor.o(handleRecharge),
-        K: common_assets._imports_1$2,
+        K: common_assets._imports_1$3,
         L: common_vendor.o(($event) => navigateToOrders("all")),
         M: common_assets._imports_8$1,
         N: orderCounts.value.pending > 0
@@ -317,9 +317,9 @@ const _sfc_main = {
         O: common_vendor.t(orderCounts.value.pending)
       } : {}, {
         P: common_vendor.o(($event) => navigateToOrders("pending")),
-        Q: common_assets._imports_2$1,
+        Q: common_assets._imports_2$2,
         R: common_vendor.o(($event) => navigateToOrders("to-serve")),
-        S: common_assets._imports_3$1,
+        S: common_assets._imports_3,
         T: orderCounts.value.inProgress > 0
       }, orderCounts.value.inProgress > 0 ? {
         U: common_vendor.t(orderCounts.value.inProgress)
@@ -347,17 +347,17 @@ const _sfc_main = {
         an: common_vendor.o(navigateToHelp),
         ao: common_assets._imports_17,
         ap: common_vendor.o(navigateToRefund),
-        aq: common_assets._imports_4$3,
-        ar: common_assets._imports_1$2,
+        aq: common_assets._imports_4$2,
+        ar: common_assets._imports_1$3,
         as: common_vendor.o(navigateToPrivacySettings),
         at: common_assets._imports_18,
-        av: common_assets._imports_1$2,
+        av: common_assets._imports_1$3,
         aw: common_vendor.o(navigateToNotificationSettings),
         ax: common_assets._imports_19,
-        ay: common_assets._imports_1$2,
+        ay: common_assets._imports_1$3,
         az: common_vendor.o(navigateToCustomerService),
         aA: common_assets._imports_20,
-        aB: common_assets._imports_1$2,
+        aB: common_assets._imports_1$3,
         aC: common_vendor.o(navigateToSystemSettings),
         aD: isRefreshing.value,
         aE: common_vendor.o(onRefresh),

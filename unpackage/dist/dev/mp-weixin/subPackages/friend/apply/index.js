@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
+const common_assets = require("../../../common/assets.js");
 const api_user = require("../../../api/user.js");
 const _sfc_main = {
   __name: "index",
@@ -35,19 +36,6 @@ const _sfc_main = {
       "探店体验": 6,
       "陪诊服务": 7,
       "陪伴聊天": 8
-    };
-    const getSkillEmoji = (skill) => {
-      const emojiMap = {
-        "陪拍写真": "📸",
-        "陪护就医": "🏥",
-        "陪伴购物": "🛍️",
-        "陪同观影": "🎬",
-        "礼仪模特": "👗",
-        "探店体验": "🍰",
-        "陪诊服务": "💊",
-        "陪伴聊天": "💬"
-      };
-      return emojiMap[skill] || "💝";
     };
     const selectGender = (gender) => {
       formData.gender = gender;
@@ -92,6 +80,11 @@ const _sfc_main = {
       common_vendor.index.showToast({
         title: "协议功能待开发",
         icon: "none"
+      });
+    };
+    const handleBack = () => {
+      common_vendor.index.navigateBack({
+        delta: 1
       });
     };
     const submitApplication = async () => {
@@ -167,9 +160,9 @@ const _sfc_main = {
             // 认证等级固定为1
           }))
         };
-        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:478", "提交数据:", submitData);
+        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:495", "提交数据:", submitData);
         const response = await api_user.createCompanionApplication(submitData);
-        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:483", "接口响应:", response);
+        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:500", "接口响应:", response);
         if (response && response.data && response.data.code === 0) {
           common_vendor.index.showModal({
             title: "申请提交成功 🎉",
@@ -190,7 +183,7 @@ const _sfc_main = {
           });
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:511", "提交失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:528", "提交失败:", error);
         let errorMessage = "提交失败，请稍后重试";
         if (error && error.message) {
           if (error.message.includes("网络")) {
@@ -215,21 +208,25 @@ const _sfc_main = {
     };
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: formData.nickname,
-        b: common_vendor.o(($event) => formData.nickname = $event.detail.value),
-        c: formData.gender === "male" ? 1 : "",
-        d: common_vendor.o(($event) => selectGender("male")),
-        e: formData.gender === "female" ? 1 : "",
-        f: common_vendor.o(($event) => selectGender("female")),
-        g: formData.age,
-        h: common_vendor.o(($event) => formData.age = $event.detail.value),
-        i: formData.height,
-        j: common_vendor.o(($event) => formData.height = $event.detail.value),
-        k: formData.weight,
-        l: common_vendor.o(($event) => formData.weight = $event.detail.value),
-        m: common_vendor.t(formData.city),
-        n: common_vendor.o(selectCity),
-        o: common_vendor.f(photos.value, (photo, index, i0) => {
+        a: common_assets._imports_0$3,
+        b: common_vendor.o(handleBack),
+        c: formData.nickname,
+        d: common_vendor.o(($event) => formData.nickname = $event.detail.value),
+        e: common_assets._imports_1$1,
+        f: formData.gender === "male" ? 1 : "",
+        g: common_vendor.o(($event) => selectGender("male")),
+        h: common_assets._imports_2,
+        i: formData.gender === "female" ? 1 : "",
+        j: common_vendor.o(($event) => selectGender("female")),
+        k: formData.age,
+        l: common_vendor.o(($event) => formData.age = $event.detail.value),
+        m: formData.height,
+        n: common_vendor.o(($event) => formData.height = $event.detail.value),
+        o: formData.weight,
+        p: common_vendor.o(($event) => formData.weight = $event.detail.value),
+        q: common_vendor.t(formData.city),
+        r: common_vendor.o(selectCity),
+        s: common_vendor.f(photos.value, (photo, index, i0) => {
           return {
             a: photo,
             b: common_vendor.o(($event) => deletePhoto(index), index),
@@ -237,30 +234,23 @@ const _sfc_main = {
             d: common_vendor.o(($event) => previewPhoto(index), index)
           };
         }),
-        p: photos.value.length < 6
+        t: photos.value.length < 6
       }, photos.value.length < 6 ? {
-        q: common_vendor.o(addPhoto)
+        v: common_vendor.o(addPhoto)
       } : {}, {
-        r: common_vendor.f(serviceSkills.value, (skill, k0, i0) => {
-          return common_vendor.e({
-            a: common_vendor.t(getSkillEmoji(skill)),
-            b: common_vendor.t(skill),
-            c: selectedSkills.value.includes(skill)
-          }, selectedSkills.value.includes(skill) ? {} : {}, {
-            d: selectedSkills.value.includes(skill) ? 1 : "",
-            e: skill,
-            f: common_vendor.o(($event) => toggleSkill(skill), skill)
-          });
+        w: common_vendor.f(serviceSkills.value, (skill, k0, i0) => {
+          return {
+            a: common_vendor.t(skill),
+            b: selectedSkills.value.includes(skill) ? 1 : "",
+            c: skill,
+            d: common_vendor.o(($event) => toggleSkill(skill), skill)
+          };
         }),
-        s: common_vendor.o(viewAgreement),
-        t: !isSubmitting.value
+        x: common_vendor.o(viewAgreement),
+        y: !isSubmitting.value
       }, !isSubmitting.value ? {} : {}, {
-        v: !isSubmitting.value
-      }, !isSubmitting.value ? {} : {}, {
-        w: !isSubmitting.value
-      }, !isSubmitting.value ? {} : {}, {
-        x: isSubmitting.value ? 1 : "",
-        y: common_vendor.o(submitApplication)
+        z: isSubmitting.value ? 1 : "",
+        A: common_vendor.o(submitApplication)
       });
     };
   }

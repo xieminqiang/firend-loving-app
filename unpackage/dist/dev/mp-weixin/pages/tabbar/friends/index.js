@@ -764,9 +764,9 @@ const _sfc_main = {
             d: common_vendor.t(p.name),
             e: p.gender === "女"
           }, p.gender === "女" ? {
-            f: common_assets._imports_3
+            f: common_assets._imports_2
           } : {
-            g: common_assets._imports_4
+            g: common_assets._imports_1$1
           }, {
             h: common_vendor.t(p.rate),
             i: common_vendor.t(p.age),

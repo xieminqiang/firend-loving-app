@@ -39,7 +39,7 @@ export const getUserInfo = () => {
  */
 export const createCompanionApplication = (data) => {
   return http({
-    url: '/front/companion/application',
+    url: '/companion/application',
     method: 'POST',
     data
   })
@@ -53,7 +53,7 @@ export const createCompanionApplication = (data) => {
  */
 export const updateUserInfo = (data) => {
   return http({
-    url: '/front/user/update',
+    url: '/user/update',
     method: 'PUT',
     data
   })
@@ -65,7 +65,7 @@ export const updateUserInfo = (data) => {
  */
 export const logout = () => {
   return http({
-    url: '/front/user/logout',
+    url: '/user/logout',
     method: 'POST'
   })
 }

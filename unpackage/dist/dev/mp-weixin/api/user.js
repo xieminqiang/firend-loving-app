@@ -9,7 +9,7 @@ const wxLogin = (data) => {
 };
 const createCompanionApplication = (data) => {
   return config_http.http({
-    url: "/front/companion/application",
+    url: "/companion/application",
     method: "POST",
     data
   });

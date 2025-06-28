@@ -451,7 +451,7 @@ const _sfc_main = {
           }, feed.videoThumbnail ? {
             i: feed.videoThumbnail
           } : {}, {
-            j: common_assets._imports_1$1,
+            j: common_assets._imports_1$2,
             k: common_vendor.o(($event) => playVideo(feed), feed.id)
           }) : {}, {
             l: common_vendor.t(feed.likes),
@@ -464,17 +464,17 @@ const _sfc_main = {
             s: feed.id
           });
         }),
-        k: common_assets._imports_2,
-        l: common_assets._imports_4$1,
-        m: common_assets._imports_4$2,
+        k: common_assets._imports_2$1,
+        l: common_assets._imports_4,
+        m: common_assets._imports_4$1,
         n: common_assets._imports_5$2,
         o: isRefreshing.value,
         p: common_vendor.o(onRefresh),
         q: showRewardModal.value
       }, showRewardModal.value ? {
-        r: common_assets._imports_2,
+        r: common_assets._imports_2$1,
         s: common_vendor.t(selectedFeed.value && selectedFeed.value.name || ""),
-        t: common_assets._imports_2,
+        t: common_assets._imports_2$1,
         v: common_vendor.f(rewardAmounts, (amount, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(amount.value),
@@ -494,7 +494,7 @@ const _sfc_main = {
         B: common_vendor.o(($event) => rewardMessage.value = $event.detail.value),
         C: common_vendor.t(rewardMessage.value.length),
         D: common_vendor.t(finalAmount.value),
-        E: common_assets._imports_2,
+        E: common_assets._imports_2$1,
         F: common_vendor.o(confirmReward),
         G: common_vendor.o(() => {
         }),
@@ -520,7 +520,7 @@ const _sfc_main = {
           };
         })
       } : {
-        Q: common_assets._imports_4$1
+        Q: common_assets._imports_4
       }, {
         R: getCommentPlaceholder(),
         S: commentText.value,
@@ -533,7 +533,7 @@ const _sfc_main = {
       }) : {}, {
         Y: showLikeToast.value
       }, showLikeToast.value ? {
-        Z: common_assets._imports_2
+        Z: common_assets._imports_2$1
       } : {});
     };
   }

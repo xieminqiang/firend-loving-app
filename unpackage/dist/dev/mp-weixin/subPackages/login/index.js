@@ -114,7 +114,7 @@ const _sfc_main = {
       return {
         a: common_assets._imports_0$3,
         b: common_vendor.o(handleBack),
-        c: common_assets._imports_1$3,
+        c: common_assets._imports_1$4,
         d: common_vendor.o(getPhoneNumber),
         e: common_vendor.o(showUserAgreement),
         f: common_vendor.o(showPrivacyPolicy),

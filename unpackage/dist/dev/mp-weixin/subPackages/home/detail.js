@@ -121,9 +121,9 @@ const _sfc_main = {
         d: common_vendor.o(goBack),
         e: _ctx.$imgBaseUrl + serviceDetail.value.image_url,
         f: common_vendor.o(onImageError),
-        g: common_assets._imports_1$4,
+        g: common_assets._imports_1$5,
         h: common_vendor.t(serviceDetail.value.category_name || "服务"),
-        i: common_assets._imports_2$2,
+        i: common_assets._imports_2$3,
         j: common_vendor.o(previewImage),
         k: common_vendor.t(serviceDetail.value.name || "服务详情"),
         l: serviceDetail.value.min_price
@@ -144,7 +144,7 @@ const _sfc_main = {
       } : {}, {
         r: priceTemplate.value && priceTemplate.value.levels && priceTemplate.value.levels.length > 0
       }, priceTemplate.value && priceTemplate.value.levels && priceTemplate.value.levels.length > 0 ? {
-        s: common_assets._imports_3$2,
+        s: common_assets._imports_3$1,
         t: common_vendor.f(priceTemplate.value.levels, (level, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(level.level_name),
@@ -158,13 +158,13 @@ const _sfc_main = {
           });
         })
       } : {}, {
-        v: common_assets._imports_1$4,
+        v: common_assets._imports_1$5,
         w: common_vendor.t(serviceDetail.value.description || "暂无详细说明")
       }) : {}, {
         b: !error.value,
         x: !loading.value && !error.value
       }, !loading.value && !error.value ? {
-        y: common_assets._imports_4$1,
+        y: common_assets._imports_4,
         z: common_vendor.o(contactService),
         A: common_vendor.o(bookService)
       } : {}, {

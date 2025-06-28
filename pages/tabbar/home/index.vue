@@ -93,6 +93,9 @@
               @refresherrestore="onRefreshRestore"
             >
               <view class="service-list-soul">
+                <!-- 加载状态 -->
+             
+                
                 <!-- 服务列表 -->
                 <view v-if="getTabServiceItems(tab).length > 0">
                   <view v-for="item in getTabServiceItems(tab)" :key="item.id" class="service-card-soul" @click="navigateToServiceDetail(item.id)">
@@ -150,8 +153,8 @@
               :class="['city-item', { active: cityIndex === index }]"
               @click="selectCity(index)"
             >
-              <text class="city-name">{{ cityItem }}</text>
-              <view v-if="cityIndex === index" class="city-check">✓</view>
+              <text class="city-name">{{ cityItem.name }}</text>
+            
             </view>
           </view>
         </view>
@@ -162,7 +165,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { getHotRecommendServices } from '@/api/discover.js'
+import { getHotRecommendServices, getCityList } from '@/api/home.js'
 
 // 状态栏高度适配
 const statusBarHeight = ref(0)
@@ -184,22 +187,67 @@ onMounted(async () => {
   navBarHeight.value = 0 // H5不需要导航栏高度
   // #endif
   
-  // 计算滚动视图高度
-
-  
   // 自动轮播
   bannerTimer = setInterval(() => {
     nextBanner()
   }, 5000)
 
-  // 加载所有选项卡的服务数据
-  await loadAllServicesData()
+  // 加载城市列表
+  await loadCityList()
+  
+  // 只加载当前选中的选项卡数据（默认"服务"）
+  await loadSingleTabData(serviceTab.value)
 })
 
-// 城市相关数据
-const cityList = ['南昌市', '北京市', '上海市', '广州市', '深圳市']
+// 城市相关数据 - 改为动态数据
+const cityList = ref([])
 const cityIndex = ref(0)
-const city = computed(() => cityList[cityIndex.value])
+const city = computed(() => {
+  if (cityList.value.length > 0) {
+    return cityList.value[cityIndex.value]?.name || '选择城市'
+  }
+  return '选择城市'
+})
+const currentCityCode = computed(() => {
+  if (cityList.value.length > 0) {
+    return cityList.value[cityIndex.value]?.code || null
+  }
+  return null
+})
+
+// 加载城市列表
+const loadCityList = async () => {
+  try {
+    const response = await getCityList()
+    
+    if (response.data && response.data.code === 0 && response.data.data) {
+      // 转换API数据格式为组件需要的格式
+      cityList.value = response.data.data.map(city => ({
+        name: city.name,
+        code: city.city_code // 保持字段名一致
+      }))
+      
+      // 如果有城市数据，默认选择第一个城市
+      if (cityList.value.length > 0) {
+        cityIndex.value = 0
+      }
+      
+      console.log('城市列表加载成功:', cityList.value)
+    } else {
+      console.warn('获取城市列表失败，使用默认城市列表')
+      // 使用默认城市列表作为备选方案
+      cityList.value = [
+      
+      ]
+    }
+  } catch (error) {
+    console.error('获取城市列表失败:', error)
+    // 使用默认城市列表作为备选方案
+    cityList.value = [
+   
+    ]
+  }
+}
 
 // 轮播相关数据
 const currentBanner = ref(0)
@@ -261,20 +309,40 @@ const allServiceItems = ref({
   '运动': []
 })
 
-// 数据加载状态
+// 数据加载状态 - 添加loading状态
 const dataLoaded = ref({
   '服务': false,
   '娱乐': false,
   '运动': false
 })
 
-// 加载单个选项卡的服务数据
-const loadSingleTabData = async (tab) => {
+const dataLoading = ref({
+  '服务': false,
+  '娱乐': false,
+  '运动': false
+})
+
+// 加载单个选项卡的服务数据 - 添加城市代码参数和强制刷新参数
+const loadSingleTabData = async (tab, forceRefresh = false) => {
+  // 如果已经加载过且不是重新加载，直接返回（除非强制刷新）
+  if (dataLoaded.value[tab] && !dataLoading.value[tab] && !forceRefresh) {
+    console.log(`${tab}数据已缓存，跳过加载`)
+    return
+  }
+  
+  dataLoading.value[tab] = true
+  console.log(`开始加载${tab}服务数据，当前城市代码:`, currentCityCode.value, forceRefresh ? '(强制刷新)' : '')
+  
   try {
-    const response = await getHotRecommendServices({
+    const requestParams = {
       category: getTabCategoryId(tab),
-      page_size: 10
-    })
+      page_size: 10,
+      city_code: currentCityCode.value // 传递当前选中城市的代码
+    }
+    
+    console.log(`${tab}服务请求参数:`, requestParams)
+    
+    const response = await getHotRecommendServices(requestParams)
     
     if (response.data && response.data.code === 0 && response.data.data && response.data.data.list) {
       // 转换API数据格式为模板需要的格式
@@ -284,11 +352,15 @@ const loadSingleTabData = async (tab) => {
         desc: item.description,
         tags: item.tags || [],
         img: item.image_url || '/static/images/service-default.png',
-        min_price: item.min_price || 0
+        min_price: item.min_price || 0,
+        unit: item.unit || '次' // 添加单位字段
       }))
+      
+      console.log(`${tab}服务数据加载成功，共${allServiceItems.value[tab].length}条`)
     } else {
       // API返回数据为空
       allServiceItems.value[tab] = []
+      console.log(`${tab}服务数据为空`)
     }
     dataLoaded.value[tab] = true
   } catch (error) {
@@ -296,14 +368,21 @@ const loadSingleTabData = async (tab) => {
     // 请求失败，清空数据
     allServiceItems.value[tab] = []
     dataLoaded.value[tab] = true
+  } finally {
+    dataLoading.value[tab] = false
   }
 }
 
-// 加载所有选项卡的服务数据
+// 加载所有选项卡的服务数据 - 重新加载时清除缓存
 const loadAllServicesData = async () => {
-  const promises = serviceTabs.map(tab => loadSingleTabData(tab))
-  // 等待所有请求完成
-  await Promise.all(promises)
+  console.log('重新加载所有选项卡数据')
+  // 清除所有加载状态，强制重新加载
+  Object.keys(dataLoaded.value).forEach(tab => {
+    dataLoaded.value[tab] = false
+  })
+  
+  // 只加载当前选中的选项卡
+  await loadSingleTabData(serviceTab.value)
 }
 
 // 获取tab对应的分类ID
@@ -319,10 +398,16 @@ const getTabCategoryId = (tabName) => {
 // 当前选项卡索引
 const currentTabIndex = ref(0)
 
-// 切换服务tab（不重新加载数据）
-const switchServiceTab = (tab) => {
+// 切换服务tab - 优化为懒加载
+const switchServiceTab = async (tab) => {
+  const oldTab = serviceTab.value
   serviceTab.value = tab
   currentTabIndex.value = serviceTabs.indexOf(tab)
+  
+  // 如果切换到新的tab且该tab未加载数据，则加载数据
+  if (oldTab !== tab && !dataLoaded.value[tab]) {
+    await loadSingleTabData(tab)
+  }
 }
 
 // swiper滑动改变时的处理（不重新加载数据）
@@ -392,8 +477,9 @@ const onRefresh = async (tab) => {
   refreshing.value = true
   
   try {
-    // 只刷新当前选项卡的数据
-    await loadSingleTabData(tab)
+    // 下拉刷新时强制重新加载数据
+    console.log(`下拉刷新${tab}选项卡数据`)
+    await loadSingleTabData(tab, true)
   } catch (error) {
     console.error('刷新失败:', error)
   } finally {
@@ -413,8 +499,14 @@ const onRefreshRestore = () => {
 const showCityPicker = ref(false)
 
 function selectCity(index) {
+  const oldCityIndex = cityIndex.value
   cityIndex.value = index
   showCityPicker.value = false
+  
+  // 如果城市发生变化，重新加载所有选项卡的数据
+  if (oldCityIndex !== index) {
+    loadAllServicesData()
+  }
 }
 
 
@@ -1248,37 +1340,21 @@ function selectCity(index) {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(247, 248, 250, 0.6) 100%);
   border: 2rpx solid rgba(130, 160, 216, 0.1);
   border-radius: 24rpx;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(10rpx);
-  -webkit-backdrop-filter: blur(10rpx);
+
   
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent 0%, rgba(130, 160, 216, 0.1) 50%, transparent 100%);
-    transition: left 0.6s;
-  }
+
   
-  &:active {
-    transform: scale(0.98);
-  }
-  
-  &:active::before {
-    left: 100%;
-  }
+
 }
 
 .city-item.active {
   background: linear-gradient(135deg, rgba(130, 160, 216, 0.15) 0%, rgba(167, 188, 231, 0.1) 100%);
   border-color: $primary-color;
-  box-shadow: 0 8rpx 24rpx rgba(130, 160, 216, 0.2);
-  transform: scale(1.02);
+
+
 }
 
 .city-name {
@@ -1327,8 +1403,6 @@ function selectCity(index) {
   text-align: center;
 }
 
-
-
 .empty-icon {
   width: 200rpx;
   height: 200rpx;
@@ -1353,5 +1427,36 @@ function selectCity(index) {
 .bottom-safe-area {
   height: 120rpx; /* 增加高度，为TabBar和安全区域预留空间 */
   background: transparent;
+}
+
+/* 加载状态样式 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 60rpx;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 6rpx solid #f0f0f0;
+  border-top: 6rpx solid #7363ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 32rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #666666;
+  font-weight: 500;
 }
 </style> 
