@@ -2,9 +2,6 @@
 const common_vendor = require("../../../common/vendor.js");
 const common_assets = require("../../../common/assets.js");
 const api_home = require("../../../api/home.js");
-require("../../../config/http.js");
-require("../../../stores/user.js");
-require("../../../config/config.js");
 const _sfc_main = {
   __name: "index",
   setup(__props) {
@@ -48,13 +45,13 @@ const _sfc_main = {
           if (cityList.value.length > 0) {
             cityIndex.value = 0;
           }
-          console.log("城市列表加载成功:", cityList.value);
+          common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:237", "城市列表加载成功:", cityList.value);
         } else {
-          console.warn("获取城市列表失败，使用默认城市列表");
+          common_vendor.index.__f__("warn", "at pages/tabbar/home/index.vue:239", "获取城市列表失败，使用默认城市列表");
           cityList.value = [];
         }
       } catch (error) {
-        console.error("获取城市列表失败:", error);
+        common_vendor.index.__f__("error", "at pages/tabbar/home/index.vue:246", "获取城市列表失败:", error);
         cityList.value = [];
       }
     };
@@ -108,11 +105,11 @@ const _sfc_main = {
     });
     const loadSingleTabData = async (tab, forceRefresh = false) => {
       if (dataLoaded.value[tab] && !dataLoading.value[tab] && !forceRefresh) {
-        console.log(`${tab}数据已缓存，跳过加载`);
+        common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:331", `${tab}数据已缓存，跳过加载`);
         return;
       }
       dataLoading.value[tab] = true;
-      console.log(`开始加载${tab}服务数据，当前城市代码:`, currentCityCode.value, forceRefresh ? "(强制刷新)" : "");
+      common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:336", `开始加载${tab}服务数据，当前城市代码:`, currentCityCode.value, forceRefresh ? "(强制刷新)" : "");
       try {
         const requestParams = {
           category: getTabCategoryId(tab),
@@ -120,7 +117,7 @@ const _sfc_main = {
           city_code: currentCityCode.value
           // 传递当前选中城市的代码
         };
-        console.log(`${tab}服务请求参数:`, requestParams);
+        common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:345", `${tab}服务请求参数:`, requestParams);
         const response = await api_home.getHotRecommendServices(requestParams);
         if (response.data && response.data.code === 0 && response.data.data && response.data.data.list) {
           allServiceItems.value[tab] = response.data.data.list.map((item) => ({
@@ -133,14 +130,14 @@ const _sfc_main = {
             unit: item.unit || "次"
             // 添加单位字段
           }));
-          console.log(`${tab}服务数据加载成功，共${allServiceItems.value[tab].length}条`);
+          common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:361", `${tab}服务数据加载成功，共${allServiceItems.value[tab].length}条`);
         } else {
           allServiceItems.value[tab] = [];
-          console.log(`${tab}服务数据为空`);
+          common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:365", `${tab}服务数据为空`);
         }
         dataLoaded.value[tab] = true;
       } catch (error) {
-        console.error(`获取${tab}服务数据失败:`, error);
+        common_vendor.index.__f__("error", "at pages/tabbar/home/index.vue:369", `获取${tab}服务数据失败:`, error);
         allServiceItems.value[tab] = [];
         dataLoaded.value[tab] = true;
       } finally {
@@ -148,7 +145,7 @@ const _sfc_main = {
       }
     };
     const loadAllServicesData = async () => {
-      console.log("重新加载所有选项卡数据");
+      common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:380", "重新加载所有选项卡数据");
       Object.keys(dataLoaded.value).forEach((tab) => {
         dataLoaded.value[tab] = false;
       });
@@ -203,7 +200,7 @@ const _sfc_main = {
       touchEndX = 0;
     }
     function navigateToServiceDetail(serviceId) {
-      console.log("跳转到服务详情页, ID:", serviceId);
+      common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:452", "跳转到服务详情页, ID:", serviceId);
       common_vendor.index.navigateTo({
         url: `/subPackages/home/detail?id=${serviceId}`
       });
@@ -217,10 +214,10 @@ const _sfc_main = {
       isRefreshing.value = true;
       refreshing.value = true;
       try {
-        console.log(`下拉刷新${tab}选项卡数据`);
+        common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:483", `下拉刷新${tab}选项卡数据`);
         await loadSingleTabData(tab, true);
       } catch (error) {
-        console.error("刷新失败:", error);
+        common_vendor.index.__f__("error", "at pages/tabbar/home/index.vue:486", "刷新失败:", error);
       } finally {
         refreshing.value = false;
         isRefreshing.value = false;
@@ -242,7 +239,7 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_assets._imports_0,
-        b: common_vendor.t(common_vendor.unref(city)),
+        b: common_vendor.t(city.value),
         c: common_assets._imports_1,
         d: common_vendor.o(($event) => showCityPicker.value = true),
         e: statusBarHeight.value + "px",
@@ -300,11 +297,12 @@ const _sfc_main = {
               };
             })
           } : {
-            c: common_vendor.t(tab)
+            c: common_assets._imports_5,
+            d: common_vendor.t(tab)
           }, {
-            d: common_vendor.o(($event) => onRefresh(tab), tab),
-            e: common_vendor.o(onRefreshRestore, tab),
-            f: tab
+            e: common_vendor.o(($event) => onRefresh(tab), tab),
+            f: common_vendor.o(onRefreshRestore, tab),
+            g: tab
           });
         }),
         n: refreshing.value,
@@ -332,5 +330,6 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-30d82312"], ["__file", "/Users/mac/Documents/firend-loving-app/pages/tabbar/home/index.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-30d82312"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/tabbar/home/index.js.map

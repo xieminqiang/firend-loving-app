@@ -32,6 +32,13 @@ export const getUserInfo = () => {
   })
 }
 
+export const getApplicatioInfo = () => {
+  return http({
+    url: '/companion/application/my',
+    method: 'GET'
+  })
+}
+
 /**
  * 获取指定城市的服务列表
  * @param {Array} cityCodes - 城市代码列表
@@ -58,6 +65,29 @@ export const createCompanionApplication = (data) => {
   })
 }
 
+/**
+ * 更新友伴师上线/下线状态
+ * @param {Object} data - 状态数据
+ * @returns {Promise} 返回更新结果
+ */
+export const updateCompanionOnlineStatus = (data) => {
+  return http({
+    url: '/companion/online-status',
+    method: 'POST',
+    data
+  })
+}
+
+/**
+ * 获取友伴师在线状态信息
+ * @returns {Promise} 返回状态信息
+ */
+export const getCompanionOnlineStatus = () => {
+  return http({
+    url: '/companion/online-status',
+    method: 'GET'
+  })
+}
 
 /**
  * 更新用户信息

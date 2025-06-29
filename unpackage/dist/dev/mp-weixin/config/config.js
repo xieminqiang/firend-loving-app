@@ -9,3 +9,4 @@ const config = {
   }
 };
 exports.config = config;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/config/config.js.map

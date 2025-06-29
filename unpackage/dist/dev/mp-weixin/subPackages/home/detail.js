@@ -2,9 +2,6 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const api_home = require("../../api/home.js");
-require("../../config/http.js");
-require("../../stores/user.js");
-require("../../config/config.js");
 const _sfc_main = {
   __name: "detail",
   setup(__props) {
@@ -17,7 +14,7 @@ const _sfc_main = {
       const pages = getCurrentPages();
       const currentPage = pages[pages.length - 1];
       params.value = currentPage.options || {};
-      console.log("详情页参数:", params.value);
+      common_vendor.index.__f__("log", "at subPackages/home/detail.vue:151", "详情页参数:", params.value);
       if (!params.value.id) {
         error.value = "缺少服务ID参数";
         loading.value = false;
@@ -40,14 +37,14 @@ const _sfc_main = {
                 priceTemplate.value = templateRes.data.data;
               }
             } catch (templateError) {
-              console.warn("获取价格模板失败:", templateError);
+              common_vendor.index.__f__("warn", "at subPackages/home/detail.vue:183", "获取价格模板失败:", templateError);
             }
           }
         } else {
           throw new Error(serviceRes.data && serviceRes.data.message || "获取服务详情失败");
         }
       } catch (err) {
-        console.error("加载数据失败:", err);
+        common_vendor.index.__f__("error", "at subPackages/home/detail.vue:191", "加载数据失败:", err);
         error.value = err.message || "加载失败，请重试";
       } finally {
         loading.value = false;
@@ -57,21 +54,21 @@ const _sfc_main = {
       common_vendor.index.navigateBack();
     };
     const onImageError = () => {
-      console.log("图片加载失败");
+      common_vendor.index.__f__("log", "at subPackages/home/detail.vue:205", "图片加载失败");
     };
     const previewImage = () => {
       if (serviceDetail.value && serviceDetail.value.image_url) {
         const imgBaseUrl = "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com";
         const imageUrl = serviceDetail.value.image_url.startsWith("http") ? serviceDetail.value.image_url : imgBaseUrl + serviceDetail.value.image_url;
-        console.log("预览图片URL:", imageUrl);
+        common_vendor.index.__f__("log", "at subPackages/home/detail.vue:218", "预览图片URL:", imageUrl);
         common_vendor.index.previewImage({
           urls: [imageUrl],
           current: imageUrl,
           success: () => {
-            console.log("图片预览成功");
+            common_vendor.index.__f__("log", "at subPackages/home/detail.vue:224", "图片预览成功");
           },
           fail: (err) => {
-            console.error("图片预览失败:", err);
+            common_vendor.index.__f__("error", "at subPackages/home/detail.vue:227", "图片预览失败:", err);
             common_vendor.index.showToast({
               title: "图片预览失败",
               icon: "none"
@@ -124,7 +121,7 @@ const _sfc_main = {
         d: common_vendor.o(goBack),
         e: _ctx.$imgBaseUrl + serviceDetail.value.image_url,
         f: common_vendor.o(onImageError),
-        g: common_assets._imports_1$4,
+        g: common_assets._imports_1$5,
         h: common_vendor.t(serviceDetail.value.category_name || "服务"),
         i: common_assets._imports_2$3,
         j: common_vendor.o(previewImage),
@@ -161,7 +158,7 @@ const _sfc_main = {
           });
         })
       } : {}, {
-        v: common_assets._imports_1$4,
+        v: common_assets._imports_1$5,
         w: common_vendor.t(serviceDetail.value.description || "暂无详细说明")
       }) : {}, {
         b: !error.value,
@@ -173,11 +170,13 @@ const _sfc_main = {
       } : {}, {
         B: error.value
       }, error.value ? {
-        C: common_vendor.t(error.value),
-        D: common_vendor.o(loadData)
+        C: common_assets._imports_5,
+        D: common_vendor.t(error.value),
+        E: common_vendor.o(loadData)
       } : {});
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5b390ea8"], ["__file", "/Users/mac/Documents/firend-loving-app/subPackages/home/detail.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5b390ea8"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/subPackages/home/detail.js.map

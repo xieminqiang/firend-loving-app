@@ -11,7 +11,7 @@ const _sfc_main = {
     });
     const userInfo = common_vendor.computed(() => userStore.userInfo || {});
     const handleLoginSuccess = (data) => {
-      console.log("设置页面收到登录成功事件:", data);
+      common_vendor.index.__f__("log", "at subPackages/settings/pages/index/index.vue:98", "设置页面收到登录成功事件:", data);
     };
     common_vendor.onMounted(() => {
       common_vendor.index.$on("loginSuccess", handleLoginSuccess);
@@ -21,11 +21,11 @@ const _sfc_main = {
     });
     common_vendor.onLoad(async () => {
       var _a, _b;
-      console.log("设置页面载入");
-      console.log("当前用户信息:", userStore.userInfo);
-      console.log("登录状态:", isLogin.value);
-      console.log("用户昵称:", (_a = userInfo.value) == null ? void 0 : _a.nickname);
-      console.log("用户头像:", (_b = userInfo.value) == null ? void 0 : _b.avatar);
+      common_vendor.index.__f__("log", "at subPackages/settings/pages/index/index.vue:113", "设置页面载入");
+      common_vendor.index.__f__("log", "at subPackages/settings/pages/index/index.vue:114", "当前用户信息:", userStore.userInfo);
+      common_vendor.index.__f__("log", "at subPackages/settings/pages/index/index.vue:115", "登录状态:", isLogin.value);
+      common_vendor.index.__f__("log", "at subPackages/settings/pages/index/index.vue:116", "用户昵称:", (_a = userInfo.value) == null ? void 0 : _a.nickname);
+      common_vendor.index.__f__("log", "at subPackages/settings/pages/index/index.vue:117", "用户头像:", (_b = userInfo.value) == null ? void 0 : _b.avatar);
     });
     const handleAvatarSetting = () => {
       if (!isLogin.value) {
@@ -113,18 +113,18 @@ const _sfc_main = {
     };
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.unref(isLogin)
-      }, common_vendor.unref(isLogin) ? common_vendor.e({
-        b: common_vendor.unref(userInfo).avatar
-      }, common_vendor.unref(userInfo).avatar ? {
-        c: common_vendor.unref(userInfo).avatar
+        a: isLogin.value
+      }, isLogin.value ? common_vendor.e({
+        b: userInfo.value.avatar
+      }, userInfo.value.avatar ? {
+        c: userInfo.value.avatar
       } : {}, {
         d: common_assets._imports_0$5,
         e: common_vendor.o(handleAvatarSetting)
       }) : {}, {
-        f: common_vendor.unref(isLogin)
-      }, common_vendor.unref(isLogin) ? {
-        g: common_vendor.t(common_vendor.unref(userInfo).nickname || "未设置昵称"),
+        f: isLogin.value
+      }, isLogin.value ? {
+        g: common_vendor.t(userInfo.value.nickname || "未设置昵称"),
         h: common_assets._imports_0$5,
         i: common_vendor.o(handleNicknameSetting)
       } : {}, {
@@ -134,12 +134,13 @@ const _sfc_main = {
         m: common_vendor.o(handleUserAgreement),
         n: common_assets._imports_0$5,
         o: common_vendor.o(handleAboutUs),
-        p: common_vendor.unref(isLogin)
-      }, common_vendor.unref(isLogin) ? {
+        p: isLogin.value
+      }, isLogin.value ? {
         q: common_vendor.o(outLogin)
       } : {});
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-0dc70dea"], ["__file", "/Users/mac/Documents/firend-loving-app/subPackages/settings/pages/index/index.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-0dc70dea"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/subPackages/settings/pages/index/index.js.map

@@ -2,14 +2,15 @@
 const common_vendor = require("../../../common/vendor.js");
 const common_assets = require("../../../common/assets.js");
 const stores_user = require("../../../stores/user.js");
-require("../../../config/http.js");
-require("../../../config/config.js");
+const api_user = require("../../../api/user.js");
 const _sfc_main = {
   __name: "index",
   setup(__props) {
     const userStore = stores_user.useUserStore();
     const statusBarHeight = common_vendor.ref(0);
     const isRefreshing = common_vendor.ref(false);
+    const applicationInfo = common_vendor.ref(null);
+    const applicationStatus = common_vendor.ref("");
     const isLoggedIn = common_vendor.computed(() => {
       return userStore.userInfo && Object.keys(userStore.userInfo).length > 0;
     });
@@ -35,11 +36,11 @@ const _sfc_main = {
       toReview: 3
     });
     const handleLoginSuccess = (data) => {
-      console.log("收到登录成功事件:", data);
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:350", "收到登录成功事件:", data);
       loadUserData();
     };
     const handleLogoutSuccess = () => {
-      console.log("收到退出登录事件");
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:357", "收到退出登录事件");
       accountBalance.value = "0.00";
       couponsCount.value = 0;
       orderCounts.value = {
@@ -47,6 +48,17 @@ const _sfc_main = {
         inProgress: 0,
         toReview: 0
       };
+      applicationInfo.value = null;
+      applicationStatus.value = "";
+    };
+    const handleApplicationStatusChanged = (data) => {
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:373", "收到申请状态变化事件:", data);
+      loadApplicationInfo();
+      common_vendor.index.showToast({
+        title: "申请信息已更新",
+        icon: "success",
+        duration: 2e3
+      });
     };
     common_vendor.onMounted(() => {
       const systemInfo = common_vendor.index.getSystemInfoSync();
@@ -54,14 +66,77 @@ const _sfc_main = {
       loadUserData();
       common_vendor.index.$on("loginSuccess", handleLoginSuccess);
       common_vendor.index.$on("logoutSuccess", handleLogoutSuccess);
+      common_vendor.index.$on("applicationStatusChanged", handleApplicationStatusChanged);
     });
     common_vendor.onUnmounted(() => {
       common_vendor.index.$off("loginSuccess", handleLoginSuccess);
       common_vendor.index.$off("logoutSuccess", handleLogoutSuccess);
+      common_vendor.index.$off("applicationStatusChanged", handleApplicationStatusChanged);
     });
     const loadUserData = async () => {
-      console.log("开始加载用户数据 - isLoggedIn:", isLoggedIn.value);
-      console.log("当前用户状态:", userStore.userInfo);
+      var _a;
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:412", "开始加载用户数据 - isLoggedIn:", isLoggedIn.value);
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:413", "当前用户状态:", userStore.userInfo);
+      if (isLoggedIn.value) {
+        try {
+          common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:418", "用户已登录，开始请求用户信息");
+          const response = await api_user.getUserInfo();
+          common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:420", "用户信息请求成功:", response);
+          if (response.data && response.data.code === 0) {
+            const userData = response.data.data;
+            common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:425", "解析用户数据:", userData);
+            const userInfo2 = {
+              nickname: userData.nick_name || "",
+              phone: userData.phone || "",
+              avatar: userData.head_img || "",
+              access_token: userStore.userInfo.access_token || "",
+              refresh_token: userStore.userInfo.refresh_token || ""
+            };
+            userStore.setUserInfo(userInfo2);
+          } else {
+            common_vendor.index.__f__("warn", "at pages/tabbar/profile/index.vue:442", "获取用户信息失败:", ((_a = response.data) == null ? void 0 : _a.msg) || "未知错误");
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:445", "获取用户信息失败:", error);
+        }
+        await loadApplicationInfo();
+      } else {
+        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:451", "用户未登录，跳过获取用户信息");
+      }
+    };
+    const loadApplicationInfo = async () => {
+      var _a;
+      try {
+        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:458", "开始请求申请信息");
+        const response = await api_user.getApplicatioInfo();
+        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:460", "申请信息请求成功:", response);
+        if (response.data && response.data.code === 0) {
+          applicationInfo.value = response.data.data;
+          if (applicationInfo.value) {
+            switch (applicationInfo.value.status) {
+              case "pending":
+                applicationStatus.value = "审核中";
+                break;
+              case "approved":
+                applicationStatus.value = "已通过";
+                break;
+              case "rejected":
+                applicationStatus.value = "已拒绝";
+                break;
+              default:
+                applicationStatus.value = "未知状态";
+            }
+          } else {
+            applicationStatus.value = "未申请";
+          }
+        } else {
+          common_vendor.index.__f__("warn", "at pages/tabbar/profile/index.vue:485", "获取申请信息失败:", ((_a = response.data) == null ? void 0 : _a.msg) || "未知错误");
+          applicationStatus.value = "获取失败";
+        }
+      } catch (error) {
+        common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:489", "获取申请信息失败:", error);
+        applicationStatus.value = "获取失败";
+      }
     };
     const navigateToLogin = () => {
       common_vendor.index.navigateTo({
@@ -144,9 +219,15 @@ const _sfc_main = {
       });
     };
     const navigateToPartnerRegistration = () => {
-      common_vendor.index.navigateTo({
-        url: "/subPackages/partner/index"
-      });
+      if (applicationStatus.value === "已通过") {
+        common_vendor.index.navigateTo({
+          url: "/subPackages/partner/index"
+        });
+      } else {
+        common_vendor.index.navigateTo({
+          url: "/subPackages/friend/apply/index"
+        });
+      }
     };
     const navigateToCooperation = () => {
       common_vendor.index.navigateTo({
@@ -239,13 +320,18 @@ const _sfc_main = {
       });
     };
     const onRefresh = async () => {
-      console.log("开始下拉刷新");
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:710", "开始下拉刷新");
       isRefreshing.value = true;
       try {
         await loadUserData();
         await new Promise((resolve) => setTimeout(resolve, 800));
+        common_vendor.index.showToast({
+          title: "刷新成功",
+          icon: "success",
+          duration: 1500
+        });
       } catch (error) {
-        console.error("刷新失败:", error);
+        common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:725", "刷新失败:", error);
         common_vendor.index.showToast({
           title: "刷新失败",
           icon: "none",
@@ -256,7 +342,7 @@ const _sfc_main = {
       }
     };
     const onRefreshRestore = () => {
-      console.log("刷新动画结束");
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:737", "刷新动画结束");
       isRefreshing.value = false;
     };
     const formatPhone = (phone) => {
@@ -264,108 +350,117 @@ const _sfc_main = {
         return "未绑定手机号";
       return phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2");
     };
+    const getPartnerText = () => {
+      if (applicationStatus.value === "审核中") {
+        return "友伴入驻";
+      } else if (applicationStatus.value === "已通过") {
+        return "友伴端";
+      } else if (applicationStatus.value === "已拒绝") {
+        return "友伴入驻";
+      } else {
+        return "友伴入驻";
+      }
+    };
     return (_ctx, _cache) => {
       var _a;
       return common_vendor.e({
-        a: common_vendor.unref(isLoggedIn)
-      }, common_vendor.unref(isLoggedIn) ? common_vendor.e({
-        b: common_vendor.unref(userInfo).avatar
-      }, common_vendor.unref(userInfo).avatar ? {
-        c: common_vendor.unref(userInfo).avatar
+        a: isLoggedIn.value
+      }, isLoggedIn.value ? common_vendor.e({
+        b: userInfo.value.avatar
+      }, userInfo.value.avatar ? {
+        c: userInfo.value.avatar
       } : {
-        d: common_vendor.t(((_a = common_vendor.unref(userInfo).nickname) == null ? void 0 : _a.charAt(0)) || "用")
+        d: common_vendor.t(((_a = userInfo.value.nickname) == null ? void 0 : _a.charAt(0)) || "用")
       }, {
-        e: common_vendor.t(common_vendor.unref(userInfo).nickname || "随伴行用户"),
-        f: common_vendor.t(formatPhone(common_vendor.unref(userInfo).phone) || "未绑定手机号"),
-        g: common_vendor.t(common_vendor.unref(userInfo).city || "未设置位置"),
-        h: common_assets._imports_0$2,
-        i: common_vendor.t(common_vendor.unref(userInfo).realNameAuth ? "已实名认证" : "未实名认证"),
-        j: common_vendor.unref(userInfo).realNameAuth ? 1 : "",
-        k: common_vendor.unref(userInfo).levelProgress + "%",
-        l: common_vendor.t(common_vendor.unref(userInfo).level || 1),
-        m: common_assets._imports_1$3,
-        n: common_vendor.o(navigateToUserDetail)
+        e: common_vendor.t(userInfo.value.nickname || "随伴行用户"),
+        f: common_assets._imports_0$2,
+        g: common_vendor.t(formatPhone(userInfo.value.phone) || "未绑定手机号"),
+        h: userInfo.value.levelProgress + "%",
+        i: common_vendor.t(userInfo.value.level || 1),
+        j: common_vendor.o(navigateToUserDetail)
       }) : {
-        o: common_assets._imports_2$2,
-        p: common_assets._imports_3$1,
-        q: common_assets._imports_4$2,
-        r: common_assets._imports_1$3,
-        s: common_vendor.o(navigateToLogin)
+        k: common_assets._imports_1$3,
+        l: common_assets._imports_2$2,
+        m: common_assets._imports_3$1,
+        n: common_assets._imports_0$2,
+        o: common_vendor.o(navigateToLogin)
       }, {
-        t: statusBarHeight.value + "px",
-        v: common_assets._imports_5$2,
-        w: common_vendor.o(($event) => handleActionClick("wallet")),
-        x: common_assets._imports_6,
-        y: couponsCount.value > 0
+        p: statusBarHeight.value + "px",
+        q: common_assets._imports_4$2,
+        r: common_vendor.o(($event) => handleActionClick("wallet")),
+        s: common_assets._imports_5$3,
+        t: couponsCount.value > 0
       }, couponsCount.value > 0 ? {
-        z: common_vendor.t(couponsCount.value)
+        v: common_vendor.t(couponsCount.value)
       } : {}, {
-        A: common_vendor.o(($event) => handleActionClick("coupons")),
-        B: common_assets._imports_2$2,
-        C: common_vendor.o(($event) => handleActionClick("favorites")),
-        D: common_assets._imports_7$1,
-        E: common_vendor.o(($event) => handleActionClick("history")),
-        F: common_assets._imports_1$3,
-        G: common_vendor.o(navigateToBillDetails),
-        H: common_vendor.t(accountBalance.value),
-        I: common_vendor.o(handleWithdraw),
-        J: common_vendor.o(handleRecharge),
-        K: common_assets._imports_1$3,
-        L: common_vendor.o(($event) => navigateToOrders("all")),
-        M: common_assets._imports_8,
-        N: orderCounts.value.pending > 0
+        w: common_vendor.o(($event) => handleActionClick("coupons")),
+        x: common_assets._imports_1$3,
+        y: common_vendor.o(($event) => handleActionClick("favorites")),
+        z: common_assets._imports_6,
+        A: common_vendor.o(($event) => handleActionClick("history")),
+        B: common_assets._imports_0$2,
+        C: common_vendor.o(navigateToBillDetails),
+        D: common_vendor.t(accountBalance.value),
+        E: common_vendor.o(handleWithdraw),
+        F: common_vendor.o(handleRecharge),
+        G: common_assets._imports_0$2,
+        H: common_vendor.o(($event) => navigateToOrders("all")),
+        I: common_assets._imports_7$1,
+        J: orderCounts.value.pending > 0
       }, orderCounts.value.pending > 0 ? {
-        O: common_vendor.t(orderCounts.value.pending)
+        K: common_vendor.t(orderCounts.value.pending)
       } : {}, {
-        P: common_vendor.o(($event) => navigateToOrders("pending")),
-        Q: common_assets._imports_2$2,
-        R: common_vendor.o(($event) => navigateToOrders("to-serve")),
-        S: common_assets._imports_3$1,
-        T: orderCounts.value.inProgress > 0
+        L: common_vendor.o(($event) => navigateToOrders("pending")),
+        M: common_assets._imports_1$3,
+        N: common_vendor.o(($event) => navigateToOrders("to-serve")),
+        O: common_assets._imports_2$2,
+        P: orderCounts.value.inProgress > 0
       }, orderCounts.value.inProgress > 0 ? {
-        U: common_vendor.t(orderCounts.value.inProgress)
+        Q: common_vendor.t(orderCounts.value.inProgress)
       } : {}, {
-        V: common_vendor.o(($event) => navigateToOrders("in-progress")),
-        W: common_assets._imports_9,
-        X: common_vendor.o(($event) => navigateToOrders("completed")),
-        Y: common_assets._imports_10,
-        Z: orderCounts.value.toReview > 0
+        R: common_vendor.o(($event) => navigateToOrders("in-progress")),
+        S: common_assets._imports_8,
+        T: common_vendor.o(($event) => navigateToOrders("completed")),
+        U: common_assets._imports_9,
+        V: orderCounts.value.toReview > 0
       }, orderCounts.value.toReview > 0 ? {
-        aa: common_vendor.t(orderCounts.value.toReview)
+        W: common_vendor.t(orderCounts.value.toReview)
       } : {}, {
-        ab: common_vendor.o(($event) => navigateToOrders("to-review")),
-        ac: common_assets._imports_11,
-        ad: common_vendor.o(navigateToPromotion),
-        ae: common_assets._imports_12,
-        af: common_vendor.o(navigateToReportReward),
-        ag: common_assets._imports_13,
-        ah: common_vendor.o(navigateToPartnerRegistration),
-        ai: common_assets._imports_14,
-        aj: common_vendor.o(navigateToCooperation),
-        ak: common_assets._imports_15,
-        al: common_vendor.o(handleEmergencyCall),
-        am: common_assets._imports_16,
-        an: common_vendor.o(navigateToHelp),
-        ao: common_assets._imports_17,
-        ap: common_vendor.o(navigateToRefund),
-        aq: common_assets._imports_4$2,
-        ar: common_assets._imports_1$3,
-        as: common_vendor.o(navigateToPrivacySettings),
+        X: common_vendor.o(($event) => navigateToOrders("to-review")),
+        Y: common_assets._imports_10,
+        Z: common_vendor.o(navigateToPromotion),
+        aa: common_assets._imports_11,
+        ab: common_vendor.o(navigateToReportReward),
+        ac: common_assets._imports_12,
+        ad: common_vendor.t(getPartnerText()),
+        ae: common_vendor.o(navigateToPartnerRegistration),
+        af: common_assets._imports_13,
+        ag: common_vendor.o(navigateToCooperation),
+        ah: common_assets._imports_14,
+        ai: common_vendor.o(handleEmergencyCall),
+        aj: common_assets._imports_15,
+        ak: common_vendor.o(navigateToHelp),
+        al: common_assets._imports_16,
+        am: common_vendor.o(navigateToRefund),
+        an: common_assets._imports_3$1,
+        ao: common_assets._imports_0$2,
+        ap: common_vendor.o(navigateToPrivacySettings),
+        aq: common_assets._imports_17,
+        ar: common_assets._imports_0$2,
+        as: common_vendor.o(navigateToNotificationSettings),
         at: common_assets._imports_18,
-        av: common_assets._imports_1$3,
-        aw: common_vendor.o(navigateToNotificationSettings),
+        av: common_assets._imports_0$2,
+        aw: common_vendor.o(navigateToCustomerService),
         ax: common_assets._imports_19,
-        ay: common_assets._imports_1$3,
-        az: common_vendor.o(navigateToCustomerService),
-        aA: common_assets._imports_20,
-        aB: common_assets._imports_1$3,
-        aC: common_vendor.o(navigateToSystemSettings),
-        aD: isRefreshing.value,
-        aE: common_vendor.o(onRefresh),
-        aF: common_vendor.o(onRefreshRestore)
+        ay: common_assets._imports_0$2,
+        az: common_vendor.o(navigateToSystemSettings),
+        aA: isRefreshing.value,
+        aB: common_vendor.o(onRefresh),
+        aC: common_vendor.o(onRefreshRestore)
       });
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-4cb51321"], ["__file", "/Users/mac/Documents/firend-loving-app/pages/tabbar/profile/index.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-4cb51321"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/tabbar/profile/index.js.map

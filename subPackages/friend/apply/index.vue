@@ -781,8 +781,8 @@ const doSubmit = async () => {
     // 判断接口是否成功 - 需要 response.data.code == 0
     if (response && response.data && response.data.code === 0) {
       // 提交成功 - 直接入驻成功
-      const successMessage = (response.data && response.data.data && response.data.data.message) || 
-                             '恭喜您！入驻申请已通过，您已成功成为友伴师。'
+      const successMessage =  '恭喜您！入驻申请已通过，您已成功成为友伴师。'
+                            
       
       uni.showModal({
         title: '入驻成功 🎉',
@@ -790,6 +790,12 @@ const doSubmit = async () => {
         showCancel: false,
         confirmText: '我知道了',
         success: () => {
+          // 发送事件通知个人中心页面刷新申请信息
+          uni.$emit('applicationStatusChanged', {
+            status: 'approved',
+            message: '入驻申请已通过'
+          })
+          
           // 返回上一页
           uni.navigateBack()
         }

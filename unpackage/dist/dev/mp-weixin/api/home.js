@@ -37,3 +37,4 @@ exports.getCityList = getCityList;
 exports.getHotRecommendServices = getHotRecommendServices;
 exports.getPriceTemplateDetail = getPriceTemplateDetail;
 exports.getServiceDetail = getServiceDetail;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/api/home.js.map

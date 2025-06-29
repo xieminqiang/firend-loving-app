@@ -695,7 +695,7 @@ const _sfc_main = {
       filters[activeModal.value].value = "all";
     };
     const applyFilter = () => {
-      console.log("应用筛选:", {
+      common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:859", "应用筛选:", {
         gender: genderFilter.value,
         distance: distanceFilter.value,
         sort: sortFilter.value
@@ -716,7 +716,7 @@ const _sfc_main = {
       });
     };
     const loadMore = () => {
-      console.log("加载更多数据");
+      common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:903", "加载更多数据");
     };
     const onRefresh = () => {
       isRefreshing.value = true;
@@ -787,16 +787,16 @@ const _sfc_main = {
             q: common_vendor.o(($event) => navigateToDetail(p.id), p.id)
           });
         }),
-        q: common_assets._imports_5$1,
+        q: common_assets._imports_5$2,
         r: common_vendor.o(loadMore),
         s: isRefreshing.value,
         t: common_vendor.o(onRefresh),
         v: activeModal.value
       }, activeModal.value ? {
-        w: common_vendor.t(common_vendor.unref(getModalTitle)),
-        x: common_assets._imports_5,
+        w: common_vendor.t(getModalTitle.value),
+        x: common_assets._imports_5$1,
         y: common_vendor.o(closeModal),
-        z: common_vendor.f(common_vendor.unref(getFilterOptions), (option, k0, i0) => {
+        z: common_vendor.f(getFilterOptions.value, (option, k0, i0) => {
           return common_vendor.e({
             a: option.icon
           }, option.icon ? {
@@ -823,5 +823,6 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5e09aaad"], ["__file", "/Users/mac/Documents/firend-loving-app/pages/tabbar/friends/index.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5e09aaad"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/tabbar/friends/index.js.map

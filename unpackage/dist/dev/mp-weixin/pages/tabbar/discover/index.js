@@ -8,7 +8,7 @@ const _sfc_main = {
     common_vendor.onMounted(() => {
       const systemInfo = common_vendor.index.getSystemInfoSync();
       statusBarHeight.value = systemInfo.statusBarHeight || 0;
-      console.log("发现页面加载完成");
+      common_vendor.index.__f__("log", "at pages/tabbar/discover/index.vue:257", "发现页面加载完成");
     });
     const isSearchActive = common_vendor.ref(false);
     const searchText = common_vendor.ref("");
@@ -403,7 +403,7 @@ const _sfc_main = {
       });
     };
     const playVideo = (feed) => {
-      console.log("播放视频:", feed.id);
+      common_vendor.index.__f__("log", "at pages/tabbar/discover/index.vue:706", "播放视频:", feed.id);
     };
     const getPostPreview = () => {
       if (selectedFeed.value) {
@@ -495,7 +495,7 @@ const _sfc_main = {
         x: rewardMessage.value,
         y: common_vendor.o(($event) => rewardMessage.value = $event.detail.value),
         z: common_vendor.t(rewardMessage.value.length),
-        A: common_vendor.t(common_vendor.unref(finalAmount)),
+        A: common_vendor.t(finalAmount.value),
         B: common_assets._imports_3,
         C: common_vendor.o(confirmReward),
         D: common_vendor.o(() => {
@@ -504,7 +504,7 @@ const _sfc_main = {
       } : {}, {
         F: showCommentModal.value
       }, showCommentModal.value ? common_vendor.e({
-        G: common_assets._imports_5,
+        G: common_assets._imports_5$1,
         H: common_vendor.o(closeCommentModal),
         I: selectedFeed.value && selectedFeed.value.avatar || "",
         J: common_vendor.t(selectedFeed.value && selectedFeed.value.name || ""),
@@ -540,5 +540,6 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-ad07ea5c"], ["__file", "/Users/mac/Documents/firend-loving-app/pages/tabbar/discover/index.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-ad07ea5c"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/tabbar/discover/index.js.map

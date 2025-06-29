@@ -12,3 +12,4 @@ pinia.use(common_vendor.createPersistedState({
   }
 }));
 exports.pinia = pinia;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/stores/index.js.map

@@ -3,9 +3,6 @@ const common_vendor = require("../../../common/vendor.js");
 const common_assets = require("../../../common/assets.js");
 const api_user = require("../../../api/user.js");
 const api_home = require("../../../api/home.js");
-require("../../../config/http.js");
-require("../../../stores/user.js");
-require("../../../config/config.js");
 const _sfc_main = {
   __name: "index",
   setup(__props) {
@@ -44,7 +41,7 @@ const _sfc_main = {
           return city ? city.code : null;
         }).filter((code) => code !== null);
         if (cityCodes.length === 0) {
-          console.warn("未找到有效的城市代码");
+          common_vendor.index.__f__("warn", "at subPackages/friend/apply/index.vue:406", "未找到有效的城市代码");
           serviceSkills.value = [];
           skillCategories.value = [];
           return;
@@ -53,15 +50,15 @@ const _sfc_main = {
         if (response.data && response.data.code === 0 && response.data.data) {
           serviceSkills.value = response.data.data;
           groupServicesByCategory();
-          console.log("服务技能列表加载成功:", serviceSkills.value);
-          console.log("服务技能分组:", skillCategories.value);
+          common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:420", "服务技能列表加载成功:", serviceSkills.value);
+          common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:421", "服务技能分组:", skillCategories.value);
         } else {
-          console.warn("获取服务技能列表失败");
+          common_vendor.index.__f__("warn", "at subPackages/friend/apply/index.vue:423", "获取服务技能列表失败");
           serviceSkills.value = [];
           skillCategories.value = [];
         }
       } catch (error) {
-        console.error("获取服务技能列表失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:428", "获取服务技能列表失败:", error);
         serviceSkills.value = [];
         skillCategories.value = [];
       } finally {
@@ -94,13 +91,13 @@ const _sfc_main = {
             code: city.city_code
             // 保持字段名一致
           }));
-          console.log("申请页面区域列表加载成功:", cityList.value);
+          common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:473", "申请页面区域列表加载成功:", cityList.value);
         } else {
-          console.warn("获取区域列表失败");
+          common_vendor.index.__f__("warn", "at subPackages/friend/apply/index.vue:475", "获取区域列表失败");
           cityList.value = [];
         }
       } catch (error) {
-        console.error("获取区域列表失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:479", "获取区域列表失败:", error);
         cityList.value = [];
       } finally {
         cityLoading.value = false;
@@ -294,17 +291,21 @@ const _sfc_main = {
           // 不允许接单
           photos: photos.value
         };
-        console.log("提交数据:", submitData);
+        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:774", "提交数据:", submitData);
         const response = await api_user.createCompanionApplication(submitData);
-        console.log("接口响应:", response);
+        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:779", "接口响应:", response);
         if (response && response.data && response.data.code === 0) {
-          const successMessage = response.data && response.data.data && response.data.data.message || "恭喜您！入驻申请已通过，您已成功成为友伴师。";
+          const successMessage = "恭喜您！入驻申请已通过，您已成功成为友伴师。";
           common_vendor.index.showModal({
             title: "入驻成功 🎉",
             content: successMessage,
             showCancel: false,
             confirmText: "我知道了",
             success: () => {
+              common_vendor.index.$emit("applicationStatusChanged", {
+                status: "approved",
+                message: "入驻申请已通过"
+              });
               common_vendor.index.navigateBack();
             }
           });
@@ -318,7 +319,7 @@ const _sfc_main = {
           });
         }
       } catch (error) {
-        console.error("提交失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:816", "提交失败:", error);
         let errorMessage = "提交失败，请稍后重试";
         if (error && error.message) {
           if (error.message.includes("网络")) {
@@ -444,5 +445,6 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-eb2c0b40"], ["__file", "/Users/mac/Documents/firend-loving-app/subPackages/friend/apply/index.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-eb2c0b40"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/subPackages/friend/apply/index.js.map

@@ -55,6 +55,15 @@
             "urlCheck" : false
         },
         "usingComponents" : true,
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "获取你的具体位置信息，以便我们提供服务"
+            }
+        },
+        "requiredPrivateInfos" : [ "getLocation", "chooseLocation","startLocationUpdateBackground"],
+        "optimization" : {
+            "subPackages" : true
+        },
         "lazyCodeLoading" : "requiredComponents"
     },
     "mp-alipay" : {
