@@ -172,9 +172,16 @@ import { getHotRecommendServices, getCityList } from '@/api/home.js'
 // 状态栏高度适配
 const statusBarHeight = ref(0)
 const navBarHeight = ref(44) // 默认导航栏高度
+function requestBackgroundLocation() {
+ 
+}
 
 // 获取系统信息
 onMounted(async () => {
+
+
+	
+	
   const systemInfo = uni.getSystemInfoSync()
   statusBarHeight.value = systemInfo.statusBarHeight || 0
   
@@ -482,6 +489,8 @@ const onRefresh = async (tab) => {
     // 下拉刷新时强制重新加载数据
     console.log(`下拉刷新${tab}选项卡数据`)
     await loadSingleTabData(tab, true)
+	// 模拟加载时间，确保用户能看到刷新动画
+	await new Promise(resolve => setTimeout(resolve, 800))
   } catch (error) {
     console.error('刷新失败:', error)
   } finally {

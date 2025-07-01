@@ -7,7 +7,7 @@ import { http } from '@/config/http.js'
  */
 export const getServiceDetail = (id) => {
   return http({
-    url: `/service/detail/${id}`,
+    url: `/front/service/detail/${id}`,
     method: 'GET'
   })
 }
@@ -50,7 +50,7 @@ export const getHotRecommendServices = (params = {}) => {
  */
 export const getPlatformServicesList = (params = {}) => {
   return http({
-    url: '/home/page/services',
+    url: '/front/home/page/services',
     method: 'GET',
     data: params
   })
@@ -62,7 +62,7 @@ export const getPlatformServicesList = (params = {}) => {
  */
 export const getCityList = () => {
   return http({
-    url: '/cities',
+    url: '/front/cities',
     method: 'GET'
   })
 }

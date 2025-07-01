@@ -97,6 +97,13 @@
 						"navigationBarTitleText": "友伴端",
 						"navigationStyle": "custom"
 					}
+				},
+				{
+					"path": "DataEdetion/index",
+					"style": {
+						"navigationBarTitleText": "友伴端",
+						"navigationStyle": "custom"
+					}
 				}
 			]
 		},

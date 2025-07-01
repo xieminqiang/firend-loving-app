@@ -3,9 +3,13 @@ const common_vendor = require("../../../common/vendor.js");
 const common_assets = require("../../../common/assets.js");
 const api_user = require("../../../api/user.js");
 const api_home = require("../../../api/home.js");
+const api_file = require("../../../api/file.js");
+const stores_user = require("../../../stores/user.js");
+const cacheExpireTime = 5 * 60 * 1e3;
 const _sfc_main = {
   __name: "index",
   setup(__props) {
+    const userStore = stores_user.useUserStore();
     common_vendor.ref(false);
     const isSubmitting = common_vendor.ref(false);
     const agreementAccepted = common_vendor.ref(false);
@@ -28,6 +32,21 @@ const _sfc_main = {
     const selectedSkills = common_vendor.ref([]);
     const servicesLoading = common_vendor.ref(false);
     const skillCategories = common_vendor.ref([]);
+    const selectedTags = common_vendor.ref([]);
+    const showTagPicker = common_vendor.ref(false);
+    const tempSelectedTags = common_vendor.ref([]);
+    const tagsLoading = common_vendor.ref(false);
+    const currentTagType = common_vendor.ref(4);
+    const currentTagList = common_vendor.ref([]);
+    const tagsCache = common_vendor.ref(/* @__PURE__ */ new Map());
+    const cacheTimestamps = common_vendor.ref(/* @__PURE__ */ new Map());
+    const tagNavItems = common_vendor.ref([
+      { type: 4, name: "个性特质" },
+      { type: 5, name: "我的爱好" },
+      { type: 6, name: "外貌风格" },
+      { type: 7, name: "专业技能" },
+      { type: 8, name: "热门推荐" }
+    ]);
     const loadServicesByCity = async () => {
       if (selectedCities.value.length === 0) {
         serviceSkills.value = [];
@@ -41,7 +60,7 @@ const _sfc_main = {
           return city ? city.code : null;
         }).filter((code) => code !== null);
         if (cityCodes.length === 0) {
-          common_vendor.index.__f__("warn", "at subPackages/friend/apply/index.vue:406", "未找到有效的城市代码");
+          common_vendor.index.__f__("warn", "at subPackages/friend/apply/index.vue:536", "未找到有效的城市代码");
           serviceSkills.value = [];
           skillCategories.value = [];
           return;
@@ -50,15 +69,15 @@ const _sfc_main = {
         if (response.data && response.data.code === 0 && response.data.data) {
           serviceSkills.value = response.data.data;
           groupServicesByCategory();
-          common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:420", "服务技能列表加载成功:", serviceSkills.value);
-          common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:421", "服务技能分组:", skillCategories.value);
+          common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:550", "服务技能列表加载成功:", serviceSkills.value);
+          common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:551", "服务技能分组:", skillCategories.value);
         } else {
-          common_vendor.index.__f__("warn", "at subPackages/friend/apply/index.vue:423", "获取服务技能列表失败");
+          common_vendor.index.__f__("warn", "at subPackages/friend/apply/index.vue:553", "获取服务技能列表失败");
           serviceSkills.value = [];
           skillCategories.value = [];
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:428", "获取服务技能列表失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:558", "获取服务技能列表失败:", error);
         serviceSkills.value = [];
         skillCategories.value = [];
       } finally {
@@ -91,13 +110,13 @@ const _sfc_main = {
             code: city.city_code
             // 保持字段名一致
           }));
-          common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:473", "申请页面区域列表加载成功:", cityList.value);
+          common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:603", "申请页面区域列表加载成功:", cityList.value);
         } else {
-          common_vendor.index.__f__("warn", "at subPackages/friend/apply/index.vue:475", "获取区域列表失败");
+          common_vendor.index.__f__("warn", "at subPackages/friend/apply/index.vue:605", "获取区域列表失败");
           cityList.value = [];
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:479", "获取区域列表失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:609", "获取区域列表失败:", error);
         cityList.value = [];
       } finally {
         cityLoading.value = false;
@@ -151,13 +170,91 @@ const _sfc_main = {
       await loadServicesByCity();
     };
     const addPhoto = () => {
+      const maxCount = 6 - photos.value.length;
+      if (maxCount <= 0) {
+        common_vendor.index.showToast({
+          title: "最多只能上传6张照片",
+          icon: "none"
+        });
+        return;
+      }
       common_vendor.index.chooseImage({
-        count: 6 - photos.value.length,
+        count: maxCount,
         sizeType: ["compressed"],
         sourceType: ["album", "camera"],
-        success: (res) => {
-          photos.value.push(...res.tempFilePaths);
+        success: async (res) => {
+          common_vendor.index.showLoading({
+            title: "上传中...",
+            mask: true
+          });
+          try {
+            const uploadPromises = res.tempFilePaths.map(async (filePath, index) => {
+              try {
+                const fileInfo = await getFileInfo(filePath);
+                common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:724", "fileInfo", fileInfo);
+                common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:725", "filePath", filePath);
+                if (!fileInfo || !fileInfo.extension) {
+                  throw new Error("无法获取文件信息");
+                }
+                const uploadResult = await api_file.uploadFile({
+                  filePath,
+                  name: `photo_${Date.now()}_${index}.${fileInfo.extension}`
+                });
+                const fileData = api_file.getUploadResult(uploadResult);
+                if (!fileData || !fileData.url) {
+                  throw new Error("上传结果解析失败");
+                }
+                return "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com" + fileData.url;
+              } catch (error) {
+                common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:744", `第${index + 1}张照片上传失败:`, error);
+                throw error;
+              }
+            });
+            const uploadedUrls = await Promise.all(uploadPromises);
+            photos.value.push(...uploadedUrls);
+            common_vendor.index.showToast({
+              title: `成功上传${uploadedUrls.length}张照片`,
+              icon: "success"
+            });
+          } catch (error) {
+            common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:761", "照片上传失败:", error);
+            common_vendor.index.showToast({
+              title: "照片上传失败，请重试",
+              icon: "none"
+            });
+          } finally {
+            common_vendor.index.hideLoading();
+          }
+        },
+        fail: (error) => {
+          common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:771", "选择照片失败:", error);
+          common_vendor.index.showToast({
+            title: "选择照片失败",
+            icon: "none"
+          });
         }
+      });
+    };
+    const getFileInfo = (filePath) => {
+      return new Promise((resolve, reject) => {
+        common_vendor.index.getFileInfo({
+          filePath,
+          success: (res) => {
+            const extension = filePath.split(".").pop().toLowerCase();
+            resolve({
+              size: res.size,
+              extension
+            });
+          },
+          fail: (error) => {
+            common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:794", "获取文件信息失败:", error);
+            const extension = filePath.split(".").pop().toLowerCase() || "jpg";
+            resolve({
+              size: 0,
+              extension
+            });
+          }
+        });
       });
     };
     const previewPhoto = (index) => {
@@ -289,11 +386,15 @@ const _sfc_main = {
           // 服务ID数组
           can_accept_orders: "N",
           // 不允许接单
-          photos: photos.value
+          photos: photos.value,
+          tags: selectedTags.value.map((tag) => tag.tag_name),
+          // 个性标签名称数组
+          phone: userStore.userInfo.phone || ""
+          // 添加phone参数
         };
-        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:774", "提交数据:", submitData);
+        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:1004", "提交数据:", submitData);
         const response = await api_user.createCompanionApplication(submitData);
-        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:779", "接口响应:", response);
+        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:1009", "接口响应:", response);
         if (response && response.data && response.data.code === 0) {
           const successMessage = "恭喜您！入驻申请已通过，您已成功成为友伴师。";
           common_vendor.index.showModal({
@@ -319,7 +420,7 @@ const _sfc_main = {
           });
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:816", "提交失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:1046", "提交失败:", error);
         let errorMessage = "提交失败，请稍后重试";
         if (error && error.message) {
           if (error.message.includes("网络")) {
@@ -344,7 +445,115 @@ const _sfc_main = {
     };
     common_vendor.onMounted(async () => {
       await loadCityList();
+      common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:1079", "标签缓存配置:", {
+        expireTime: `${cacheExpireTime / 1e3 / 60}分钟`,
+        cacheSize: tagsCache.value.size
+      });
     });
+    const showTagSelector = () => {
+      tempSelectedTags.value = [...selectedTags.value];
+      showTagPicker.value = true;
+      loadTagsByType(4);
+    };
+    const hideTagSelector = () => {
+      tempSelectedTags.value = [];
+      showTagPicker.value = false;
+    };
+    const switchTagType = (tagType) => {
+      currentTagType.value = tagType;
+      loadTagsByType(tagType);
+    };
+    const isCacheValid = (tagType) => {
+      const timestamp = cacheTimestamps.value.get(tagType);
+      if (!timestamp)
+        return false;
+      const now = Date.now();
+      return now - timestamp < cacheExpireTime;
+    };
+    const getTagsFromCache = (tagType) => {
+      return tagsCache.value.get(tagType) || [];
+    };
+    const setTagsToCache = (tagType, tagList) => {
+      tagsCache.value.set(tagType, tagList);
+      cacheTimestamps.value.set(tagType, Date.now());
+      common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:1127", `标签类型${tagType}已缓存，数据量: ${tagList.length}`);
+    };
+    const loadTagsByType = async (tagType, forceRefresh = false) => {
+      if (!forceRefresh && isCacheValid(tagType)) {
+        const cachedTags = getTagsFromCache(tagType);
+        if (cachedTags.length > 0) {
+          common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:1152", `使用缓存数据 - 标签类型${tagType}，数据量: ${cachedTags.length}`);
+          currentTagList.value = cachedTags;
+          return;
+        }
+      }
+      tagsLoading.value = true;
+      try {
+        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:1160", `开始加载标签类型: ${tagType}`);
+        const params = {
+          tag_type: tagType,
+          page: 1,
+          pageSize: 60
+        };
+        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:1168", "请求参数:", params);
+        const response = await api_user.getPersonalityTags(params);
+        common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:1171", "API响应:", response);
+        if (response.data && response.data.code === 0 && response.data.data) {
+          const tagList = response.data.data.list || response.data.data;
+          currentTagList.value = tagList;
+          setTagsToCache(tagType, tagList);
+          common_vendor.index.__f__("log", "at subPackages/friend/apply/index.vue:1181", `标签类型${tagType}加载成功:`, tagList);
+        } else {
+          common_vendor.index.__f__("warn", "at subPackages/friend/apply/index.vue:1183", `获取标签类型${tagType}失败，响应数据:`, response);
+          currentTagList.value = [];
+        }
+      } catch (error) {
+        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:1187", `获取标签类型${tagType}失败:`, error);
+        common_vendor.index.__f__("error", "at subPackages/friend/apply/index.vue:1188", "错误详情:", error.response || error);
+        currentTagList.value = [];
+      } finally {
+        tagsLoading.value = false;
+      }
+    };
+    const isTagSelected = (tagId) => {
+      return tempSelectedTags.value.some((tag) => tag.id === tagId);
+    };
+    const toggleTagSelection = (tag) => {
+      const index = tempSelectedTags.value.findIndex((t) => t.id === tag.id);
+      if (index > -1) {
+        tempSelectedTags.value.splice(index, 1);
+      } else {
+        if (tempSelectedTags.value.length >= 5) {
+          common_vendor.index.showToast({
+            title: "最多只能选择5个标签",
+            icon: "none"
+          });
+          return;
+        }
+        tempSelectedTags.value.push(tag);
+      }
+      common_vendor.index.vibrateShort({
+        type: "light"
+      });
+    };
+    const confirmTagSelection = () => {
+      selectedTags.value = [...tempSelectedTags.value];
+      showTagPicker.value = false;
+      tempSelectedTags.value = [];
+      common_vendor.index.showToast({
+        title: `已选择${selectedTags.value.length}个标签`,
+        icon: "success"
+      });
+    };
+    const removeTag = (tag) => {
+      const index = selectedTags.value.findIndex((t) => t.id === tag.id);
+      if (index > -1) {
+        selectedTags.value.splice(index, 1);
+        common_vendor.index.vibrateShort({
+          type: "light"
+        });
+      }
+    };
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_assets._imports_0$3,
@@ -409,21 +618,34 @@ const _sfc_main = {
       } : {}, {
         A: selectedCities.value.length === 0,
         B: skillCategories.value.length > 0,
-        D: agreementAccepted.value
+        D: selectedTags.value.length > 0
+      }, selectedTags.value.length > 0 ? {
+        E: common_vendor.f(selectedTags.value, (tag, k0, i0) => {
+          return {
+            a: common_vendor.t(tag.tag_name),
+            b: tag.id,
+            c: common_vendor.o(($event) => removeTag(tag), tag.id)
+          };
+        })
+      } : {}, {
+        F: common_vendor.t(selectedTags.value.length),
+        G: selectedTags.value.length >= 5 ? 1 : "",
+        H: common_vendor.o(($event) => selectedTags.value.length < 5 ? showTagSelector() : null),
+        I: agreementAccepted.value
       }, agreementAccepted.value ? {} : {}, {
-        E: agreementAccepted.value ? 1 : "",
-        F: common_vendor.o(viewAgreement),
-        G: common_vendor.o(toggleAgreement),
-        H: !isSubmitting.value
+        J: agreementAccepted.value ? 1 : "",
+        K: common_vendor.o(viewAgreement),
+        L: common_vendor.o(toggleAgreement),
+        M: !isSubmitting.value
       }, !isSubmitting.value ? {} : {}, {
-        I: isSubmitting.value || !agreementAccepted.value ? 1 : "",
-        J: common_vendor.o(submitApplication),
-        K: showCityPicker.value
+        N: isSubmitting.value || !agreementAccepted.value ? 1 : "",
+        O: common_vendor.o(submitApplication),
+        P: showCityPicker.value
       }, showCityPicker.value ? common_vendor.e({
-        L: common_vendor.o(hideCitySelector),
-        M: cityLoading.value
+        Q: common_vendor.o(hideCitySelector),
+        R: cityLoading.value
       }, cityLoading.value ? {} : {
-        N: common_vendor.f(cityList.value, (cityItem, index, i0) => {
+        S: common_vendor.f(cityList.value, (cityItem, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(cityItem.name),
             b: tempSelectedCities.value.includes(cityItem.name)
@@ -436,11 +658,49 @@ const _sfc_main = {
           });
         })
       }, {
-        O: common_vendor.t(tempSelectedCities.value.length),
-        P: common_vendor.o(confirmCitySelection),
-        Q: common_vendor.o(() => {
+        T: common_vendor.t(tempSelectedCities.value.length),
+        U: common_vendor.o(confirmCitySelection),
+        V: common_vendor.o(() => {
         }),
-        R: common_vendor.o(hideCitySelector)
+        W: common_vendor.o(hideCitySelector)
+      }) : {}, {
+        X: showTagPicker.value
+      }, showTagPicker.value ? common_vendor.e({
+        Y: common_vendor.o(hideTagSelector),
+        Z: common_vendor.f(tagNavItems.value, (navItem, k0, i0) => {
+          return {
+            a: common_vendor.t(navItem.name),
+            b: navItem.type,
+            c: common_vendor.n({
+              active: currentTagType.value === navItem.type
+            }),
+            d: common_vendor.o(($event) => switchTagType(navItem.type), navItem.type)
+          };
+        }),
+        aa: !tagsLoading.value && tempSelectedTags.value.length >= 5
+      }, !tagsLoading.value && tempSelectedTags.value.length >= 5 ? {} : {}, {
+        ab: tagsLoading.value
+      }, tagsLoading.value ? {} : {
+        ac: common_vendor.f(currentTagList.value, (tag, k0, i0) => {
+          return common_vendor.e({
+            a: common_vendor.t(tag.tag_name),
+            b: isTagSelected(tag.id)
+          }, isTagSelected(tag.id) ? {} : {}, {
+            c: tag.id,
+            d: common_vendor.n({
+              selected: isTagSelected(tag.id)
+            }),
+            e: common_vendor.o(($event) => toggleTagSelection(tag), tag.id)
+          });
+        })
+      }, {
+        ad: !tagsLoading.value && currentTagList.value.length === 0
+      }, !tagsLoading.value && currentTagList.value.length === 0 ? {} : {}, {
+        ae: common_vendor.t(tempSelectedTags.value.length),
+        af: common_vendor.o(confirmTagSelection),
+        ag: common_vendor.o(() => {
+        }),
+        ah: common_vendor.o(hideTagSelector)
       }) : {});
     };
   }

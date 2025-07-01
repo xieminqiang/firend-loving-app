@@ -36,11 +36,11 @@ const _sfc_main = {
       toReview: 3
     });
     const handleLoginSuccess = (data) => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:350", "收到登录成功事件:", data);
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:351", "收到登录成功事件:", data);
       loadUserData();
     };
     const handleLogoutSuccess = () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:357", "收到退出登录事件");
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:358", "收到退出登录事件");
       accountBalance.value = "0.00";
       couponsCount.value = 0;
       orderCounts.value = {
@@ -52,13 +52,8 @@ const _sfc_main = {
       applicationStatus.value = "";
     };
     const handleApplicationStatusChanged = (data) => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:373", "收到申请状态变化事件:", data);
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:374", "收到申请状态变化事件:", data);
       loadApplicationInfo();
-      common_vendor.index.showToast({
-        title: "申请信息已更新",
-        icon: "success",
-        duration: 2e3
-      });
     };
     common_vendor.onMounted(() => {
       const systemInfo = common_vendor.index.getSystemInfoSync();
@@ -75,16 +70,16 @@ const _sfc_main = {
     });
     const loadUserData = async () => {
       var _a;
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:412", "开始加载用户数据 - isLoggedIn:", isLoggedIn.value);
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:413", "当前用户状态:", userStore.userInfo);
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:413", "开始加载用户数据 - isLoggedIn:", isLoggedIn.value);
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:414", "当前用户状态:", userStore.userInfo);
       if (isLoggedIn.value) {
         try {
-          common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:418", "用户已登录，开始请求用户信息");
+          common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:419", "用户已登录，开始请求用户信息");
           const response = await api_user.getUserInfo();
-          common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:420", "用户信息请求成功:", response);
+          common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:421", "用户信息请求成功:", response);
           if (response.data && response.data.code === 0) {
             const userData = response.data.data;
-            common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:425", "解析用户数据:", userData);
+            common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:426", "解析用户数据:", userData);
             const userInfo2 = {
               nickname: userData.nick_name || "",
               phone: userData.phone || "",
@@ -94,22 +89,22 @@ const _sfc_main = {
             };
             userStore.setUserInfo(userInfo2);
           } else {
-            common_vendor.index.__f__("warn", "at pages/tabbar/profile/index.vue:442", "获取用户信息失败:", ((_a = response.data) == null ? void 0 : _a.msg) || "未知错误");
+            common_vendor.index.__f__("warn", "at pages/tabbar/profile/index.vue:443", "获取用户信息失败:", ((_a = response.data) == null ? void 0 : _a.msg) || "未知错误");
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:445", "获取用户信息失败:", error);
+          common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:446", "获取用户信息失败:", error);
         }
         await loadApplicationInfo();
       } else {
-        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:451", "用户未登录，跳过获取用户信息");
+        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:452", "用户未登录，跳过获取用户信息");
       }
     };
     const loadApplicationInfo = async () => {
       var _a;
       try {
-        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:458", "开始请求申请信息");
+        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:459", "开始请求申请信息");
         const response = await api_user.getApplicatioInfo();
-        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:460", "申请信息请求成功:", response);
+        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:461", "申请信息请求成功:", response);
         if (response.data && response.data.code === 0) {
           applicationInfo.value = response.data.data;
           if (applicationInfo.value) {
@@ -129,13 +124,19 @@ const _sfc_main = {
           } else {
             applicationStatus.value = "未申请";
           }
+        } else if (response.data && response.data.code === 6002) {
+          common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:487", "申请记录不存在，设置为未申请状态");
+          applicationInfo.value = null;
+          applicationStatus.value = "未申请";
         } else {
-          common_vendor.index.__f__("warn", "at pages/tabbar/profile/index.vue:485", "获取申请信息失败:", ((_a = response.data) == null ? void 0 : _a.msg) || "未知错误");
+          common_vendor.index.__f__("warn", "at pages/tabbar/profile/index.vue:491", "获取申请信息失败:", ((_a = response.data) == null ? void 0 : _a.msg) || "未知错误");
           applicationStatus.value = "获取失败";
+          applicationInfo.value = null;
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:489", "获取申请信息失败:", error);
+        common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:496", "获取申请信息失败:", error);
         applicationStatus.value = "获取失败";
+        applicationInfo.value = null;
       }
     };
     const navigateToLogin = () => {
@@ -219,7 +220,7 @@ const _sfc_main = {
       });
     };
     const navigateToPartnerRegistration = () => {
-      if (applicationStatus.value === "已通过") {
+      if (applicationInfo.value && applicationInfo.value.status === "approved") {
         common_vendor.index.navigateTo({
           url: "/subPackages/partner/index"
         });
@@ -320,18 +321,18 @@ const _sfc_main = {
       });
     };
     const onRefresh = async () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:710", "开始下拉刷新");
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:718", "开始下拉刷新");
       isRefreshing.value = true;
       try {
         await loadUserData();
         await new Promise((resolve) => setTimeout(resolve, 800));
         common_vendor.index.showToast({
           title: "刷新成功",
-          icon: "success",
+          icon: "none",
           duration: 1500
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:725", "刷新失败:", error);
+        common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:733", "刷新失败:", error);
         common_vendor.index.showToast({
           title: "刷新失败",
           icon: "none",
@@ -342,24 +343,13 @@ const _sfc_main = {
       }
     };
     const onRefreshRestore = () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:737", "刷新动画结束");
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:745", "刷新动画结束");
       isRefreshing.value = false;
     };
     const formatPhone = (phone) => {
       if (!phone)
         return "未绑定手机号";
       return phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2");
-    };
-    const getPartnerText = () => {
-      if (applicationStatus.value === "审核中") {
-        return "友伴入驻";
-      } else if (applicationStatus.value === "已通过") {
-        return "友伴端";
-      } else if (applicationStatus.value === "已拒绝") {
-        return "友伴入驻";
-      } else {
-        return "友伴入驻";
-      }
     };
     return (_ctx, _cache) => {
       var _a;
@@ -432,7 +422,8 @@ const _sfc_main = {
         aa: common_assets._imports_11,
         ab: common_vendor.o(navigateToReportReward),
         ac: common_assets._imports_12,
-        ad: common_vendor.t(getPartnerText()),
+        ad: applicationInfo.value && applicationInfo.value.status && applicationInfo.value.status === "approved"
+      }, applicationInfo.value && applicationInfo.value.status && applicationInfo.value.status === "approved" ? {} : {}, {
         ae: common_vendor.o(navigateToPartnerRegistration),
         af: common_assets._imports_13,
         ag: common_vendor.o(navigateToCooperation),

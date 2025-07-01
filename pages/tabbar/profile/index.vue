@@ -228,7 +228,8 @@
               <view class="feature-icon">
                 <image src="@/static/icons/profile/flag.png" class="feature-icon-img" mode="aspectFit" />
               </view>
-              <text class="feature-text">{{ getPartnerText() }}</text>
+              <text class="feature-text" v-if="applicationInfo && applicationInfo.status && applicationInfo.status === 'approved'">友伴端</text>
+              <text class="feature-text" v-else>友伴入驻</text>
             </view>
             <view class="feature-item" @click="navigateToCooperation">
               <view class="feature-icon">
@@ -375,11 +376,11 @@ const handleApplicationStatusChanged = (data) => {
   loadApplicationInfo()
   
   // 显示刷新成功提示
-  uni.showToast({
-    title: '申请信息已更新',
-    icon: 'success',
-    duration: 2000
-  })
+  // uni.showToast({
+  //   title: '申请信息已更新',
+  //   icon: 'success',
+  //   duration: 2000
+  // })
 }
 
 onMounted(() => {
@@ -481,13 +482,20 @@ const loadApplicationInfo = async () => {
       } else {
         applicationStatus.value = '未申请'
       }
+    } else if (response.data && response.data.code === 6002) {
+      // 申请记录不存在的情况
+      console.log('申请记录不存在，设置为未申请状态')
+      applicationInfo.value = null
+      applicationStatus.value = '未申请'
     } else {
       console.warn('获取申请信息失败:', response.data?.msg || '未知错误')
       applicationStatus.value = '获取失败'
+      applicationInfo.value = null
     }
   } catch (error) {
     console.error('获取申请信息失败:', error)
     applicationStatus.value = '获取失败'
+    applicationInfo.value = null
   }
 }
 
@@ -589,7 +597,7 @@ const navigateToReportReward = () => {
 
 const navigateToPartnerRegistration = () => {
   // 根据申请状态跳转到不同页面
-  if (applicationStatus.value === '已通过') {
+  if (applicationInfo.value && applicationInfo.value.status === 'approved') {
     // 已通过，跳转到友伴端
     uni.navigateTo({
       url: '/subPackages/partner/index'
@@ -718,7 +726,7 @@ const onRefresh = async () => {
     
     uni.showToast({
       title: '刷新成功',
-      icon: 'success',
+      icon: 'none',
       duration: 1500
     })
   } catch (error) {

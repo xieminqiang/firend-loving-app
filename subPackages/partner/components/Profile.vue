@@ -4,16 +4,31 @@
       <!-- 个人信息 -->
       <view class="profile-header" @click="goToDataEdit">
         <view class="avatar-container">
-          <view class="avatar-placeholder">👤</view>
+          <image 
+            v-if="applicationInfo && applicationInfo.photos && applicationInfo.photos.length > 0"
+            :src="applicationInfo.photos[0]" 
+            class="avatar-img" 
+            mode="aspectFill" 
+          />
+          <view v-else class="avatar-placeholder">👤</view>
         </view>
         <view class="profile-info">
-          <text class="profile-name">友伴用户</text>
-          <text class="profile-id">ID: 000000</text>
+          <text class="profile-name">{{ applicationInfo?.nickname || '友伴用户' }}</text>
+          
           <view class="profile-status">
-            <view class="status-dot"></view>
-            <text class="status-text">未认证</text>
+            <view class="status-dot" :class="getStatusClass(applicationInfo?.status)"></view>
+            <text class="status-text">{{ getStatusText(applicationInfo?.status) }}</text>
+          </view>
+          
+          <view class="order-status" v-if="applicationInfo" if="applicationInfo.can_accept_orders == 'N'">
+            <text class="order-status-text" :class="getOrderStatusClass(applicationInfo.can_accept_orders)">
+              {{ applicationInfo.can_accept_orders_name || '--' }}
+            </text>
           </view>
         </view>
+        
+        <!-- 右侧箭头 -->
+        <image src="@/static/icons/common/arrow-right.png" class="profile-arrow" mode="aspectFit" />
       </view>
       
       <!-- 账户信息 -->
@@ -58,10 +73,51 @@
 <script setup>
 import { ref } from 'vue'
 
+// 定义props
+const props = defineProps({
+  applicationInfo: {
+    type: Object,
+    default: null
+  }
+})
+
+// 获取状态样式类
+const getStatusClass = (status) => {
+  switch (status) {
+    case 'approved':
+      return 'status-approved'
+    case 'pending':
+      return 'status-pending'
+    case 'rejected':
+      return 'status-rejected'
+    default:
+      return 'status-unknown'
+  }
+}
+
+// 获取状态文本
+const getStatusText = (status) => {
+  switch (status) {
+    case 'approved':
+      return '已入驻'
+    case 'pending':
+      return '审核中'
+    case 'rejected':
+      return '已拒绝'
+    default:
+      return '未入驻'
+  }
+}
+
+// 获取接单状态样式类
+const getOrderStatusClass = (canAcceptOrders) => {
+  return canAcceptOrders === 'Y' ? 'status-success' : 'status-warning'
+}
+
 // 跳转到资料编辑页面
 const goToDataEdit = () => {
   uni.navigateTo({
-    url: '/subPackages/DataEdetion/index'
+    url: '/subPackages/partner/DataEdetion/index'
   })
 }
 
@@ -139,6 +195,13 @@ const handleFunctionClick = (functionName) => {
   margin-right: 24rpx;
 }
 
+.avatar-img {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 2rpx solid #e9ecef;
+}
+
 .avatar-placeholder {
   width: 120rpx;
   height: 120rpx;
@@ -156,11 +219,11 @@ const handleFunctionClick = (functionName) => {
 }
 
 .profile-name {
-  font-size: 36rpx;
+  font-size: 34rpx;
   font-weight: 600;
   color: #1A1A1A;
   display: block;
-  margin-bottom: 8rpx;
+ 
 }
 
 .profile-id {
@@ -178,15 +241,68 @@ const handleFunctionClick = (functionName) => {
 .status-dot {
   width: 12rpx;
   height: 12rpx;
-  background: #ffc107;
   border-radius: 50%;
   margin-right: 8rpx;
 }
 
+.status-dot.status-approved {
+  background: #28a745;
+}
+
+.status-dot.status-pending {
+  background: #ffc107;
+}
+
+.status-dot.status-rejected {
+  background: #dc3545;
+}
+
+.status-dot.status-unknown {
+  background: #6c757d;
+}
+
 .status-text {
   font-size: 24rpx;
-  color: #ffc107;
   font-weight: 500;
+}
+
+.status-dot.status-approved + .status-text {
+  color: #28a745;
+}
+
+.status-dot.status-pending + .status-text {
+  color: #ffc107;
+}
+
+.status-dot.status-rejected + .status-text {
+  color: #dc3545;
+}
+
+.status-dot.status-unknown + .status-text {
+  color: #6c757d;
+}
+
+.order-status {
+  margin-top: 8rpx;
+}
+
+.order-status-text {
+  font-size: 22rpx;
+  font-weight: 500;
+  padding: 8rpx 16rpx;
+  border-radius: 4rpx;
+  background: rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+.order-status-text.status-success {
+  color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
+}
+
+.order-status-text.status-warning {
+  color: #ffc107;
+  background: rgba(255, 193, 7, 0.1);
 }
 
 .account-info {
@@ -273,6 +389,11 @@ const handleFunctionClick = (functionName) => {
 }
 
 .setting-arrow {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+.profile-arrow {
   width: 32rpx;
   height: 32rpx;
 }

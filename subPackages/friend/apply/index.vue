@@ -264,6 +264,44 @@
             </view>
           </view>
 
+          <!-- 个性标签卡片 -->
+          <view class="personality-card modern-card">
+            <view class="card-header">
+              <view class="header-content">
+                <view class="section-indicator"></view>
+                <view class="header-text">
+                  <text class="card-title">个性标签</text>
+                  <text class="card-subtitle">展现你的独特魅力 ✨</text>
+                </view>
+              </view>
+            </view>
+            
+            <!-- 已选标签展示 -->
+            <view v-if="selectedTags.length > 0" class="selected-tags">
+              <view 
+                class="tag-item" 
+                v-for="tag in selectedTags" 
+                :key="tag.id"
+                @click="removeTag(tag)"
+              >
+                <text class="tag-text">{{ tag.tag_name }}</text>
+                <text class="tag-remove">×</text>
+              </view>
+            </view>
+            
+            <!-- 添加标签按钮 -->
+            <view class="add-tags-section">
+              <view 
+                class="add-tags-btn" 
+                :class="{ disabled: selectedTags.length >= 5 }"
+                @click="selectedTags.length < 5 ? showTagSelector() : null"
+              >
+                <view class="add-icon">+</view>
+                <text class="add-text">添加个性标签</text>
+                <text class="tag-count">({{ selectedTags.length }}/5)</text>
+              </view>
+            </view>
+          </view>
 
         </view>
 
@@ -341,13 +379,83 @@
         </view>
       </view>
     </view>
+
+    <!-- 个性标签选择器弹窗 -->
+    <view v-if="showTagPicker" class="tag-picker-overlay" @click="hideTagSelector">
+      <view class="tag-picker-container" @click.stop>
+        <view class="tag-picker-header">
+          <text class="picker-title">选择个性标签</text>
+          <text class="picker-subtitle">展现你的独特魅力</text>
+          <view class="picker-close" @click="hideTagSelector">
+            <text>✕</text>
+          </view>
+        </view>
+        
+        <!-- 标签分类导航 -->
+        <view class="tag-nav">
+          <view 
+            v-for="navItem in tagNavItems" 
+            :key="navItem.type"
+            :class="['nav-item', { active: currentTagType === navItem.type }]"
+            @click="switchTagType(navItem.type)"
+          >
+            <text class="nav-text">{{ navItem.name }}</text>
+          </view>
+        </view>
+        
+        <view class="tag-picker-content">
+          <!-- 标签数量提示 -->
+          <view v-if="!tagsLoading && tempSelectedTags.length >= 5" class="max-tags-tip">
+            <text class="max-tags-text">已达到最大标签数量(5个)，请移除部分标签后继续选择</text>
+          </view>
+          
+          <!-- 加载状态 -->
+          <view v-if="tagsLoading" class="loading-container">
+            <view class="loading-spinner"></view>
+            <text class="loading-text">加载标签中...</text>
+          </view>
+          
+          <!-- 标签列表 -->
+          <view v-else class="tag-grid">
+            <view 
+              v-for="tag in currentTagList" 
+              :key="tag.id"
+              :class="['tag-grid-item', { 
+                selected: isTagSelected(tag.id)
+              }]"
+              @click="toggleTagSelection(tag)"
+            >
+              <text class="tag-grid-text">{{ tag.tag_name }}</text>
+              <view v-if="isTagSelected(tag.id)" class="tag-grid-check">✓</view>
+            </view>
+          </view>
+          
+          <!-- 暂无标签提示 -->
+          <view v-if="!tagsLoading && currentTagList.length === 0" class="no-tags-tip">
+            <text class="tip-text">暂无相关标签</text>
+          </view>
+        </view>
+        
+        <view class="picker-footer">
+          <view class="selected-count">已选择 {{ tempSelectedTags.length }}/5 个标签</view>
+          <view class="confirm-btn" @click="confirmTagSelection">
+            <text>确认选择</text>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { createCompanionApplication, getServicesByCities } from '@/api/user.js'
+import { createCompanionApplication, getServicesByCities, getPersonalityTags, getPopularPersonalityTags } from '@/api/user.js'
 import { getCityList } from '@/api/home.js'
+import { uploadFile, getUploadResult } from '@/api/file.js'
+import { useUserStore } from '@/stores/user.js'
+
+// 用户store
+const userStore = useUserStore()
 
 // 下拉刷新状态
 const isRefreshing = ref(false)
@@ -375,7 +483,7 @@ const tempSelectedCities = ref([]) // 临时选择状态（弹窗中的选择）
 const cityList = ref([]) // 从API获取城市列表
 const cityLoading = ref(false) // 城市加载状态
 
-// 照片数组
+// 照片数组 - 存储上传后的文件URL
 const photos = ref([])
 
 // 服务技能相关数据
@@ -385,6 +493,28 @@ const servicesLoading = ref(false) // 服务加载状态
 
 // 服务技能分组数据
 const skillCategories = ref([]) // 按分类分组的服务技能
+
+// 个性标签相关数据
+const selectedTags = ref([]) // 已选择的标签
+const showTagPicker = ref(false) // 标签选择器显示状态
+const tempSelectedTags = ref([]) // 临时选择的标签
+const tagsLoading = ref(false) // 标签加载状态
+const currentTagType = ref(4) // 当前标签类型：4=个性特质
+const currentTagList = ref([]) // 当前标签类型的标签列表
+
+// 标签缓存 - 用于存储已加载的标签数据
+const tagsCache = ref(new Map()) // Map<tagType, tagList>
+const cacheExpireTime = 5 * 60 * 1000 // 缓存过期时间：5分钟
+const cacheTimestamps = ref(new Map()) // Map<tagType, timestamp>
+
+// 标签分类导航
+const tagNavItems = ref([
+  { type: 4, name: '个性特质' },
+  { type: 5, name: '我的爱好' },
+  { type: 6, name: '外貌风格' },
+  { type: 7, name: '专业技能' },
+  { type: 8, name: '热门推荐' }
+])
 
 // 加载服务技能列表
 const loadServicesByCity = async () => {
@@ -559,19 +689,117 @@ const confirmCitySelection = async () => {
   
   // 加载对应城市的服务技能
   await loadServicesByCity()
-  
-
 }
 
 // 添加照片
 const addPhoto = () => {
+  const maxCount = 6 - photos.value.length
+  if (maxCount <= 0) {
+    uni.showToast({
+      title: '最多只能上传6张照片',
+      icon: 'none'
+    })
+    return
+  }
+
   uni.chooseImage({
-    count: 6 - photos.value.length,
+    count: maxCount,
     sizeType: ['compressed'],
     sourceType: ['album', 'camera'],
-    success: (res) => {
-      photos.value.push(...res.tempFilePaths)
+    success: async (res) => {
+      // 显示上传进度
+      uni.showLoading({
+        title: '上传中...',
+        mask: true
+      })
+
+      try {
+        // 逐个上传文件
+		
+		
+        const uploadPromises = res.tempFilePaths.map(async (filePath, index) => {
+          try {
+            // 获取文件信息
+            const fileInfo = await getFileInfo(filePath)
+			console.log("fileInfo",fileInfo)
+				console.log("filePath",filePath)
+             if (!fileInfo || !fileInfo.extension) {
+              throw new Error('无法获取文件信息')
+            }
+            // 上传文件
+            const uploadResult = await uploadFile({
+              filePath: filePath,
+              name: `photo_${Date.now()}_${index}.${fileInfo.extension}`
+            })
+
+            // 解析上传结果
+            const fileData = getUploadResult(uploadResult)
+            if (!fileData || !fileData.url) {
+              throw new Error('上传结果解析失败')
+            }
+
+            // 返回上传后的URL
+            return "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com" + fileData.url
+          } catch (error) {
+            console.error(`第${index + 1}张照片上传失败:`, error)
+            throw error
+          }
+        })
+
+        // 等待所有文件上传完成
+        const uploadedUrls = await Promise.all(uploadPromises)
+        
+        // 将上传成功的URL添加到照片数组
+        photos.value.push(...uploadedUrls)
+        
+        uni.showToast({
+          title: `成功上传${uploadedUrls.length}张照片`,
+          icon: 'success'
+        })
+
+      } catch (error) {
+        console.error('照片上传失败:', error)
+        uni.showToast({
+          title: '照片上传失败，请重试',
+          icon: 'none'
+        })
+      } finally {
+        uni.hideLoading()
+      }
+    },
+    fail: (error) => {
+      console.error('选择照片失败:', error)
+      uni.showToast({
+        title: '选择照片失败',
+        icon: 'none'
+      })
     }
+  })
+}
+
+// 获取文件信息
+const getFileInfo = (filePath) => {
+  return new Promise((resolve, reject) => {
+    uni.getFileInfo({
+      filePath: filePath,
+      success: (res) => {
+        // 从文件路径中提取扩展名
+        const extension = filePath.split('.').pop().toLowerCase()
+        resolve({
+          size: res.size,
+          extension: extension
+        })
+      },
+      fail: (error) => {
+        console.error('获取文件信息失败:', error)
+        // 如果获取文件信息失败，使用默认扩展名
+        const extension = filePath.split('.').pop().toLowerCase() || 'jpg'
+        resolve({
+          size: 0,
+          extension: extension
+        })
+      }
+    })
   })
 }
 
@@ -768,7 +996,9 @@ const doSubmit = async () => {
       service_areas: serviceAreaCodes, // 服务区域代码字符串数组
       services: selectedSkills.value, // 服务ID数组
       can_accept_orders: 'N', // 不允许接单
-      photos: photos.value
+      photos: photos.value,
+      tags: selectedTags.value.map(tag => tag.tag_name), // 个性标签名称数组
+      phone: userStore.userInfo.phone || '' // 添加phone参数
     }
     
     console.log('提交数据:', submitData)
@@ -844,7 +1074,182 @@ const doSubmit = async () => {
 // 组件挂载时加载城市列表
 onMounted(async () => {
   await loadCityList()
+  
+  // 输出缓存配置信息
+  console.log('标签缓存配置:', {
+    expireTime: `${cacheExpireTime / 1000 / 60}分钟`,
+    cacheSize: tagsCache.value.size
+  })
 })
+
+// 个性标签相关方法
+// 显示标签选择器
+const showTagSelector = () => {
+  // 初始化临时选择状态为当前已选择的标签
+  tempSelectedTags.value = [...selectedTags.value]
+  showTagPicker.value = true
+  // 加载默认标签类型（个性特质）的标签列表（会先检查缓存）
+  loadTagsByType(4)
+}
+
+// 隐藏标签选择器
+const hideTagSelector = () => {
+  // 重置临时选择状态
+  tempSelectedTags.value = []
+  showTagPicker.value = false
+}
+
+// 切换标签类型
+const switchTagType = (tagType) => {
+  currentTagType.value = tagType
+  // 切换分类时加载对应分类的标签数据（会先检查缓存）
+  loadTagsByType(tagType)
+}
+
+// 检查缓存是否有效
+const isCacheValid = (tagType) => {
+  const timestamp = cacheTimestamps.value.get(tagType)
+  if (!timestamp) return false
+  
+  const now = Date.now()
+  return (now - timestamp) < cacheExpireTime
+}
+
+// 从缓存获取标签数据
+const getTagsFromCache = (tagType) => {
+  return tagsCache.value.get(tagType) || []
+}
+
+// 将标签数据存入缓存
+const setTagsToCache = (tagType, tagList) => {
+  tagsCache.value.set(tagType, tagList)
+  cacheTimestamps.value.set(tagType, Date.now())
+  console.log(`标签类型${tagType}已缓存，数据量: ${tagList.length}`)
+}
+
+// 清除指定类型的缓存
+const clearTagCache = (tagType) => {
+  tagsCache.value.delete(tagType)
+  cacheTimestamps.value.delete(tagType)
+  console.log(`已清除标签类型${tagType}的缓存`)
+}
+
+// 清除所有标签缓存
+const clearAllTagCache = () => {
+  tagsCache.value.clear()
+  cacheTimestamps.value.clear()
+  console.log('已清除所有标签缓存')
+}
+
+
+
+// 根据类型加载标签
+const loadTagsByType = async (tagType, forceRefresh = false) => {
+  // 如果不是强制刷新，检查缓存是否有效
+  if (!forceRefresh && isCacheValid(tagType)) {
+    const cachedTags = getTagsFromCache(tagType)
+    if (cachedTags.length > 0) {
+      console.log(`使用缓存数据 - 标签类型${tagType}，数据量: ${cachedTags.length}`)
+      currentTagList.value = cachedTags
+      return
+    }
+  }
+  
+  tagsLoading.value = true
+  try {
+    console.log(`开始加载标签类型: ${tagType}`)
+    
+    // 所有分类都使用普通标签接口
+    const params = { 
+      tag_type: tagType, 
+      page: 1, 
+      pageSize: 60 
+    }
+    console.log('请求参数:', params)
+    
+    const response = await getPersonalityTags(params)
+    console.log('API响应:', response)
+    
+    if (response.data && response.data.code === 0 && response.data.data) {
+      // 统一处理返回数据
+      const tagList = response.data.data.list || response.data.data
+      currentTagList.value = tagList
+      
+      // 将数据存入缓存
+      setTagsToCache(tagType, tagList)
+      
+      console.log(`标签类型${tagType}加载成功:`, tagList)
+    } else {
+      console.warn(`获取标签类型${tagType}失败，响应数据:`, response)
+      currentTagList.value = []
+    }
+  } catch (error) {
+    console.error(`获取标签类型${tagType}失败:`, error)
+    console.error('错误详情:', error.response || error)
+    currentTagList.value = []
+  } finally {
+    tagsLoading.value = false
+  }
+}
+
+// 检查标签是否已选中
+const isTagSelected = (tagId) => {
+  return tempSelectedTags.value.some(tag => tag.id === tagId)
+}
+
+// 切换标签选择状态
+const toggleTagSelection = (tag) => {
+  const index = tempSelectedTags.value.findIndex(t => t.id === tag.id)
+  
+  if (index > -1) {
+    // 如果已选中，则取消选择
+    tempSelectedTags.value.splice(index, 1)
+  } else {
+    // 如果未选中，检查是否超过限制
+    if (tempSelectedTags.value.length >= 5) {
+      uni.showToast({
+        title: '最多只能选择5个标签',
+        icon: 'none'
+      })
+      return
+    }
+    // 添加标签
+    tempSelectedTags.value.push(tag)
+  }
+  
+  // 提供触觉反馈
+  uni.vibrateShort({
+    type: 'light'
+  })
+}
+
+// 确认标签选择
+const confirmTagSelection = () => {
+  // 将临时选择应用到正式状态
+  selectedTags.value = [...tempSelectedTags.value]
+  
+  // 关闭弹窗
+  showTagPicker.value = false
+  tempSelectedTags.value = []
+  
+  uni.showToast({
+    title: `已选择${selectedTags.value.length}个标签`,
+    icon: 'success'
+  })
+}
+
+// 移除标签
+const removeTag = (tag) => {
+  const index = selectedTags.value.findIndex(t => t.id === tag.id)
+  if (index > -1) {
+    selectedTags.value.splice(index, 1)
+    
+    // 提供触觉反馈
+    uni.vibrateShort({
+      type: 'light'
+    })
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1292,12 +1697,12 @@ onMounted(async () => {
   right: 0;
   bottom: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.3s;
 }
 
 .photo-item:active .photo-overlay {
-  opacity: 1;
+  opacity: 0.8;
 }
 
 .photo-remove {
@@ -1431,19 +1836,11 @@ onMounted(async () => {
   background: #f8f9fe;
   border: 2rpx solid #e9ecf5;
   border-radius: 14rpx;
-  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
   overflow: hidden;
- 
   
   &.selected {
     border-color: #7363FF;
     background: linear-gradient(135deg, rgba(115, 99, 255, 0.1) 0%, rgba(255, 105, 222, 0.1) 100%);
-    transform: translateY(-1rpx);
-    box-shadow: 0 4rpx 14rpx rgba(115, 99, 255, 0.15);
-  }
-  
-  &:active {
-    transform: scale(0.95);
   }
 }
 
@@ -1987,5 +2384,410 @@ onMounted(async () => {
     transform: scale(0.95);
     box-shadow: 0 4rpx 16rpx rgba(115, 99, 255, 0.4);
   }
+}
+
+/* 个性标签卡片样式 */
+.personality-card {
+  margin-bottom: 20rpx;
+}
+
+.selected-tags {
+  padding: 20rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.tag-item {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(115, 99, 255, 0.1) 0%, rgba(255, 105, 222, 0.1) 100%);
+  border: 1rpx solid rgba(115, 99, 255, 0.2);
+  border-radius: 20rpx;
+  padding: 8rpx 16rpx;
+  transition: all 0.3s ease;
+  
+  &:active {
+    transform: scale(0.95);
+    background: linear-gradient(135deg, rgba(115, 99, 255, 0.15) 0%, rgba(255, 105, 222, 0.15) 100%);
+  }
+}
+
+.tag-text {
+  font-size: 22rpx;
+  color: #7363FF;
+  font-weight: 500;
+  margin-right: 8rpx;
+}
+
+.tag-remove {
+  font-size: 24rpx;
+  color: rgba(115, 99, 255, 0.6);
+  font-weight: 600;
+  width: 24rpx;
+  height: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.add-tags-section {
+  padding: 20rpx;
+}
+
+.add-tags-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8f9fe 0%, #ffffff 100%);
+  border: 3rpx dashed rgba(115, 99, 255, 0.3);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  transition: all 0.3s;
+  
+  &:active:not(.disabled) {
+    transform: scale(0.95);
+    border-color: #7363FF;
+    background: rgba(115, 99, 255, 0.05);
+  }
+  
+  &.disabled {
+    opacity: 0.5;
+    border-color: rgba(115, 99, 255, 0.1);
+    background: rgba(248, 249, 254, 0.5);
+    cursor: not-allowed;
+    
+    .add-icon {
+      background: #cccccc;
+    }
+    
+    .add-text, .tag-count {
+      color: #999999;
+    }
+  }
+}
+
+.add-icon {
+  width: 40rpx;
+  height: 40rpx;
+  background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12rpx;
+  font-size: 24rpx;
+  color: white;
+  font-weight: 600;
+}
+
+.add-text {
+  font-size: 26rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.tag-count {
+  font-size: 22rpx;
+  color: #999999;
+  margin-left: 8rpx;
+}
+
+/* 个性标签选择器弹窗样式 */
+.tag-picker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8rpx);
+  -webkit-backdrop-filter: blur(8rpx);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.tag-picker-container {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 248, 250, 0.95) 100%);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  padding: 32rpx;
+  border-radius: 32rpx 32rpx 0 0;
+  width: 100%;
+  height: 75%;
+  box-shadow: 0 20rpx 60rpx rgba(115, 99, 255, 0.2);
+  border: 1rpx solid rgba(115, 99, 255, 0.1);
+  animation: slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tag-picker-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24rpx;
+  position: relative;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid rgba(115, 99, 255, 0.1);
+}
+
+
+
+/* 标签分类导航 */
+.tag-nav {
+  display: flex;
+  background: rgba(115, 99, 255, 0.05);
+  border-radius: 16rpx;
+  padding: 4rpx;
+  margin-bottom: 24rpx;
+  overflow-x: auto;
+}
+
+.nav-item {
+  flex: 1;
+  min-width: 120rpx;
+  padding: 12rpx 16rpx;
+  border-radius: 12rpx;
+  text-align: center;
+  white-space: nowrap;
+  
+  &.active {
+    background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
+    box-shadow: 0 4rpx 12rpx rgba(115, 99, 255, 0.3);
+    
+    .nav-text {
+      color: white;
+      font-weight: 600;
+    }
+  }
+}
+
+.nav-text {
+  font-size: 24rpx;
+  color: #666666;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.tag-picker-content {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 24rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tag-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12rpx;
+}
+
+.tag-grid-item {
+  position: relative;
+  padding: 16rpx 12rpx;
+  background: #f8f9fe;
+  border: 2rpx solid #e9ecf5;
+  border-radius: 14rpx;
+  overflow: hidden;
+  min-height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &.selected {
+    border-color: #7363FF;
+    background: linear-gradient(135deg, rgba(115, 99, 255, 0.1) 0%, rgba(255, 105, 222, 0.1) 100%);
+  }
+}
+
+.tag-grid-text {
+  font-size: 22rpx;
+  color: #1A1A1A;
+  font-weight: 400;
+  line-height: 1.3;
+  text-align: center;
+  word-break: break-all;
+}
+
+.tag-grid-check {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 28rpx;
+  height: 28rpx;
+  background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16rpx;
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 2rpx 8rpx rgba(115, 99, 255, 0.3);
+  animation: checkBounce 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.no-tags-tip {
+  padding: 60rpx 40rpx;
+  text-align: center;
+}
+
+.tip-text {
+  font-size: 26rpx;
+  color: #999999;
+  font-weight: 500;
+}
+
+/* 最大标签数量提示样式 */
+.max-tags-tip {
+  padding: 20rpx 40rpx;
+  text-align: center;
+  background: rgba(255, 105, 222, 0.1);
+  border-radius: 12rpx;
+  margin: 20rpx;
+  border: 1rpx solid rgba(255, 105, 222, 0.2);
+}
+
+.max-tags-text {
+  font-size: 24rpx;
+  color: #FF69DE;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+
+
+/* 弹窗底部样式 */
+.picker-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 20rpx;
+  border-top: 1rpx solid rgba(115, 99, 255, 0.1);
+}
+
+.selected-count {
+  font-size: 24rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
+  border-radius: 20rpx;
+  padding: 12rpx 32rpx;
+  transition: all 0.3s ease;
+  
+  &:active {
+    transform: scale(0.95);
+    box-shadow: 0 4rpx 16rpx rgba(115, 99, 255, 0.4);
+  }
+  
+  text {
+    font-size: 26rpx;
+    color: white;
+    font-weight: 600;
+  }
+}
+
+/* 弹窗关闭按钮 */
+.picker-close {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  width: 48rpx;
+  height: 48rpx;
+  background: rgba(115, 99, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  
+  &:active {
+    transform: scale(0.9);
+    background: rgba(115, 99, 255, 0.2);
+  }
+  
+  text {
+    font-size: 28rpx;
+    color: #666666;
+    font-weight: 600;
+  }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes checkBounce {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 40rpx;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid #E5E5E5;
+  border-top: 4rpx solid #7363FF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #666666;
+  font-weight: 500;
 }
 </style>

@@ -15,8 +15,15 @@
     
     <!-- 主内容区域 -->
     <view class="main-content">
+      <!-- 加载状态 -->
+      <view v-if="!dataReady" class="loading-container">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">加载中...</text>
+      </view>
+      
       <!-- 页面内容 -->
       <swiper
+        v-else
         class="content-swiper"
         :current="currentTabIndex"
         @change="onSwiperChange"
@@ -32,13 +39,13 @@
         
         <!-- 我的页面 -->
         <swiper-item>
-          <Profile />
+          <Profile :applicationInfo="applicationInfo" />
         </swiper-item>
       </swiper>
     </view>
     
     <!-- 底部TabBar -->
-    <view class="tab-bar">
+    <view v-if="dataReady" class="tab-bar">
       <view 
         class="tab-item" 
         :class="{ active: currentTabIndex === 0 }"
@@ -68,7 +75,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import Workbench from './components/Workbench.vue'
 import Profile from './components/Profile.vue'
 import { getApplicatioInfo } from '@/api/user.js'
@@ -82,6 +89,9 @@ const currentTabIndex = ref(0)
 // 申请信息
 const applicationInfo = ref(null)
 
+// 数据加载状态
+const dataReady = ref(false)
+
 onMounted(() => {
   // 获取系统信息
   const info = uni.getSystemInfoSync()
@@ -89,7 +99,32 @@ onMounted(() => {
   
   // 加载申请信息
   loadApplicationInfo()
+  
+  // 监听申请状态变化事件
+  uni.$on('applicationStatusChanged', handleApplicationStatusChanged)
 })
+
+onUnmounted(() => {
+  // 移除事件监听
+  uni.$off('applicationStatusChanged', handleApplicationStatusChanged)
+})
+
+// 处理申请状态变化事件
+const handleApplicationStatusChanged = (event) => {
+  console.log('收到申请状态变化事件:', event)
+  
+  if (event.type === 'video_uploaded') {
+    // 视频上传成功，刷新申请信息
+    console.log('视频上传成功，刷新申请信息')
+    loadApplicationInfo()
+    
+    // 显示成功提示
+    // uni.showToast({
+    //   title: event.message || '操作成功',
+    //   icon: 'none'
+    // })
+  }
+}
 
 // 加载申请信息
 const loadApplicationInfo = async () => {
@@ -101,11 +136,19 @@ const loadApplicationInfo = async () => {
     if (response.data && response.data.code === 0) {
       applicationInfo.value = response.data.data
       console.log('申请信息:', applicationInfo.value)
+      
+      // 数据加载完成，设置准备状态
+      dataReady.value = true
+      console.log('数据准备完成，可以渲染Workbench组件')
     } else {
       console.warn('获取申请信息失败:', response.data?.msg || '未知错误')
+      // 即使失败也要设置准备状态，避免无限加载
+      dataReady.value = true
     }
   } catch (error) {
     console.error('获取申请信息失败:', error)
+    // 即使失败也要设置准备状态，避免无限加载
+    dataReady.value = true
   }
 }
 
@@ -190,6 +233,37 @@ const goBack = () => {
 .main-content {
   flex: 1;
   overflow: hidden;
+}
+
+// 加载状态样式
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: #F7F8FA;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid #E5E5E5;
+  border-top: 4rpx solid #7363FF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #666666;
+  font-weight: 500;
 }
 
 .content-swiper {

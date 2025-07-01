@@ -19,6 +19,12 @@
 .avatar-container.data-v-4724f316 {
   margin-right: 24rpx;
 }
+.avatar-img.data-v-4724f316 {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 2rpx solid #e9ecef;
+}
 .avatar-placeholder.data-v-4724f316 {
   width: 120rpx;
   height: 120rpx;
@@ -34,11 +40,10 @@
   flex: 1;
 }
 .profile-name.data-v-4724f316 {
-  font-size: 36rpx;
+  font-size: 34rpx;
   font-weight: 600;
   color: #1A1A1A;
   display: block;
-  margin-bottom: 8rpx;
 }
 .profile-id.data-v-4724f316 {
   font-size: 24rpx;
@@ -53,14 +58,55 @@
 .status-dot.data-v-4724f316 {
   width: 12rpx;
   height: 12rpx;
-  background: #ffc107;
   border-radius: 50%;
   margin-right: 8rpx;
 }
+.status-dot.status-approved.data-v-4724f316 {
+  background: #28a745;
+}
+.status-dot.status-pending.data-v-4724f316 {
+  background: #ffc107;
+}
+.status-dot.status-rejected.data-v-4724f316 {
+  background: #dc3545;
+}
+.status-dot.status-unknown.data-v-4724f316 {
+  background: #6c757d;
+}
 .status-text.data-v-4724f316 {
   font-size: 24rpx;
-  color: #ffc107;
   font-weight: 500;
+}
+.status-dot.status-approved + .status-text.data-v-4724f316 {
+  color: #28a745;
+}
+.status-dot.status-pending + .status-text.data-v-4724f316 {
+  color: #ffc107;
+}
+.status-dot.status-rejected + .status-text.data-v-4724f316 {
+  color: #dc3545;
+}
+.status-dot.status-unknown + .status-text.data-v-4724f316 {
+  color: #6c757d;
+}
+.order-status.data-v-4724f316 {
+  margin-top: 8rpx;
+}
+.order-status-text.data-v-4724f316 {
+  font-size: 22rpx;
+  font-weight: 500;
+  padding: 8rpx 16rpx;
+  border-radius: 4rpx;
+  background: rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+.order-status-text.status-success.data-v-4724f316 {
+  color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
+}
+.order-status-text.status-warning.data-v-4724f316 {
+  color: #ffc107;
+  background: rgba(255, 193, 7, 0.1);
 }
 .account-info.data-v-4724f316 {
   margin-bottom: 24rpx;
@@ -133,6 +179,10 @@
   font-weight: 500;
 }
 .setting-arrow.data-v-4724f316 {
+  width: 32rpx;
+  height: 32rpx;
+}
+.profile-arrow.data-v-4724f316 {
   width: 32rpx;
   height: 32rpx;
 }

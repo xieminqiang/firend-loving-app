@@ -30,7 +30,8 @@
     {
       "root": "subPackages/partner",
       "pages": [
-        "index"
+        "index",
+        "DataEdetion/index"
       ]
     },
     {

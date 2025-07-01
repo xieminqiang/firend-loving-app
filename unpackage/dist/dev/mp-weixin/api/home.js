@@ -2,7 +2,7 @@
 const config_http = require("../config/http.js");
 const getServiceDetail = (id) => {
   return config_http.http({
-    url: `/service/detail/${id}`,
+    url: `/front/service/detail/${id}`,
     method: "GET"
   });
 };
@@ -22,14 +22,14 @@ const getHotRecommendServices = (params = {}) => {
 };
 const getPlatformServicesList = (params = {}) => {
   return config_http.http({
-    url: "/home/page/services",
+    url: "/front/home/page/services",
     method: "GET",
     data: params
   });
 };
 const getCityList = () => {
   return config_http.http({
-    url: "/cities",
+    url: "/front/cities",
     method: "GET"
   });
 };

@@ -71,6 +71,17 @@ export const http = (options) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           // 2.1 提取核心数据 res.data
 		     console.log("222")
+          
+          // 检查业务错误码
+          if (res.data && res.data.code !== undefined && res.data.code !== 0) {
+            // 业务错误，显示错误信息并reject
+            uni.showToast({
+              icon: 'none',
+              title: res.data.msg || '请求失败',
+            })
+            reject(res)
+            return
+          }
 		
           resolve(res)
 		   
@@ -119,6 +130,18 @@ export const httpWx = (options) => {
         // 状态码 2xx， axios 就是这样设计的
         if (res.statusCode >= 200 && res.statusCode < 300) {
           // 2.1 提取核心数据 res.data
+          
+          // 检查业务错误码
+          if (res.data && res.data.code !== undefined && res.data.code !== 0) {
+            // 业务错误，显示错误信息并reject
+            uni.showToast({
+              icon: 'none',
+              title: res.data.msg || '请求失败',
+            })
+            reject(res)
+            return
+          }
+          
           resolve(res)
         } else if (res.statusCode === 401) {
          

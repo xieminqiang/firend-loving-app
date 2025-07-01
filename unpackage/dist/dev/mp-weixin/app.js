@@ -14,6 +14,7 @@ if (!Math) {
   "./subPackages/settings/pages/privacy/index.js";
   "./subPackages/settings/pages/about/index.js";
   "./subPackages/partner/index.js";
+  "./subPackages/partner/DataEdetion/index.js";
   "./subPackages/friend/apply/index.js";
 }
 const _sfc_main = {
