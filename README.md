@@ -616,3 +616,54 @@ npm run build:mp-weixin
 - 优化位置信息更新
 - 改进状态同步机制
 - 修复验证规则问题
+
+### 下拉刷新功能 (2024年更新)
+在友伴端页面(`/subPackages/partner/index.vue`)中新增了下拉刷新功能：
+
+#### 功能特点：
+- **原生下拉刷新**：使用uni-app的scroll-view组件实现原生下拉刷新体验
+- **智能状态管理**：自动处理刷新状态，避免重复请求
+- **用户友好提示**：刷新成功/失败都有相应的Toast提示
+- **数据同步**：刷新时会重新获取最新的申请信息
+
+#### 技术实现：
+```javascript
+// 下拉刷新处理
+const onRefresh = async () => {
+  refreshing.value = true
+  
+  try {
+    await loadApplicationInfo()
+    uni.showToast({
+      title: '刷新成功',
+      icon: 'success',
+      duration: 1500
+    })
+  } catch (error) {
+    uni.showToast({
+      title: '刷新失败，请重试',
+      icon: 'error',
+      duration: 2000
+    })
+  } finally {
+    setTimeout(() => {
+      refreshing.value = false
+    }, 500)
+  }
+}
+```
+
+#### 使用方法：
+1. 在友伴端页面中，向下拉动页面顶部
+2. 系统会自动触发刷新动画
+3. 刷新完成后会显示相应的提示信息
+
+#### 组件结构优化：
+- 移除了Workbench和Profile组件内部的scroll-view，避免嵌套滚动冲突
+- 使用父组件的scroll-view统一处理滚动和下拉刷新
+- 优化了布局结构，确保在不同设备上都有良好的显示效果
+
+## 注意事项
+- 下拉刷新功能仅在友伴端页面可用
+- 确保网络连接正常以获得最佳体验
+- 刷新频率建议控制在合理范围内，避免频繁请求

@@ -171,17 +171,23 @@ const loadData = async () => {
     if (serviceRes.data && serviceRes.data.code === 0) {
       serviceDetail.value = serviceRes.data.data
       
-      // 如果服务有价格模板ID，则加载价格模板详情
+      // 优先使用传递过来的price_template_id，如果没有则使用服务详情中的
       const templateId = params.value.price_template_id || serviceDetail.value.price_template_id
       if (templateId) {
+        console.log('加载价格模板详情, ID:', templateId)
         try {
           const templateRes = await getPriceTemplateDetail(templateId)
           if (templateRes.data && templateRes.data.code === 0) {
             priceTemplate.value = templateRes.data.data
+            console.log('价格模板加载成功:', priceTemplate.value)
+          } else {
+            console.warn('价格模板接口返回错误:', templateRes.data)
           }
         } catch (templateError) {
           console.warn('获取价格模板失败:', templateError)
         }
+      } else {
+        console.log('没有价格模板ID，跳过价格模板加载')
       }
     } else {
       throw new Error((serviceRes.data && serviceRes.data.message) || '获取服务详情失败')

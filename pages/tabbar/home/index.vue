@@ -362,7 +362,8 @@ const loadSingleTabData = async (tab, forceRefresh = false) => {
         tags: item.tags || [],
         img: item.image_url || '/static/images/service-default.png',
         min_price: item.min_price || 0,
-        unit: item.unit || '次' // 添加单位字段
+        unit: item.unit || '次', // 添加单位字段
+        price_template_id: item.price_template_id // 添加价格模板ID
       }))
       
       console.log(`${tab}服务数据加载成功，共${allServiceItems.value[tab].length}条`)
@@ -457,8 +458,20 @@ function onTouchEnd() {
 // 跳转到服务详情页功能
 function navigateToServiceDetail(serviceId) {
   console.log('跳转到服务详情页, ID:', serviceId)
+  
+  // 获取当前服务项的数据
+  const currentTabItems = getTabServiceItems(serviceTab.value)
+  const serviceItem = currentTabItems.find(item => item.id === serviceId)
+  
+  // 构建URL参数
+  let url = `/subPackages/home/detail?id=${serviceId}`
+  if (serviceItem && serviceItem.price_template_id) {
+    url += `&price_template_id=${serviceItem.price_template_id}`
+  }
+  
+  console.log('跳转URL:', url)
   uni.navigateTo({
-    url: `/subPackages/home/detail?id=${serviceId}`
+    url: url
   })
 }
 

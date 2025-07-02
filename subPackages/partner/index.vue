@@ -21,27 +21,39 @@
         <text class="loading-text">加载中...</text>
       </view>
       
-      <!-- 页面内容 -->
-      <swiper
+      <!-- 页面内容 - 使用scroll-view实现下拉刷新 -->
+      <scroll-view
         v-else
-        class="content-swiper"
-        :current="currentTabIndex"
-        @change="onSwiperChange"
-        :indicator-dots="false"
-        :circular="false"
-        :autoplay="false"
-        :duration="300"
+        class="content-scroll"
+        scroll-y="true"
+        :refresher-enabled="true"
+        :refresher-triggered="refreshing"
+        @refresherrefresh="onRefresh"
+        @refresherrestore="onRefreshRestore"
+        @refresherabort="onRefreshAbort"
       >
-        <!-- 工作台页面 -->
-        <swiper-item>
-          <Workbench :applicationInfo="applicationInfo" />
-        </swiper-item>
-        
-        <!-- 我的页面 -->
-        <swiper-item>
-          <Profile :applicationInfo="applicationInfo" />
-        </swiper-item>
-      </swiper>
+        <view class="scroll-content">
+          <swiper
+            class="content-swiper"
+            :current="currentTabIndex"
+            @change="onSwiperChange"
+            :indicator-dots="false"
+            :circular="false"
+            :autoplay="false"
+            :duration="300"
+          >
+            <!-- 工作台页面 -->
+            <swiper-item>
+              <Workbench :applicationInfo="applicationInfo" />
+            </swiper-item>
+            
+            <!-- 我的页面 -->
+            <swiper-item>
+              <Profile :applicationInfo="applicationInfo" />
+            </swiper-item>
+          </swiper>
+        </view>
+      </scroll-view>
     </view>
     
     <!-- 底部TabBar -->
@@ -92,6 +104,9 @@ const applicationInfo = ref(null)
 // 数据加载状态
 const dataReady = ref(false)
 
+// 下拉刷新状态
+const refreshing = ref(false)
+
 onMounted(() => {
   // 获取系统信息
   const info = uni.getSystemInfoSync()
@@ -126,6 +141,44 @@ const handleApplicationStatusChanged = (event) => {
   }
 }
 
+// 下拉刷新处理
+const onRefresh = async () => {
+  console.log('开始下拉刷新')
+  refreshing.value = true
+  
+  try {
+    // 重新加载申请信息
+    await loadApplicationInfo()
+    
+ 
+  } catch (error) {
+    console.error('下拉刷新失败:', error)
+    
+    // 显示刷新失败提示
+    uni.showToast({
+      title: '刷新失败，请重试',
+      icon: 'error',
+      duration: 2000
+    })
+  } finally {
+    // 延迟结束刷新状态，让用户看到刷新完成
+    setTimeout(() => {
+      refreshing.value = false
+    }, 500)
+  }
+}
+
+// 刷新状态恢复
+const onRefreshRestore = () => {
+  console.log('刷新状态恢复')
+}
+
+// 刷新状态中止
+const onRefreshAbort = () => {
+  console.log('刷新状态中止')
+  refreshing.value = false
+}
+
 // 加载申请信息
 const loadApplicationInfo = async () => {
   try {
@@ -144,11 +197,17 @@ const loadApplicationInfo = async () => {
       console.warn('获取申请信息失败:', response.data?.msg || '未知错误')
       // 即使失败也要设置准备状态，避免无限加载
       dataReady.value = true
+      
+      // 抛出错误，让调用方知道刷新失败
+      throw new Error(response.data?.msg || '获取申请信息失败')
     }
   } catch (error) {
     console.error('获取申请信息失败:', error)
     // 即使失败也要设置准备状态，避免无限加载
     dataReady.value = true
+    
+    // 重新抛出错误
+    throw error
   }
 }
 
@@ -266,8 +325,18 @@ const goBack = () => {
   font-weight: 500;
 }
 
-.content-swiper {
+// 内容滚动区域
+.content-scroll {
   height: 100%;
+  background: #F7F8FA;
+}
+
+.scroll-content {
+  min-height: 100%;
+}
+
+.content-swiper {
+  height: calc(100vh - 88rpx - 120rpx);
 }
 
 /* 底部TabBar样式 */

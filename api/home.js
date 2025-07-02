@@ -19,7 +19,7 @@ export const getServiceDetail = (id) => {
  */
 export const getPriceTemplateDetail = (id) => {
   return http({
-    url: `/price-template/detail/${id}`,
+    url: `/front/price-template/detail/${id}`,
     method: 'GET'
   })
 }

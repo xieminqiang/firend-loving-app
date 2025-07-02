@@ -326,13 +326,8 @@ const _sfc_main = {
       try {
         await loadUserData();
         await new Promise((resolve) => setTimeout(resolve, 800));
-        common_vendor.index.showToast({
-          title: "刷新成功",
-          icon: "none",
-          duration: 1500
-        });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:733", "刷新失败:", error);
+        common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:729", "刷新失败:", error);
         common_vendor.index.showToast({
           title: "刷新失败",
           icon: "none",
@@ -343,7 +338,7 @@ const _sfc_main = {
       }
     };
     const onRefreshRestore = () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:745", "刷新动画结束");
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:741", "刷新动画结束");
       isRefreshing.value = false;
     };
     const formatPhone = (phone) => {
@@ -372,13 +367,13 @@ const _sfc_main = {
         k: common_assets._imports_1$3,
         l: common_assets._imports_2$2,
         m: common_assets._imports_3$1,
-        n: common_assets._imports_0$2,
+        n: common_assets._imports_4$2,
         o: common_vendor.o(navigateToLogin)
       }, {
         p: statusBarHeight.value + "px",
-        q: common_assets._imports_4$2,
+        q: common_assets._imports_5$3,
         r: common_vendor.o(($event) => handleActionClick("wallet")),
-        s: common_assets._imports_5$3,
+        s: common_assets._imports_6,
         t: couponsCount.value > 0
       }, couponsCount.value > 0 ? {
         v: common_vendor.t(couponsCount.value)
@@ -386,7 +381,7 @@ const _sfc_main = {
         w: common_vendor.o(($event) => handleActionClick("coupons")),
         x: common_assets._imports_1$3,
         y: common_vendor.o(($event) => handleActionClick("favorites")),
-        z: common_assets._imports_6,
+        z: common_assets._imports_7$1,
         A: common_vendor.o(($event) => handleActionClick("history")),
         B: common_assets._imports_0$2,
         C: common_vendor.o(navigateToBillDetails),
@@ -395,7 +390,7 @@ const _sfc_main = {
         F: common_vendor.o(handleRecharge),
         G: common_assets._imports_0$2,
         H: common_vendor.o(($event) => navigateToOrders("all")),
-        I: common_assets._imports_7$1,
+        I: common_assets._imports_8,
         J: orderCounts.value.pending > 0
       }, orderCounts.value.pending > 0 ? {
         K: common_vendor.t(orderCounts.value.pending)
@@ -409,40 +404,40 @@ const _sfc_main = {
         Q: common_vendor.t(orderCounts.value.inProgress)
       } : {}, {
         R: common_vendor.o(($event) => navigateToOrders("in-progress")),
-        S: common_assets._imports_8,
+        S: common_assets._imports_9,
         T: common_vendor.o(($event) => navigateToOrders("completed")),
-        U: common_assets._imports_9,
+        U: common_assets._imports_10,
         V: orderCounts.value.toReview > 0
       }, orderCounts.value.toReview > 0 ? {
         W: common_vendor.t(orderCounts.value.toReview)
       } : {}, {
         X: common_vendor.o(($event) => navigateToOrders("to-review")),
-        Y: common_assets._imports_10,
+        Y: common_assets._imports_11,
         Z: common_vendor.o(navigateToPromotion),
-        aa: common_assets._imports_11,
+        aa: common_assets._imports_12,
         ab: common_vendor.o(navigateToReportReward),
-        ac: common_assets._imports_12,
+        ac: common_assets._imports_13,
         ad: applicationInfo.value && applicationInfo.value.status && applicationInfo.value.status === "approved"
       }, applicationInfo.value && applicationInfo.value.status && applicationInfo.value.status === "approved" ? {} : {}, {
         ae: common_vendor.o(navigateToPartnerRegistration),
-        af: common_assets._imports_13,
+        af: common_assets._imports_14,
         ag: common_vendor.o(navigateToCooperation),
-        ah: common_assets._imports_14,
+        ah: common_assets._imports_15,
         ai: common_vendor.o(handleEmergencyCall),
-        aj: common_assets._imports_15,
+        aj: common_assets._imports_16,
         ak: common_vendor.o(navigateToHelp),
-        al: common_assets._imports_16,
+        al: common_assets._imports_17,
         am: common_vendor.o(navigateToRefund),
         an: common_assets._imports_3$1,
         ao: common_assets._imports_0$2,
         ap: common_vendor.o(navigateToPrivacySettings),
-        aq: common_assets._imports_17,
+        aq: common_assets._imports_18,
         ar: common_assets._imports_0$2,
         as: common_vendor.o(navigateToNotificationSettings),
-        at: common_assets._imports_18,
+        at: common_assets._imports_19,
         av: common_assets._imports_0$2,
         aw: common_vendor.o(navigateToCustomerService),
-        ax: common_assets._imports_19,
+        ax: common_assets._imports_20,
         ay: common_assets._imports_0$2,
         az: common_vendor.o(navigateToSystemSettings),
         aA: isRefreshing.value,

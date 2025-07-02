@@ -8,7 +8,7 @@ const getServiceDetail = (id) => {
 };
 const getPriceTemplateDetail = (id) => {
   return config_http.http({
-    url: `/price-template/detail/${id}`,
+    url: `/front/price-template/detail/${id}`,
     method: "GET"
   });
 };

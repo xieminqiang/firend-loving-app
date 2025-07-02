@@ -176,3 +176,16 @@ export const getPopularPersonalityTags = (params) => {
     params
   })
 }
+
+/**
+ * 更新友伴师申请信息
+ * @param {Object} data - 申请数据
+ * @returns {Promise} 返回更新结果
+ */
+export const updateCompanionApplication = (data) => {
+  return http({
+    url: '/front/companion/application',
+    method: 'PUT',
+    data
+  })
+}

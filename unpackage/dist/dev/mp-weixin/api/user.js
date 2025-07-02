@@ -68,11 +68,19 @@ const getPersonalityTags = (params) => {
     method: "GET"
   });
 };
+const updateCompanionApplication = (data) => {
+  return config_http.http({
+    url: "/front/companion/application",
+    method: "PUT",
+    data
+  });
+};
 exports.createCompanionApplication = createCompanionApplication;
 exports.getApplicatioInfo = getApplicatioInfo;
 exports.getPersonalityTags = getPersonalityTags;
 exports.getServicesByCities = getServicesByCities;
 exports.getUserInfo = getUserInfo;
+exports.updateCompanionApplication = updateCompanionApplication;
 exports.updateCompanionOnlineStatus = updateCompanionOnlineStatus;
 exports.uploadCompanionVideo = uploadCompanionVideo;
 exports.wxLogin = wxLogin;

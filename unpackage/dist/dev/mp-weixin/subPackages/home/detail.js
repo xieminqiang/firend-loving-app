@@ -31,20 +31,26 @@ const _sfc_main = {
           serviceDetail.value = serviceRes.data.data;
           const templateId = params.value.price_template_id || serviceDetail.value.price_template_id;
           if (templateId) {
+            common_vendor.index.__f__("log", "at subPackages/home/detail.vue:177", "加载价格模板详情, ID:", templateId);
             try {
               const templateRes = await api_home.getPriceTemplateDetail(templateId);
               if (templateRes.data && templateRes.data.code === 0) {
                 priceTemplate.value = templateRes.data.data;
+                common_vendor.index.__f__("log", "at subPackages/home/detail.vue:182", "价格模板加载成功:", priceTemplate.value);
+              } else {
+                common_vendor.index.__f__("warn", "at subPackages/home/detail.vue:184", "价格模板接口返回错误:", templateRes.data);
               }
             } catch (templateError) {
-              common_vendor.index.__f__("warn", "at subPackages/home/detail.vue:183", "获取价格模板失败:", templateError);
+              common_vendor.index.__f__("warn", "at subPackages/home/detail.vue:187", "获取价格模板失败:", templateError);
             }
+          } else {
+            common_vendor.index.__f__("log", "at subPackages/home/detail.vue:190", "没有价格模板ID，跳过价格模板加载");
           }
         } else {
           throw new Error(serviceRes.data && serviceRes.data.message || "获取服务详情失败");
         }
       } catch (err) {
-        common_vendor.index.__f__("error", "at subPackages/home/detail.vue:191", "加载数据失败:", err);
+        common_vendor.index.__f__("error", "at subPackages/home/detail.vue:197", "加载数据失败:", err);
         error.value = err.message || "加载失败，请重试";
       } finally {
         loading.value = false;
@@ -54,21 +60,21 @@ const _sfc_main = {
       common_vendor.index.navigateBack();
     };
     const onImageError = () => {
-      common_vendor.index.__f__("log", "at subPackages/home/detail.vue:205", "图片加载失败");
+      common_vendor.index.__f__("log", "at subPackages/home/detail.vue:211", "图片加载失败");
     };
     const previewImage = () => {
       if (serviceDetail.value && serviceDetail.value.image_url) {
         const imgBaseUrl = "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com";
         const imageUrl = serviceDetail.value.image_url.startsWith("http") ? serviceDetail.value.image_url : imgBaseUrl + serviceDetail.value.image_url;
-        common_vendor.index.__f__("log", "at subPackages/home/detail.vue:218", "预览图片URL:", imageUrl);
+        common_vendor.index.__f__("log", "at subPackages/home/detail.vue:224", "预览图片URL:", imageUrl);
         common_vendor.index.previewImage({
           urls: [imageUrl],
           current: imageUrl,
           success: () => {
-            common_vendor.index.__f__("log", "at subPackages/home/detail.vue:224", "图片预览成功");
+            common_vendor.index.__f__("log", "at subPackages/home/detail.vue:230", "图片预览成功");
           },
           fail: (err) => {
-            common_vendor.index.__f__("error", "at subPackages/home/detail.vue:227", "图片预览失败:", err);
+            common_vendor.index.__f__("error", "at subPackages/home/detail.vue:233", "图片预览失败:", err);
             common_vendor.index.showToast({
               title: "图片预览失败",
               icon: "none"

@@ -94,7 +94,7 @@
               <view class="login-btn" @click="navigateToLogin">
                 <view class="btn-shine"></view>
                 <text class="login-btn-text">立即登录</text>
-                <image src="@/static/icons/common/arrow-right.png" class="login-arrow" mode="aspectFit" />
+                <image src="@/static/icons/common/jiantou.png" class="login-arrow" mode="aspectFit" />
               </view>
             </view>
           </view>
@@ -724,11 +724,7 @@ const onRefresh = async () => {
     // 模拟加载时间，确保用户能看到刷新动画
     await new Promise(resolve => setTimeout(resolve, 800))
     
-    uni.showToast({
-      title: '刷新成功',
-      icon: 'none',
-      duration: 1500
-    })
+   
   } catch (error) {
     console.error('刷新失败:', error)
     uni.showToast({
@@ -1117,8 +1113,8 @@ const getPartnerText = () => {
 }
 
 .login-arrow {
-  width: 40rpx;
-  height: 40rpx;
+  width: 34rpx;
+  height: 34rpx;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1128,6 +1124,8 @@ const getPartnerText = () => {
   flex-shrink: 0;
   backdrop-filter: blur(10rpx);
   margin-left: 12rpx;
+  padding: 4rpx;
+
 }
 
 .user-profile:active .profile-arrow {
