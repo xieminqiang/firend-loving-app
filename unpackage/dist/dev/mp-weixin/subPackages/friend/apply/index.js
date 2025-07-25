@@ -560,7 +560,7 @@ const _sfc_main = {
         b: common_vendor.o(handleBack),
         c: formData.nickname,
         d: common_vendor.o(($event) => formData.nickname = $event.detail.value),
-        e: common_assets._imports_1$1,
+        e: common_assets._imports_1$2,
         f: formData.gender === "male" ? 1 : "",
         g: common_vendor.o(($event) => selectGender("male")),
         h: common_assets._imports_2,

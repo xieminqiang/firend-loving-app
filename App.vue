@@ -1,15 +1,30 @@
 <script>
-	export default {
-		onLaunch: function() {
-			console.log('App Launch')
-		},
-		onShow: function() {
-			console.log('App Show')
-		},
-		onHide: function() {
-			console.log('App Hide')
+import { useLevelStore } from '@/stores/level.js'
+
+export default {
+	onLaunch: function() {
+		console.log('App Launch')
+		// 初始化时获取服务等级列表
+		this.initServiceLevels()
+	},
+	onShow: function() {
+		console.log('App Show')
+	},
+	onHide: function() {
+		console.log('App Hide')
+	},
+	methods: {
+		async initServiceLevels() {
+			try {
+				const levelStore = useLevelStore()
+				await levelStore.fetchServiceLevels()
+				console.log('服务等级列表初始化完成')
+			} catch (error) {
+				console.error('初始化服务等级列表失败:', error)
+			}
 		}
 	}
+}
 </script>
 
 <style lang="scss">

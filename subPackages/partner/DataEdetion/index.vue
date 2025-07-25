@@ -10,10 +10,7 @@
         <text class="back-text">返回</text>
       </view>
       <text class="nav-title">资料编辑</text>
-      <view class="save-btn" @click="saveChanges" :class="{ disabled: isSaving }">
-        <text class="save-text" v-if="!isSaving">保存</text>
-        <text class="save-text" v-else>保存中...</text>
-      </view>
+
     </view>
     
     <!-- 主内容区域 -->
@@ -310,7 +307,7 @@
                 <view class="dot"></view>
               </view>
             </view>
-            <view v-else class="save-icon">💾</view>
+
             <text class="save-btn-text" v-if="!isSaving">保存资料</text>
             <text class="save-btn-text" v-else>保存中...</text>
           </view>

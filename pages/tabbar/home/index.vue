@@ -8,13 +8,7 @@
           				<text class="logo">随伴行</text>
           <text class="logo-tag">提供精选服务</text>
         </view>
-        <view class="city-selector" @click="showCityPicker = true">
-          <image src="@/static/icons/friend/map-pin.png" class="location-icon" mode="aspectFit" />
-          <view class="city-select">
-            <text>{{ city }}</text>
-            <image src="@/static/icons/friend/chevron-down.png" class="select-arrow" mode="aspectFit" />
-          </view>
-        </view>
+        <CitySelector @click="showCityPicker = true" />
       </view>
     </view>
    
@@ -94,10 +88,13 @@
             >
               <view class="service-list-soul">
                 <!-- 加载状态 -->
-             
+                <view v-if="dataLoading[tab]" class="loading-state">
+                  <view class="loading-spinner"></view>
+                  <text class="loading-text">加载中...</text>
+                </view>
                 
                 <!-- 服务列表 -->
-                <view v-if="getTabServiceItems(tab).length > 0">
+                <view v-else-if="getTabServiceItems(tab).length > 0">
                   <view v-for="item in getTabServiceItems(tab)" :key="item.id" class="service-card-soul" @click="navigateToServiceDetail(item.id)">
                     <view class="service-img-wrap">
                       <image :src="$imgBaseUrl + item.img" class="service-img-soul" mode="aspectFill" />
@@ -120,9 +117,9 @@
                   </view>
                 </view>
                 
-                <!-- 空状态 -->
-                <view v-else class="empty-state">
-                  <image src="/static/images/girl-megaphone.png" class="empty-icon" mode="aspectFit" />
+                <!-- 空状态 - 只在加载完成后且没有数据时显示 -->
+                <view v-else-if="dataLoaded[tab] && getTabServiceItems(tab).length === 0" class="empty-state">
+                  <image src="/static/images/empty.png" class="empty-icon" mode="aspectFit" />
                   <text class="empty-text">暂无{{ tab }}服务</text>
                   <text class="empty-desc">更多精彩服务即将上线</text>
                 </view>
@@ -136,38 +133,20 @@
 
      </view>
 
-    <!-- 自定义选择弹窗 -->
-    <view v-if="showCityPicker" class="city-picker-overlay" @click="showCityPicker = false">
-      <view class="city-picker-container" @click.stop>
-        <view class="city-picker-header">
-          <text class="picker-title">请选择服务区域</text>
-          <view class="picker-close" @click="showCityPicker = false">
-            <text>✕</text>
-          </view>
-        </view>
-        <view class="city-picker-content">
-          <view class="city-grid">
-            <view 
-              v-for="(cityItem, index) in cityList" 
-              :key="index"
-              :class="['city-item', { active: cityIndex === index }]"
-              @click="selectCity(index)"
-            >
-              <text class="city-name">{{ cityItem.name }}</text>
-
-              <view v-if="cityIndex === index" class="city-check">✓</view>
-
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
+    <!-- 城市选择弹窗 -->
+    <CityPicker 
+      v-model:visible="showCityPicker" 
+      @city-selected="onCitySelected"
+    />
   </view>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { getHotRecommendServices, getCityList } from '@/api/home.js'
+import { getHotRecommendServices } from '@/api/home.js'
+import { useCityStore } from '@/stores/city.js'
+import CitySelector from '@/components/common/CitySelector.vue'
+import CityPicker from '@/components/common/CityPicker.vue'
 
 // 状态栏高度适配
 const statusBarHeight = ref(0)
@@ -178,10 +157,6 @@ function requestBackgroundLocation() {
 
 // 获取系统信息
 onMounted(async () => {
-
-
-	
-	
   const systemInfo = uni.getSystemInfoSync()
   statusBarHeight.value = systemInfo.statusBarHeight || 0
   
@@ -201,62 +176,21 @@ onMounted(async () => {
     nextBanner()
   }, 5000)
 
-  // 加载城市列表
-  await loadCityList()
+  // 初始化城市数据（获取位置和加载城市列表）
+  await cityStore.initCityData()
   
   // 只加载当前选中的选项卡数据（默认"服务"）
   await loadSingleTabData(serviceTab.value)
 })
 
-// 城市相关数据 - 改为动态数据
-const cityList = ref([])
-const cityIndex = ref(0)
-const city = computed(() => {
-  if (cityList.value.length > 0) {
-    return cityList.value[cityIndex.value]?.name || '选择城市'
-  }
-  return '选择城市'
-})
-const currentCityCode = computed(() => {
-  if (cityList.value.length > 0) {
-    return cityList.value[cityIndex.value]?.code || null
-  }
-  return null
-})
+// 获取全局城市store
+const cityStore = useCityStore()
 
-// 加载城市列表
-const loadCityList = async () => {
-  try {
-    const response = await getCityList()
-    
-    if (response.data && response.data.code === 0 && response.data.data) {
-      // 转换API数据格式为组件需要的格式
-      cityList.value = response.data.data.map(city => ({
-        name: city.name,
-        code: city.city_code // 保持字段名一致
-      }))
-      
-      // 如果有城市数据，默认选择第一个城市
-      if (cityList.value.length > 0) {
-        cityIndex.value = 0
-      }
-      
-      console.log('城市列表加载成功:', cityList.value)
-    } else {
-      console.warn('获取城市列表失败，使用默认城市列表')
-      // 使用默认城市列表作为备选方案
-      cityList.value = [
-
-      ]
-    }
-  } catch (error) {
-    console.error('获取城市列表失败:', error)
-    // 使用默认城市列表作为备选方案
-    cityList.value = [
-
-    ]
-  }
-}
+// 使用全局store的计算属性
+const city = computed(() => cityStore.currentCity)
+const currentCityCode = computed(() => cityStore.currentCityCode)
+const cityList = computed(() => cityStore.cityList)
+const cityIndex = computed(() => cityStore.cityIndex)
 
 // 轮播相关数据
 const currentBanner = ref(0)
@@ -287,9 +221,9 @@ function prevBanner() {
   }
 }
 
-// 城市选择
+// 城市选择 - 使用全局store
 function onCityChange(e) {
-  cityIndex.value = e.detail.value
+  cityStore.selectCity(e.detail.value)
 }
 
 // Banner data
@@ -499,11 +433,17 @@ const onRefresh = async (tab) => {
   refreshing.value = true
   
   try {
+    // 检查城市列表是否为空，如果为空则重新加载
+    if (cityStore.cityList.length === 0) {
+      console.log('城市列表为空，重新加载城市列表')
+      await cityStore.loadCityList()
+    }
+    
     // 下拉刷新时强制重新加载数据
     console.log(`下拉刷新${tab}选项卡数据`)
     await loadSingleTabData(tab, true)
-	// 模拟加载时间，确保用户能看到刷新动画
-	await new Promise(resolve => setTimeout(resolve, 800))
+    // 模拟加载时间，确保用户能看到刷新动画
+    await new Promise(resolve => setTimeout(resolve, 800))
   } catch (error) {
     console.error('刷新失败:', error)
   } finally {
@@ -522,13 +462,12 @@ const onRefreshRestore = () => {
 // 自定义城市选择
 const showCityPicker = ref(false)
 
-function selectCity(index) {
-  const oldCityIndex = cityIndex.value
-  cityIndex.value = index
-  showCityPicker.value = false
+function onCitySelected(index) {
+  const oldCityIndex = cityStore.cityIndex
   
   // 如果城市发生变化，重新加载所有选项卡的数据
   if (oldCityIndex !== index) {
+    console.log(`手动选择城市: ${cityStore.cityList[index].name}`)
     loadAllServicesData()
   }
 }
@@ -663,55 +602,7 @@ function selectCity(index) {
   letter-spacing: 1rpx;
 }
 
-.city-selector {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background: linear-gradient(135deg, rgba(130, 160, 216, 0.1) 0%, rgba(167, 188, 231, 0.06) 100%);
-  border-radius: 32rpx;
-  padding: 6rpx 12rpx 6rpx 12rpx;
-  border: 1rpx solid rgba(130, 160, 216, 0.12);
-  box-shadow: 0 2rpx 8rpx rgba(130, 160, 216, 0.08);
-  backdrop-filter: blur(10rpx);
-  -webkit-backdrop-filter: blur(10rpx);
-  transition: all 0.3s;
- 
-  
-  &:active {
-    transform: scale(0.96);
-    box-shadow: 0 4rpx 12rpx rgba(130, 160, 216, 0.12);
-    background: linear-gradient(135deg, rgba(130, 160, 216, 0.15) 0%, rgba(167, 188, 231, 0.08) 100%);
-  }
-}
 
-.location-icon {
-  width: 32rpx;
-  height: 32rpx;
-  margin-right: 6rpx;
-  /* PNG图标已经是正确颜色，不需要filter */
-}
-
-.city-select {
-  display: flex;
-  align-items: center;
-  padding: 0;
-  color: $text-color-primary;
-  font-size: 24rpx;
-  font-weight: 600;
-}
-
-.select-arrow {
-  width: 24rpx;
-  height: 24rpx;
-  margin-left: 6rpx;
-  transition: transform 0.3s;
-  opacity: 0.8;
-  /* PNG图标已经是正确颜色，不需要filter */
-}
-
-.city-selector:active .select-arrow {
-  transform: rotate(180deg);
-}
 
 /* Banner 容器 - 现在在scroll-view内部 */
 .banner-container {
@@ -1186,7 +1077,7 @@ function selectCity(index) {
 }
 
 .price-amount {
-  color: $highlight-color;
+  color:$pricelight-color;
   font-weight: 700;
   font-size: 30rpx;
   text-shadow: 0 1rpx 3rpx rgba(255, 111, 97, 0.15);
@@ -1235,178 +1126,7 @@ function selectCity(index) {
   }
 }
 
-/* 自定义城市选择弹窗 */
-.city-picker-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8rpx);
-  -webkit-backdrop-filter: blur(8rpx);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease-out;
-}
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { 
-    transform: translateY(100rpx);
-    opacity: 0;
-  }
-  to { 
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.city-picker-container {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 248, 250, 0.95) 100%);
-  backdrop-filter: blur(20rpx);
-  -webkit-backdrop-filter: blur(20rpx);
-  padding: 40rpx;
-  border-radius: 32rpx;
-  width: 85%;
-  max-width: 640rpx;
-  box-shadow: 0 20rpx 60rpx rgba(130, 160, 216, 0.2);
-  border: 1rpx solid rgba(130, 160, 216, 0.1);
-  animation: slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -30%;
-    width: 200rpx;
-    height: 200rpx;
-    background: radial-gradient(circle, rgba(130, 160, 216, 0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    z-index: 0;
-  }
-}
-
-.city-picker-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40rpx;
-  position: relative;
-  z-index: 1;
- 
-
-}
-
-.picker-title {
-  font-size: 30rpx;
-  font-weight: 400;
-  color: $text-color-primary;
-
-  position: relative;
-  
-
-}
-
-.picker-close {
-  width: 56rpx;
-  height: 56rpx;
-  background: linear-gradient(135deg, rgba(130, 160, 216, 0.1) 0%, rgba(255, 255, 255, 0.8) 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28rpx;
-  color: $text-color-secondary;
-  font-weight: 600;
-  transition: all 0.3s;
-  border: 1rpx solid rgba(130, 160, 216, 0.15);
-  
-  &:active {
-    transform: scale(0.9);
-    background: linear-gradient(135deg, rgba(130, 160, 216, 0.15) 0%, rgba(255, 255, 255, 0.9) 100%);
-  }
-}
-
-.city-picker-content {
-  position: relative;
-  z-index: 1;
-}
-
-.city-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20rpx;
-}
-
-.city-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24rpx 20rpx;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(247, 248, 250, 0.6) 100%);
-  border: 2rpx solid rgba(130, 160, 216, 0.1);
-  border-radius: 24rpx;
-
-  position: relative;
-  overflow: hidden;
-
-  
-
-  
-
-}
-
-.city-item.active {
-  background: linear-gradient(135deg, rgba(130, 160, 216, 0.15) 0%, rgba(167, 188, 231, 0.1) 100%);
-  border-color: $primary-color;
-
-
-}
-
-.city-name {
-  flex: 1;
-  font-size: 26rpx;
-  color: $text-color-primary;
-  font-weight: 400;
-  letter-spacing: 1rpx;
-}
-
-.city-item.active .city-name {
-  color: $primary-color;
-  font-weight: 500;
-}
-
-.city-check {
-  width: 28rpx;
-  height: 28rpx;
-  background: linear-gradient(135deg, $primary-color 0%, $highlight-color 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18rpx;
-  color: white;
-  font-weight: 700;
-  box-shadow: 0 3rpx 10rpx rgba(130, 160, 216, 0.25);
-  animation: checkBounce 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  margin-left: 16rpx;
-  flex-shrink: 0;
-}
-
-@keyframes checkBounce {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
 
 /* 空状态样式 */
 .empty-state {

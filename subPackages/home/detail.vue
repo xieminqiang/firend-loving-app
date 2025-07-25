@@ -21,20 +21,6 @@
           mode="aspectFill"
           @error="onImageError"
         />
-        <view class="hero-overlay">
-          <view class="hero-content">
-            <view class="service-category">
-              <view class="category-icon">
-                <image src="@/static/icons/friend/tag.png" class="category-icon-img" mode="aspectFit" />
-              </view>
-              <text class="category-text">{{ serviceDetail.category_name || '服务' }}</text>
-            </view>
-          </view>
-        </view>
-        <!-- 放大提示图标 -->
-        <view class="zoom-hint">
-          <image src="@/static/icons/common/camera.png" class="zoom-icon" mode="aspectFit" />
-        </view>
       </view>
 
       <!-- 服务信息 -->
@@ -119,7 +105,7 @@
 
     <!-- 错误提示 -->
     <view v-if="error" class="error-container">
-      <image src="/static/images/girl-megaphone.png" class="error-icon" mode="aspectFit" />
+      <image src="/static/images/empty.png" class="error-icon" mode="aspectFit" />
       <text class="error-text">{{ error }}</text>
       <view class="retry-btn" @click="loadData">
         <text>重试</text>
@@ -413,102 +399,7 @@ const bookService = () => {
 
 }
 
-.hero-overlay {
-  position: absolute;
-  bottom: 10rpx;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-  padding: 60rpx 24rpx 24rpx;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
 
-.hero-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 16rpx;
-}
-
-.service-category {
-  background: linear-gradient(135deg, rgba(115, 99, 255, 0.95) 0%, rgba(255, 105, 222, 0.85) 100%);
-  backdrop-filter: blur(20rpx);
-  -webkit-backdrop-filter: blur(20rpx);
-  padding: 12rpx 24rpx;
-  border-radius: 28rpx;
-  
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  transform: translateY(0);
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4rpx); }
-}
-
-.category-icon {
-  width: 28rpx;
-  height: 28rpx;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.category-icon-img {
-  width: 16rpx;
-  height: 16rpx;
-  filter: brightness(0) invert(1);
-}
-
-.category-text {
-  font-size: 26rpx;
-  color: #FFFFFF;
-  font-weight: 700;
-  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.3);
-  letter-spacing: 0.5rpx;
-}
-
-// 放大提示
-.zoom-hint {
-  position: absolute;
-  top: 24rpx;
-  right: 24rpx;
-  width: 56rpx;
-  height: 56rpx;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(16rpx);
-  -webkit-backdrop-filter: blur(16rpx);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1rpx solid rgba(255, 255, 255, 0.2);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { 
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% { 
-    transform: scale(1.1);
-    opacity: 1;
-  }
-}
-
-.zoom-icon {
-  width: 24rpx;
-  height: 24rpx;
-  filter: brightness(0) invert(1);
-}
 
 
 
@@ -553,7 +444,7 @@ const bookService = () => {
 .price-text {
   font-size: 30rpx;
   font-weight: 700;
-  color: $highlight-color;
+   color:$pricelight-color;
   line-height: 1.2;
   white-space: nowrap;
   text-shadow: 0 1rpx 3rpx rgba(255, 111, 97, 0.15);
@@ -597,13 +488,23 @@ const bookService = () => {
 }
 
 .service-tag {
-  background: linear-gradient(135deg, rgba($primary-color, 0.1) 0%, rgba($highlight-color, 0.05) 100%);
-  color: $primary-color;
-  padding: 8rpx 16rpx;
-  border-radius: 20rpx;
-  font-size: 22rpx;
+  font-size: 20rpx;
+  background: linear-gradient(135deg, rgba(108, 117, 125, 0.08) 0%, rgba(248, 249, 250, 0.6) 100%);
+  color: #495057;
+  padding: 4rpx 12rpx;
+  border-radius: 16rpx;
   font-weight: 600;
-  border: 1rpx solid rgba($primary-color, 0.15);
+  border: 1rpx solid rgba(108, 117, 125, 0.12);
+  backdrop-filter: blur(8rpx);
+  -webkit-backdrop-filter: blur(8rpx);
+  transition: all 0.3s;
+  
+  &:active {
+    transform: scale(0.95);
+    background: linear-gradient(135deg, rgba(255, 105, 222, 0.1) 0%, rgba(255, 255, 255, 0.8) 100%);
+    color: $highlight-color;
+    border-color: rgba(255, 105, 222, 0.2);
+  }
 }
 
 .description-text {
@@ -711,7 +612,7 @@ const bookService = () => {
 .price-amount {
   font-size: 36rpx;
   font-weight: 700;
-  color: $highlight-color;
+  color:$pricelight-color;
 }
 
 .price-unit {

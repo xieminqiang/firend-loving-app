@@ -14,7 +14,7 @@ const _sfc_main = {
       const pages = getCurrentPages();
       const currentPage = pages[pages.length - 1];
       params.value = currentPage.options || {};
-      common_vendor.index.__f__("log", "at subPackages/home/detail.vue:151", "详情页参数:", params.value);
+      common_vendor.index.__f__("log", "at subPackages/home/detail.vue:137", "详情页参数:", params.value);
       if (!params.value.id) {
         error.value = "缺少服务ID参数";
         loading.value = false;
@@ -31,26 +31,26 @@ const _sfc_main = {
           serviceDetail.value = serviceRes.data.data;
           const templateId = params.value.price_template_id || serviceDetail.value.price_template_id;
           if (templateId) {
-            common_vendor.index.__f__("log", "at subPackages/home/detail.vue:177", "加载价格模板详情, ID:", templateId);
+            common_vendor.index.__f__("log", "at subPackages/home/detail.vue:163", "加载价格模板详情, ID:", templateId);
             try {
               const templateRes = await api_home.getPriceTemplateDetail(templateId);
               if (templateRes.data && templateRes.data.code === 0) {
                 priceTemplate.value = templateRes.data.data;
-                common_vendor.index.__f__("log", "at subPackages/home/detail.vue:182", "价格模板加载成功:", priceTemplate.value);
+                common_vendor.index.__f__("log", "at subPackages/home/detail.vue:168", "价格模板加载成功:", priceTemplate.value);
               } else {
-                common_vendor.index.__f__("warn", "at subPackages/home/detail.vue:184", "价格模板接口返回错误:", templateRes.data);
+                common_vendor.index.__f__("warn", "at subPackages/home/detail.vue:170", "价格模板接口返回错误:", templateRes.data);
               }
             } catch (templateError) {
-              common_vendor.index.__f__("warn", "at subPackages/home/detail.vue:187", "获取价格模板失败:", templateError);
+              common_vendor.index.__f__("warn", "at subPackages/home/detail.vue:173", "获取价格模板失败:", templateError);
             }
           } else {
-            common_vendor.index.__f__("log", "at subPackages/home/detail.vue:190", "没有价格模板ID，跳过价格模板加载");
+            common_vendor.index.__f__("log", "at subPackages/home/detail.vue:176", "没有价格模板ID，跳过价格模板加载");
           }
         } else {
           throw new Error(serviceRes.data && serviceRes.data.message || "获取服务详情失败");
         }
       } catch (err) {
-        common_vendor.index.__f__("error", "at subPackages/home/detail.vue:197", "加载数据失败:", err);
+        common_vendor.index.__f__("error", "at subPackages/home/detail.vue:183", "加载数据失败:", err);
         error.value = err.message || "加载失败，请重试";
       } finally {
         loading.value = false;
@@ -60,21 +60,21 @@ const _sfc_main = {
       common_vendor.index.navigateBack();
     };
     const onImageError = () => {
-      common_vendor.index.__f__("log", "at subPackages/home/detail.vue:211", "图片加载失败");
+      common_vendor.index.__f__("log", "at subPackages/home/detail.vue:197", "图片加载失败");
     };
     const previewImage = () => {
       if (serviceDetail.value && serviceDetail.value.image_url) {
         const imgBaseUrl = "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com";
         const imageUrl = serviceDetail.value.image_url.startsWith("http") ? serviceDetail.value.image_url : imgBaseUrl + serviceDetail.value.image_url;
-        common_vendor.index.__f__("log", "at subPackages/home/detail.vue:224", "预览图片URL:", imageUrl);
+        common_vendor.index.__f__("log", "at subPackages/home/detail.vue:210", "预览图片URL:", imageUrl);
         common_vendor.index.previewImage({
           urls: [imageUrl],
           current: imageUrl,
           success: () => {
-            common_vendor.index.__f__("log", "at subPackages/home/detail.vue:230", "图片预览成功");
+            common_vendor.index.__f__("log", "at subPackages/home/detail.vue:216", "图片预览成功");
           },
           fail: (err) => {
-            common_vendor.index.__f__("error", "at subPackages/home/detail.vue:233", "图片预览失败:", err);
+            common_vendor.index.__f__("error", "at subPackages/home/detail.vue:219", "图片预览失败:", err);
             common_vendor.index.showToast({
               title: "图片预览失败",
               icon: "none"
@@ -127,31 +127,28 @@ const _sfc_main = {
         d: common_vendor.o(goBack),
         e: _ctx.$imgBaseUrl + serviceDetail.value.image_url,
         f: common_vendor.o(onImageError),
-        g: common_assets._imports_1$5,
-        h: common_vendor.t(serviceDetail.value.category_name || "服务"),
-        i: common_assets._imports_2$3,
-        j: common_vendor.o(previewImage),
-        k: common_vendor.t(serviceDetail.value.name || "服务详情"),
-        l: serviceDetail.value.min_price
+        g: common_vendor.o(previewImage),
+        h: common_vendor.t(serviceDetail.value.name || "服务详情"),
+        i: serviceDetail.value.min_price
       }, serviceDetail.value.min_price ? common_vendor.e({
-        m: common_vendor.t(serviceDetail.value.min_price),
-        n: priceTemplate.value.unit
+        j: common_vendor.t(serviceDetail.value.min_price),
+        k: priceTemplate.value.unit
       }, priceTemplate.value.unit ? {
-        o: common_vendor.t(priceTemplate.value.unit)
+        l: common_vendor.t(priceTemplate.value.unit)
       } : {}) : {}, {
-        p: serviceDetail.value.tags && serviceDetail.value.tags.length > 0
+        m: serviceDetail.value.tags && serviceDetail.value.tags.length > 0
       }, serviceDetail.value.tags && serviceDetail.value.tags.length > 0 ? {
-        q: common_vendor.f(serviceDetail.value.tags, (tag, k0, i0) => {
+        n: common_vendor.f(serviceDetail.value.tags, (tag, k0, i0) => {
           return {
             a: common_vendor.t(tag),
             b: tag
           };
         })
       } : {}, {
-        r: priceTemplate.value && priceTemplate.value.levels && priceTemplate.value.levels.length > 0
+        o: priceTemplate.value && priceTemplate.value.levels && priceTemplate.value.levels.length > 0
       }, priceTemplate.value && priceTemplate.value.levels && priceTemplate.value.levels.length > 0 ? {
-        s: common_assets._imports_3$2,
-        t: common_vendor.f(priceTemplate.value.levels, (level, k0, i0) => {
+        p: common_assets._imports_1$6,
+        q: common_vendor.f(priceTemplate.value.levels, (level, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(level.level_name),
             b: level.level_order <= 2
@@ -164,21 +161,21 @@ const _sfc_main = {
           });
         })
       } : {}, {
-        v: common_assets._imports_1$5,
-        w: common_vendor.t(serviceDetail.value.description || "暂无详细说明")
+        r: common_assets._imports_2$4,
+        s: common_vendor.t(serviceDetail.value.description || "暂无详细说明")
       }) : {}, {
         b: !error.value,
-        x: !loading.value && !error.value
+        t: !loading.value && !error.value
       }, !loading.value && !error.value ? {
-        y: common_assets._imports_4,
-        z: common_vendor.o(contactService),
-        A: common_vendor.o(bookService)
+        v: common_assets._imports_3$1,
+        w: common_vendor.o(contactService),
+        x: common_vendor.o(bookService)
       } : {}, {
-        B: error.value
+        y: error.value
       }, error.value ? {
-        C: common_assets._imports_5,
-        D: common_vendor.t(error.value),
-        E: common_vendor.o(loadData)
+        z: common_assets._imports_0,
+        A: common_vendor.t(error.value),
+        B: common_vendor.o(loadData)
       } : {});
     };
   }

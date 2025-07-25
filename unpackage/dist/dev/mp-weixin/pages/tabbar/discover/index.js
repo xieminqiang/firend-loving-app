@@ -451,7 +451,7 @@ const _sfc_main = {
           }, feed.videoThumbnail ? {
             i: feed.videoThumbnail
           } : {}, {
-            j: common_assets._imports_1$2,
+            j: common_assets._imports_1$3,
             k: common_vendor.o(($event) => playVideo(feed), feed.id)
           }) : {}, {
             l: !feed.isLiked
@@ -469,7 +469,7 @@ const _sfc_main = {
             v: feed.id
           });
         }),
-        k: common_assets._imports_4$1,
+        k: common_assets._imports_4,
         l: isRefreshing.value,
         m: common_vendor.o(onRefresh),
         n: showRewardModal.value
@@ -504,7 +504,7 @@ const _sfc_main = {
       } : {}, {
         F: showCommentModal.value
       }, showCommentModal.value ? common_vendor.e({
-        G: common_assets._imports_5$1,
+        G: common_assets._imports_5,
         H: common_vendor.o(closeCommentModal),
         I: selectedFeed.value && selectedFeed.value.avatar || "",
         J: common_vendor.t(selectedFeed.value && selectedFeed.value.name || ""),
@@ -522,7 +522,7 @@ const _sfc_main = {
           };
         })
       } : {
-        N: common_assets._imports_4
+        N: common_assets._imports_3$1
       }, {
         O: getCommentPlaceholder(),
         P: commentText.value,

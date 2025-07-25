@@ -57,7 +57,7 @@ const _sfc_main = {
         await loadCityList();
         await loadApplicationData();
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:514", "加载初始数据失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:511", "加载初始数据失败:", error);
         common_vendor.index.showToast({
           title: "加载数据失败，请重试",
           icon: "none"
@@ -76,18 +76,18 @@ const _sfc_main = {
           formData.weight = applicationData.weight ? String(applicationData.weight) : "";
           photos.value = applicationData.photos || [];
           if (applicationData.service_areas && applicationData.service_areas.length > 0) {
-            common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:542", "开始处理服务区域回显:", {
+            common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:539", "开始处理服务区域回显:", {
               service_areas: applicationData.service_areas,
               cityList: cityList.value
             });
             const cityNames = applicationData.service_areas.map((cityCode) => {
               const city = cityList.value.find((c) => c.code === Number(cityCode));
-              common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:550", `查找城市代码 ${cityCode}:`, city);
+              common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:547", `查找城市代码 ${cityCode}:`, city);
               return city ? city.name : null;
             }).filter((name) => name !== null);
             selectedCities.value = cityNames;
             formData.city = cityNames[0] || "深圳市";
-            common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:557", "服务区域回显完成:", {
+            common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:554", "服务区域回显完成:", {
               service_areas: applicationData.service_areas,
               cityNames,
               selectedCities: selectedCities.value
@@ -104,12 +104,12 @@ const _sfc_main = {
           if (selectedCities.value.length > 0) {
             await loadServicesByCity();
           }
-          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:582", "申请数据加载成功:", applicationData);
+          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:579", "申请数据加载成功:", applicationData);
         } else {
-          common_vendor.index.__f__("warn", "at subPackages/partner/DataEdetion/index.vue:584", "获取申请数据失败");
+          common_vendor.index.__f__("warn", "at subPackages/partner/DataEdetion/index.vue:581", "获取申请数据失败");
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:587", "加载申请数据失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:584", "加载申请数据失败:", error);
         common_vendor.index.showToast({
           title: "加载申请数据失败",
           icon: "none"
@@ -129,7 +129,7 @@ const _sfc_main = {
           return city ? city.code : null;
         }).filter((code) => code !== null);
         if (cityCodes.length === 0) {
-          common_vendor.index.__f__("warn", "at subPackages/partner/DataEdetion/index.vue:612", "未找到有效的城市代码");
+          common_vendor.index.__f__("warn", "at subPackages/partner/DataEdetion/index.vue:609", "未找到有效的城市代码");
           serviceSkills.value = [];
           skillCategories.value = [];
           return;
@@ -138,15 +138,15 @@ const _sfc_main = {
         if (response.data && response.data.code === 0 && response.data.data) {
           serviceSkills.value = response.data.data;
           groupServicesByCategory();
-          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:626", "服务技能列表加载成功:", serviceSkills.value);
-          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:627", "服务技能分组:", skillCategories.value);
+          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:623", "服务技能列表加载成功:", serviceSkills.value);
+          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:624", "服务技能分组:", skillCategories.value);
         } else {
-          common_vendor.index.__f__("warn", "at subPackages/partner/DataEdetion/index.vue:629", "获取服务技能列表失败");
+          common_vendor.index.__f__("warn", "at subPackages/partner/DataEdetion/index.vue:626", "获取服务技能列表失败");
           serviceSkills.value = [];
           skillCategories.value = [];
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:634", "获取服务技能列表失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:631", "获取服务技能列表失败:", error);
         serviceSkills.value = [];
         skillCategories.value = [];
       } finally {
@@ -179,14 +179,14 @@ const _sfc_main = {
             code: city.city_code
             // 城市代码字段
           }));
-          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:679", "资料编辑页面区域列表加载成功:", cityList.value);
-          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:680", "城市列表数据结构:", response.data.data);
+          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:676", "资料编辑页面区域列表加载成功:", cityList.value);
+          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:677", "城市列表数据结构:", response.data.data);
         } else {
-          common_vendor.index.__f__("warn", "at subPackages/partner/DataEdetion/index.vue:682", "获取区域列表失败");
+          common_vendor.index.__f__("warn", "at subPackages/partner/DataEdetion/index.vue:679", "获取区域列表失败");
           cityList.value = [];
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:686", "获取区域列表失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:683", "获取区域列表失败:", error);
         cityList.value = [];
       } finally {
         cityLoading.value = false;
@@ -261,8 +261,8 @@ const _sfc_main = {
             const uploadPromises = res.tempFilePaths.map(async (filePath, index) => {
               try {
                 const fileInfo = await getFileInfo(filePath);
-                common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:799", "fileInfo", fileInfo);
-                common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:800", "filePath", filePath);
+                common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:796", "fileInfo", fileInfo);
+                common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:797", "filePath", filePath);
                 if (!fileInfo || !fileInfo.extension) {
                   throw new Error("无法获取文件信息");
                 }
@@ -276,7 +276,7 @@ const _sfc_main = {
                 }
                 return "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com" + fileData.url;
               } catch (error) {
-                common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:819", `第${index + 1}张照片上传失败:`, error);
+                common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:816", `第${index + 1}张照片上传失败:`, error);
                 throw error;
               }
             });
@@ -287,7 +287,7 @@ const _sfc_main = {
               icon: "success"
             });
           } catch (error) {
-            common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:836", "照片上传失败:", error);
+            common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:833", "照片上传失败:", error);
             common_vendor.index.showToast({
               title: "照片上传失败，请重试",
               icon: "none"
@@ -297,7 +297,7 @@ const _sfc_main = {
           }
         },
         fail: (error) => {
-          common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:846", "选择照片失败:", error);
+          common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:843", "选择照片失败:", error);
           common_vendor.index.showToast({
             title: "选择照片失败",
             icon: "none"
@@ -317,7 +317,7 @@ const _sfc_main = {
             });
           },
           fail: (error) => {
-            common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:869", "获取文件信息失败:", error);
+            common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:866", "获取文件信息失败:", error);
             const extension = filePath.split(".").pop().toLowerCase() || "jpg";
             resolve({
               size: 0,
@@ -456,9 +456,9 @@ const _sfc_main = {
           phone: userStore.userInfo.phone || ""
           // 添加phone参数
         };
-        common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1045", "保存数据:", submitData);
+        common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1042", "保存数据:", submitData);
         const response = await api_user.updateCompanionApplication(submitData);
-        common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1050", "接口响应:", response);
+        common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1047", "接口响应:", response);
         if (response && response.data && response.data.code === 0) {
           common_vendor.index.showToast({
             title: "保存成功",
@@ -482,7 +482,7 @@ const _sfc_main = {
           });
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:1084", "保存失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:1081", "保存失败:", error);
         let errorMessage = "保存失败，请稍后重试";
         if (error && error.message) {
           if (error.message.includes("网络")) {
@@ -529,40 +529,40 @@ const _sfc_main = {
     const setTagsToCache = (tagType, tagList) => {
       tagsCache.value.set(tagType, tagList);
       cacheTimestamps.value.set(tagType, Date.now());
-      common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1152", `标签类型${tagType}已缓存，数据量: ${tagList.length}`);
+      common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1149", `标签类型${tagType}已缓存，数据量: ${tagList.length}`);
     };
     const loadTagsByType = async (tagType, forceRefresh = false) => {
       if (!forceRefresh && isCacheValid(tagType)) {
         const cachedTags = getTagsFromCache(tagType);
         if (cachedTags.length > 0) {
-          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1175", `使用缓存数据 - 标签类型${tagType}，数据量: ${cachedTags.length}`);
+          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1172", `使用缓存数据 - 标签类型${tagType}，数据量: ${cachedTags.length}`);
           currentTagList.value = cachedTags;
           return;
         }
       }
       tagsLoading.value = true;
       try {
-        common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1183", `开始加载标签类型: ${tagType}`);
+        common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1180", `开始加载标签类型: ${tagType}`);
         const params = {
           tag_type: tagType,
           page: 1,
           pageSize: 60
         };
-        common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1191", "请求参数:", params);
+        common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1188", "请求参数:", params);
         const response = await api_user.getPersonalityTags(params);
-        common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1194", "API响应:", response);
+        common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1191", "API响应:", response);
         if (response.data && response.data.code === 0 && response.data.data) {
           const tagList = response.data.data.list || response.data.data;
           currentTagList.value = tagList;
           setTagsToCache(tagType, tagList);
-          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1204", `标签类型${tagType}加载成功:`, tagList);
+          common_vendor.index.__f__("log", "at subPackages/partner/DataEdetion/index.vue:1201", `标签类型${tagType}加载成功:`, tagList);
         } else {
-          common_vendor.index.__f__("warn", "at subPackages/partner/DataEdetion/index.vue:1206", `获取标签类型${tagType}失败，响应数据:`, response);
+          common_vendor.index.__f__("warn", "at subPackages/partner/DataEdetion/index.vue:1203", `获取标签类型${tagType}失败，响应数据:`, response);
           currentTagList.value = [];
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:1210", `获取标签类型${tagType}失败:`, error);
-        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:1211", "错误详情:", error.response || error);
+        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:1207", `获取标签类型${tagType}失败:`, error);
+        common_vendor.index.__f__("error", "at subPackages/partner/DataEdetion/index.vue:1208", "错误详情:", error.response || error);
         currentTagList.value = [];
       } finally {
         tagsLoading.value = false;
@@ -612,32 +612,28 @@ const _sfc_main = {
         a: statusBarHeight.value + "px",
         b: common_assets._imports_0$4,
         c: common_vendor.o(goBack),
-        d: !isSaving.value
-      }, !isSaving.value ? {} : {}, {
-        e: common_vendor.o(saveChanges),
-        f: isSaving.value ? 1 : "",
-        g: formData.nickname,
-        h: common_vendor.o(($event) => formData.nickname = $event.detail.value),
-        i: common_assets._imports_1$1,
-        j: formData.gender === "male" ? 1 : "",
-        k: common_vendor.o(($event) => selectGender("male")),
-        l: common_assets._imports_2,
-        m: formData.gender === "female" ? 1 : "",
-        n: common_vendor.o(($event) => selectGender("female")),
-        o: formData.age,
-        p: common_vendor.o(($event) => formData.age = $event.detail.value),
-        q: formData.height,
-        r: common_vendor.o(($event) => formData.height = $event.detail.value),
-        s: formData.weight,
-        t: common_vendor.o(($event) => formData.weight = $event.detail.value),
-        v: selectedCities.value.length === 0
+        d: formData.nickname,
+        e: common_vendor.o(($event) => formData.nickname = $event.detail.value),
+        f: common_assets._imports_1$2,
+        g: formData.gender === "male" ? 1 : "",
+        h: common_vendor.o(($event) => selectGender("male")),
+        i: common_assets._imports_2,
+        j: formData.gender === "female" ? 1 : "",
+        k: common_vendor.o(($event) => selectGender("female")),
+        l: formData.age,
+        m: common_vendor.o(($event) => formData.age = $event.detail.value),
+        n: formData.height,
+        o: common_vendor.o(($event) => formData.height = $event.detail.value),
+        p: formData.weight,
+        q: common_vendor.o(($event) => formData.weight = $event.detail.value),
+        r: selectedCities.value.length === 0
       }, selectedCities.value.length === 0 ? {} : {
-        w: common_vendor.t(selectedCities.value.length)
+        s: common_vendor.t(selectedCities.value.length)
       }, {
-        x: common_vendor.o(showCitySelector),
-        y: selectedCities.value.length > 0
+        t: common_vendor.o(showCitySelector),
+        v: selectedCities.value.length > 0
       }, selectedCities.value.length > 0 ? {
-        z: common_vendor.f(selectedCities.value, (city, k0, i0) => {
+        w: common_vendor.f(selectedCities.value, (city, k0, i0) => {
           return {
             a: common_vendor.t(city),
             b: city,
@@ -645,7 +641,7 @@ const _sfc_main = {
           };
         })
       } : {}, {
-        A: common_vendor.f(photos.value, (photo, index, i0) => {
+        x: common_vendor.f(photos.value, (photo, index, i0) => {
           return {
             a: photo,
             b: common_vendor.o(($event) => deletePhoto(index), index),
@@ -653,13 +649,13 @@ const _sfc_main = {
             d: common_vendor.o(($event) => previewPhoto(index), index)
           };
         }),
-        B: photos.value.length < 6
+        y: photos.value.length < 6
       }, photos.value.length < 6 ? {
-        C: common_vendor.o(addPhoto)
+        z: common_vendor.o(addPhoto)
       } : {}, {
-        D: servicesLoading.value
+        A: servicesLoading.value
       }, servicesLoading.value ? {} : selectedCities.value.length === 0 ? {} : skillCategories.value.length > 0 ? {
-        G: common_vendor.f(skillCategories.value, (category, k0, i0) => {
+        D: common_vendor.f(skillCategories.value, (category, k0, i0) => {
           return {
             a: common_vendor.t(category.name),
             b: common_vendor.f(category.services, (service, k1, i1) => {
@@ -674,11 +670,11 @@ const _sfc_main = {
           };
         })
       } : {}, {
-        E: selectedCities.value.length === 0,
-        F: skillCategories.value.length > 0,
-        H: selectedTags.value.length > 0
+        B: selectedCities.value.length === 0,
+        C: skillCategories.value.length > 0,
+        E: selectedTags.value.length > 0
       }, selectedTags.value.length > 0 ? {
-        I: common_vendor.f(selectedTags.value, (tag, k0, i0) => {
+        F: common_vendor.f(selectedTags.value, (tag, k0, i0) => {
           return {
             a: common_vendor.t(tag.tag_name),
             b: tag.id,
@@ -686,24 +682,24 @@ const _sfc_main = {
           };
         })
       } : {}, {
-        J: common_vendor.t(selectedTags.value.length),
-        K: selectedTags.value.length >= 5 ? 1 : "",
-        L: common_vendor.o(($event) => selectedTags.value.length < 5 ? showTagSelector() : null),
-        M: isRefreshing.value,
-        N: common_vendor.o(onRefresh),
-        O: common_vendor.o(onRefreshRestore),
-        P: isSaving.value
+        G: common_vendor.t(selectedTags.value.length),
+        H: selectedTags.value.length >= 5 ? 1 : "",
+        I: common_vendor.o(($event) => selectedTags.value.length < 5 ? showTagSelector() : null),
+        J: isRefreshing.value,
+        K: common_vendor.o(onRefresh),
+        L: common_vendor.o(onRefreshRestore),
+        M: isSaving.value
       }, isSaving.value ? {} : {}, {
-        Q: !isSaving.value
+        N: !isSaving.value
       }, !isSaving.value ? {} : {}, {
-        R: isSaving.value ? 1 : "",
-        S: common_vendor.o(saveChanges),
-        T: showCityPicker.value
+        O: isSaving.value ? 1 : "",
+        P: common_vendor.o(saveChanges),
+        Q: showCityPicker.value
       }, showCityPicker.value ? common_vendor.e({
-        U: common_vendor.o(hideCitySelector),
-        V: cityLoading.value
+        R: common_vendor.o(hideCitySelector),
+        S: cityLoading.value
       }, cityLoading.value ? {} : {
-        W: common_vendor.f(cityList.value, (cityItem, index, i0) => {
+        T: common_vendor.f(cityList.value, (cityItem, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(cityItem.name),
             b: tempSelectedCities.value.includes(cityItem.name)
@@ -716,16 +712,16 @@ const _sfc_main = {
           });
         })
       }, {
-        X: common_vendor.t(tempSelectedCities.value.length),
-        Y: common_vendor.o(confirmCitySelection),
-        Z: common_vendor.o(() => {
+        U: common_vendor.t(tempSelectedCities.value.length),
+        V: common_vendor.o(confirmCitySelection),
+        W: common_vendor.o(() => {
         }),
-        aa: common_vendor.o(hideCitySelector)
+        X: common_vendor.o(hideCitySelector)
       }) : {}, {
-        ab: showTagPicker.value
+        Y: showTagPicker.value
       }, showTagPicker.value ? common_vendor.e({
-        ac: common_vendor.o(hideTagSelector),
-        ad: common_vendor.f(tagNavItems.value, (navItem, k0, i0) => {
+        Z: common_vendor.o(hideTagSelector),
+        aa: common_vendor.f(tagNavItems.value, (navItem, k0, i0) => {
           return {
             a: common_vendor.t(navItem.name),
             b: navItem.type,
@@ -735,11 +731,11 @@ const _sfc_main = {
             d: common_vendor.o(($event) => switchTagType(navItem.type), navItem.type)
           };
         }),
-        ae: !tagsLoading.value && tempSelectedTags.value.length >= 5
+        ab: !tagsLoading.value && tempSelectedTags.value.length >= 5
       }, !tagsLoading.value && tempSelectedTags.value.length >= 5 ? {} : {}, {
-        af: tagsLoading.value
+        ac: tagsLoading.value
       }, tagsLoading.value ? {} : {
-        ag: common_vendor.f(currentTagList.value, (tag, k0, i0) => {
+        ad: common_vendor.f(currentTagList.value, (tag, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(tag.tag_name),
             b: isTagSelected(tag.id)
@@ -752,13 +748,13 @@ const _sfc_main = {
           });
         })
       }, {
-        ah: !tagsLoading.value && currentTagList.value.length === 0
+        ae: !tagsLoading.value && currentTagList.value.length === 0
       }, !tagsLoading.value && currentTagList.value.length === 0 ? {} : {}, {
-        ai: common_vendor.t(tempSelectedTags.value.length),
-        aj: common_vendor.o(confirmTagSelection),
-        ak: common_vendor.o(() => {
+        af: common_vendor.t(tempSelectedTags.value.length),
+        ag: common_vendor.o(confirmTagSelection),
+        ah: common_vendor.o(() => {
         }),
-        al: common_vendor.o(hideTagSelector)
+        ai: common_vendor.o(hideTagSelector)
       }) : {});
     };
   }

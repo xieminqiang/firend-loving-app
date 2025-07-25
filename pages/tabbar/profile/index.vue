@@ -462,40 +462,10 @@ const loadApplicationInfo = async () => {
     
     if (response.data && response.data.code === 0) {
       applicationInfo.value = response.data.data
-      
-      // 根据申请状态设置显示文本
-      if (applicationInfo.value) {
-        // 根据返回的status字段设置状态
-        switch (applicationInfo.value.status) {
-          case 'pending':
-            applicationStatus.value = '审核中'
-            break
-          case 'approved':
-            applicationStatus.value = '已通过'
-            break
-          case 'rejected':
-            applicationStatus.value = '已拒绝'
-            break
-          default:
-            applicationStatus.value = '未知状态'
-        }
-      } else {
-        applicationStatus.value = '未申请'
-      }
-    } else if (response.data && response.data.code === 6002) {
-      // 申请记录不存在的情况
-      console.log('申请记录不存在，设置为未申请状态')
-      applicationInfo.value = null
-      applicationStatus.value = '未申请'
-    } else {
-      console.warn('获取申请信息失败:', response.data?.msg || '未知错误')
-      applicationStatus.value = '获取失败'
-      applicationInfo.value = null
-    }
+    
+    } 
   } catch (error) {
-    console.error('获取申请信息失败:', error)
-    applicationStatus.value = '获取失败'
-    applicationInfo.value = null
+    
   }
 }
 
@@ -579,7 +549,7 @@ const navigateToBillDetails = () => {
 
 const navigateToOrders = (status) => {
   uni.navigateTo({
-    url: `/subPackages/profile/orders/index?status=${status}`
+    url: `/subPackages/order/index?status=${status}`
   })
 }
 
@@ -748,18 +718,7 @@ const formatPhone = (phone) => {
   return phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
 }
 
-// 获取友伴入驻文本
-const getPartnerText = () => {
-  if (applicationStatus.value === '审核中') {
-    return '友伴入驻'
-  } else if (applicationStatus.value === '已通过') {
-    return '友伴端'
-  } else if (applicationStatus.value === '已拒绝') {
-    return '友伴入驻'
-  } else {
-    return '友伴入驻'
-  }
-}
+
 </script>
 
 <style lang="scss" scoped>

@@ -104,6 +104,14 @@
 						"navigationBarTitleText": "友伴端",
 						"navigationStyle": "custom"
 					}
+				},
+				
+				{
+					"path": "level/index",
+					"style": {
+						"navigationBarTitleText": "友伴端",
+						"navigationStyle": "custom"
+					}
 				}
 			]
 		},
@@ -112,6 +120,33 @@
 		"pages": [
 			{
 				"path": "apply/index",
+				"style": {
+				
+					  "navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "detail",
+				"style": {
+				
+					  "navigationStyle": "custom"
+				}
+			}
+			
+		]
+	},
+	{
+		"root": "subPackages/order",
+		"pages": [
+			{
+				"path": "index",
+				"style": {
+				
+					"navigationBarTitleText": "我的订单"
+				}
+			},
+			{
+				"path": "detail",
 				"style": {
 				
 					  "navigationStyle": "custom"

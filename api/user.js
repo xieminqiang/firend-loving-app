@@ -189,3 +189,14 @@ export const updateCompanionApplication = (data) => {
     data
   })
 }
+
+/**
+ * 获取服务等级列表
+ * @returns {Promise} 返回服务等级列表
+ */
+export const getServiceLevels = () => {
+  return http({
+    url: '/front/companion/service-levels',
+    method: 'GET'
+  })
+}

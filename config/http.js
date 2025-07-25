@@ -75,10 +75,10 @@ export const http = (options) => {
           // 检查业务错误码
           if (res.data && res.data.code !== undefined && res.data.code !== 0) {
             // 业务错误，显示错误信息并reject
-            uni.showToast({
-              icon: 'none',
-              title: res.data.msg || '请求失败',
-            })
+            // uni.showToast({
+            //   icon: 'none',
+            //   title: res.data.msg || '请求失败',
+            // })
             reject(res)
             return
           }

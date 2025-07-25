@@ -627,13 +627,13 @@ onMounted(() => {
 
 .toggle-button {
   background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
-  border-radius: 50rpx;
-  padding: 20rpx 32rpx;
+  border-radius: 50000rpx;
+  padding: 16rpx 28rpx;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 120rpx;
+  
   position: relative;
   overflow: hidden;
   border: 2rpx solid rgba(255, 255, 255, 0.3);

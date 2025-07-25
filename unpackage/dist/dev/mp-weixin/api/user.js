@@ -75,9 +75,16 @@ const updateCompanionApplication = (data) => {
     data
   });
 };
+const getServiceLevels = () => {
+  return config_http.http({
+    url: "/front/companion/service-levels",
+    method: "GET"
+  });
+};
 exports.createCompanionApplication = createCompanionApplication;
 exports.getApplicatioInfo = getApplicatioInfo;
 exports.getPersonalityTags = getPersonalityTags;
+exports.getServiceLevels = getServiceLevels;
 exports.getServicesByCities = getServicesByCities;
 exports.getUserInfo = getUserInfo;
 exports.updateCompanionApplication = updateCompanionApplication;

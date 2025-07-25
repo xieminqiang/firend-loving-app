@@ -117,11 +117,15 @@ onMounted(() => {
   
   // 监听申请状态变化事件
   uni.$on('applicationStatusChanged', handleApplicationStatusChanged)
+  
+  // 监听刷新申请信息事件
+  uni.$on('refreshApplicationInfo', handleRefreshApplicationInfo)
 })
 
 onUnmounted(() => {
   // 移除事件监听
   uni.$off('applicationStatusChanged', handleApplicationStatusChanged)
+  uni.$off('refreshApplicationInfo', handleRefreshApplicationInfo)
 })
 
 // 处理申请状态变化事件
@@ -139,6 +143,12 @@ const handleApplicationStatusChanged = (event) => {
     //   icon: 'none'
     // })
   }
+}
+
+// 处理刷新申请信息事件
+const handleRefreshApplicationInfo = () => {
+  console.log('收到刷新申请信息事件')
+  loadApplicationInfo()
 }
 
 // 下拉刷新处理

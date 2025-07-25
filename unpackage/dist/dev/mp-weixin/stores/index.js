@@ -1,5 +1,8 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+require("./user.js");
+require("./level.js");
+require("./city.js");
 const pinia = common_vendor.createPinia();
 pinia.use(common_vendor.createPersistedState({
   storage: {

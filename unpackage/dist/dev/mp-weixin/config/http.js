@@ -33,10 +33,6 @@ const http = (options) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           common_vendor.index.__f__("log", "at config/http.js:73", "222");
           if (res.data && res.data.code !== void 0 && res.data.code !== 0) {
-            common_vendor.index.showToast({
-              icon: "none",
-              title: res.data.msg || "请求失败"
-            });
             reject(res);
             return;
           }

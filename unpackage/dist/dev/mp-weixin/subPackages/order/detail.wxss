@@ -1,0 +1,306 @@
+/* 项目主题变量 */
+.order-container.data-v-c0a82bfd {
+  height: 100vh;
+  background-color: #F7F8FA;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 状态筛选栏 */
+.status-filter.data-v-c0a82bfd {
+  background: #FFFFFF;
+  border-bottom: 1rpx solid #f0f0f0;
+  padding: 0 32rpx;
+  flex-shrink: 0;
+}
+.filter-scroll.data-v-c0a82bfd {
+  white-space: nowrap;
+}
+.filter-tabs.data-v-c0a82bfd {
+  display: flex;
+  padding: 24rpx 0;
+}
+.filter-tab.data-v-c0a82bfd {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  margin-right: 16rpx;
+  border-radius: 24rpx;
+  background: #f8f9fa;
+  border: 1rpx solid #e9ecef;
+  transition: all 0.3s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+.filter-tab.active.data-v-c0a82bfd {
+  background: #7363FF;
+  border-color: #7363FF;
+  color: #FFFFFF;
+}
+.tab-text.data-v-c0a82bfd {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #666666;
+}
+.filter-tab.active .tab-text.data-v-c0a82bfd {
+  color: #FFFFFF;
+}
+.tab-badge.data-v-c0a82bfd {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  background: #ff4757;
+  color: #FFFFFF;
+  font-size: 20rpx;
+  font-weight: 600;
+  border-radius: 50%;
+  min-width: 28rpx;
+  height: 28rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2rpx solid #FFFFFF;
+}
+
+/* 订单列表 */
+.order-list.data-v-c0a82bfd {
+  flex: 1;
+  padding: 24rpx;
+}
+
+/* 空状态 */
+.empty-state.data-v-c0a82bfd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+.empty-image.data-v-c0a82bfd {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 32rpx;
+  opacity: 0.6;
+}
+.empty-text.data-v-c0a82bfd {
+  font-size: 32rpx;
+  color: #999999;
+  margin-bottom: 16rpx;
+}
+.empty-desc.data-v-c0a82bfd {
+  font-size: 26rpx;
+  color: #cccccc;
+}
+
+/* 订单卡片 */
+.order-cards.data-v-c0a82bfd {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+.order-card.data-v-c0a82bfd {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+  border: 1rpx solid #f0f0f0;
+}
+
+/* 订单头部 */
+.order-header.data-v-c0a82bfd {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24rpx;
+}
+.order-info.data-v-c0a82bfd {
+  flex: 1;
+}
+.order-number.data-v-c0a82bfd {
+  font-size: 28rpx;
+  color: #1A1A1A;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+  display: block;
+}
+.order-time.data-v-c0a82bfd {
+  font-size: 24rpx;
+  color: #999999;
+}
+.order-status.data-v-c0a82bfd {
+  padding: 8rpx 16rpx;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+.status-pending.data-v-c0a82bfd {
+  background: #fff3cd;
+  color: #856404;
+}
+.status-to-serve.data-v-c0a82bfd {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+.status-in-progress.data-v-c0a82bfd {
+  background: #d4edda;
+  color: #155724;
+}
+.status-completed.data-v-c0a82bfd {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+.status-to-review.data-v-c0a82bfd {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* 服务信息 */
+.service-info.data-v-c0a82bfd {
+  display: flex;
+  margin-bottom: 24rpx;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.service-image.data-v-c0a82bfd {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+.service-details.data-v-c0a82bfd {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.service-name.data-v-c0a82bfd {
+  font-size: 30rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+.service-desc.data-v-c0a82bfd {
+  font-size: 26rpx;
+  color: #666666;
+  margin-bottom: 16rpx;
+  line-height: 1.4;
+}
+.service-meta.data-v-c0a82bfd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.service-duration.data-v-c0a82bfd {
+  font-size: 24rpx;
+  color: #999999;
+}
+.service-price.data-v-c0a82bfd {
+  font-size: 28rpx;
+  color: #7363FF;
+  font-weight: 600;
+}
+
+/* 友伴师信息 */
+.partner-info.data-v-c0a82bfd {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.partner-avatar.data-v-c0a82bfd {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+.partner-details.data-v-c0a82bfd {
+  flex: 1;
+}
+.partner-name.data-v-c0a82bfd {
+  font-size: 28rpx;
+  color: #1A1A1A;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+  display: block;
+}
+.partner-rating.data-v-c0a82bfd {
+  display: flex;
+  align-items: center;
+}
+.rating-text.data-v-c0a82bfd {
+  font-size: 24rpx;
+  color: #ff9500;
+  font-weight: 500;
+  margin-right: 8rpx;
+}
+.rating-count.data-v-c0a82bfd {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+/* 订单金额 */
+.order-amount.data-v-c0a82bfd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32rpx;
+  padding: 24rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+}
+.amount-label.data-v-c0a82bfd {
+  font-size: 28rpx;
+  color: #666666;
+}
+.amount-value.data-v-c0a82bfd {
+  font-size: 32rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+}
+
+/* 操作按钮 */
+.order-actions.data-v-c0a82bfd {
+  display: flex;
+  gap: 16rpx;
+  justify-content: flex-end;
+}
+.action-btn.data-v-c0a82bfd {
+  padding: 16rpx 32rpx;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1rpx solid;
+}
+.action-btn.primary.data-v-c0a82bfd {
+  background: #7363FF;
+  color: #FFFFFF;
+  border-color: #7363FF;
+}
+.action-btn.primary.data-v-c0a82bfd:active {
+  background: #6354e6;
+  transform: scale(0.96);
+}
+.action-btn.secondary.data-v-c0a82bfd {
+  background: #FFFFFF;
+  color: #666666;
+  border-color: #e9ecef;
+}
+.action-btn.secondary.data-v-c0a82bfd:active {
+  background: #f8f9fa;
+  transform: scale(0.96);
+}
+
+/* 加载更多 */
+.load-more.data-v-c0a82bfd {
+  text-align: center;
+  padding: 32rpx 0;
+}
+.loading-text.data-v-c0a82bfd,
+.load-more-text.data-v-c0a82bfd {
+  font-size: 26rpx;
+  color: #999999;
+}

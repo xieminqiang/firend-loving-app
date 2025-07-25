@@ -2,6 +2,12 @@
 const common_vendor = require("../../../common/vendor.js");
 const common_assets = require("../../../common/assets.js");
 const api_home = require("../../../api/home.js");
+const stores_city = require("../../../stores/city.js");
+if (!Math) {
+  (CitySelector + CityPicker)();
+}
+const CitySelector = () => "../../../components/common/CitySelector.js";
+const CityPicker = () => "../../../components/common/CityPicker.js";
 const _sfc_main = {
   __name: "index",
   setup(__props) {
@@ -14,47 +20,14 @@ const _sfc_main = {
       bannerTimer = setInterval(() => {
         nextBanner();
       }, 5e3);
-      await loadCityList();
+      await cityStore.initCityData();
       await loadSingleTabData(serviceTab.value);
     });
-    const cityList = common_vendor.ref([]);
-    const cityIndex = common_vendor.ref(0);
-    const city = common_vendor.computed(() => {
-      var _a;
-      if (cityList.value.length > 0) {
-        return ((_a = cityList.value[cityIndex.value]) == null ? void 0 : _a.name) || "选择城市";
-      }
-      return "选择城市";
-    });
-    const currentCityCode = common_vendor.computed(() => {
-      var _a;
-      if (cityList.value.length > 0) {
-        return ((_a = cityList.value[cityIndex.value]) == null ? void 0 : _a.code) || null;
-      }
-      return null;
-    });
-    const loadCityList = async () => {
-      try {
-        const response = await api_home.getCityList();
-        if (response.data && response.data.code === 0 && response.data.data) {
-          cityList.value = response.data.data.map((city2) => ({
-            name: city2.name,
-            code: city2.city_code
-            // 保持字段名一致
-          }));
-          if (cityList.value.length > 0) {
-            cityIndex.value = 0;
-          }
-          common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:244", "城市列表加载成功:", cityList.value);
-        } else {
-          common_vendor.index.__f__("warn", "at pages/tabbar/home/index.vue:246", "获取城市列表失败，使用默认城市列表");
-          cityList.value = [];
-        }
-      } catch (error) {
-        common_vendor.index.__f__("error", "at pages/tabbar/home/index.vue:253", "获取城市列表失败:", error);
-        cityList.value = [];
-      }
-    };
+    const cityStore = stores_city.useCityStore();
+    common_vendor.computed(() => cityStore.currentCity);
+    const currentCityCode = common_vendor.computed(() => cityStore.currentCityCode);
+    common_vendor.computed(() => cityStore.cityList);
+    common_vendor.computed(() => cityStore.cityIndex);
     const currentBanner = common_vendor.ref(0);
     const serviceTab = common_vendor.ref("服务");
     const serviceTabs = ["服务", "娱乐", "运动"];
@@ -105,11 +78,11 @@ const _sfc_main = {
     });
     const loadSingleTabData = async (tab, forceRefresh = false) => {
       if (dataLoaded.value[tab] && !dataLoading.value[tab] && !forceRefresh) {
-        common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:338", `${tab}数据已缓存，跳过加载`);
+        common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:272", `${tab}数据已缓存，跳过加载`);
         return;
       }
       dataLoading.value[tab] = true;
-      common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:343", `开始加载${tab}服务数据，当前城市代码:`, currentCityCode.value, forceRefresh ? "(强制刷新)" : "");
+      common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:277", `开始加载${tab}服务数据，当前城市代码:`, currentCityCode.value, forceRefresh ? "(强制刷新)" : "");
       try {
         const requestParams = {
           category: getTabCategoryId(tab),
@@ -117,7 +90,7 @@ const _sfc_main = {
           city_code: currentCityCode.value
           // 传递当前选中城市的代码
         };
-        common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:352", `${tab}服务请求参数:`, requestParams);
+        common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:286", `${tab}服务请求参数:`, requestParams);
         const response = await api_home.getHotRecommendServices(requestParams);
         if (response.data && response.data.code === 0 && response.data.data && response.data.data.list) {
           allServiceItems.value[tab] = response.data.data.list.map((item) => ({
@@ -132,14 +105,14 @@ const _sfc_main = {
             price_template_id: item.price_template_id
             // 添加价格模板ID
           }));
-          common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:369", `${tab}服务数据加载成功，共${allServiceItems.value[tab].length}条`);
+          common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:303", `${tab}服务数据加载成功，共${allServiceItems.value[tab].length}条`);
         } else {
           allServiceItems.value[tab] = [];
-          common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:373", `${tab}服务数据为空`);
+          common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:307", `${tab}服务数据为空`);
         }
         dataLoaded.value[tab] = true;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/tabbar/home/index.vue:377", `获取${tab}服务数据失败:`, error);
+        common_vendor.index.__f__("error", "at pages/tabbar/home/index.vue:311", `获取${tab}服务数据失败:`, error);
         allServiceItems.value[tab] = [];
         dataLoaded.value[tab] = true;
       } finally {
@@ -147,7 +120,7 @@ const _sfc_main = {
       }
     };
     const loadAllServicesData = async () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:388", "重新加载所有选项卡数据");
+      common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:322", "重新加载所有选项卡数据");
       Object.keys(dataLoaded.value).forEach((tab) => {
         dataLoaded.value[tab] = false;
       });
@@ -202,14 +175,14 @@ const _sfc_main = {
       touchEndX = 0;
     }
     function navigateToServiceDetail(serviceId) {
-      common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:460", "跳转到服务详情页, ID:", serviceId);
+      common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:394", "跳转到服务详情页, ID:", serviceId);
       const currentTabItems = getTabServiceItems(serviceTab.value);
       const serviceItem = currentTabItems.find((item) => item.id === serviceId);
       let url = `/subPackages/home/detail?id=${serviceId}`;
       if (serviceItem && serviceItem.price_template_id) {
         url += `&price_template_id=${serviceItem.price_template_id}`;
       }
-      common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:472", "跳转URL:", url);
+      common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:406", "跳转URL:", url);
       common_vendor.index.navigateTo({
         url
       });
@@ -223,11 +196,15 @@ const _sfc_main = {
       isRefreshing.value = true;
       refreshing.value = true;
       try {
-        common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:503", `下拉刷新${tab}选项卡数据`);
+        if (cityStore.cityList.length === 0) {
+          common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:438", "城市列表为空，重新加载城市列表");
+          await cityStore.loadCityList();
+        }
+        common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:443", `下拉刷新${tab}选项卡数据`);
         await loadSingleTabData(tab, true);
         await new Promise((resolve) => setTimeout(resolve, 800));
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/tabbar/home/index.vue:508", "刷新失败:", error);
+        common_vendor.index.__f__("error", "at pages/tabbar/home/index.vue:448", "刷新失败:", error);
       } finally {
         refreshing.value = false;
         isRefreshing.value = false;
@@ -238,22 +215,18 @@ const _sfc_main = {
       isRefreshing.value = false;
     };
     const showCityPicker = common_vendor.ref(false);
-    function selectCity(index) {
-      const oldCityIndex = cityIndex.value;
-      cityIndex.value = index;
-      showCityPicker.value = false;
+    function onCitySelected(index) {
+      const oldCityIndex = cityStore.cityIndex;
       if (oldCityIndex !== index) {
+        common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:470", `手动选择城市: ${cityStore.cityList[index].name}`);
         loadAllServicesData();
       }
     }
     return (_ctx, _cache) => {
-      return common_vendor.e({
-        a: common_assets._imports_0,
-        b: common_vendor.t(city.value),
-        c: common_assets._imports_1,
-        d: common_vendor.o(($event) => showCityPicker.value = true),
-        e: statusBarHeight.value + "px",
-        f: common_vendor.f(banners, (b, idx, i0) => {
+      return {
+        a: common_vendor.o(($event) => showCityPicker.value = true),
+        b: statusBarHeight.value + "px",
+        c: common_vendor.f(banners, (b, idx, i0) => {
           return {
             a: b.img,
             b: common_vendor.t(b.title),
@@ -261,8 +234,8 @@ const _sfc_main = {
             d: idx
           };
         }),
-        g: `translateX(-${currentBanner.value * 100}%)`,
-        h: common_vendor.f(banners, (_, index, i0) => {
+        d: `translateX(-${currentBanner.value * 100}%)`,
+        e: common_vendor.f(banners, (_, index, i0) => {
           return {
             a: index,
             b: common_vendor.n({
@@ -271,10 +244,10 @@ const _sfc_main = {
             c: common_vendor.o(($event) => currentBanner.value = index, index)
           };
         }),
-        i: common_vendor.o(onTouchStart),
-        j: common_vendor.o(onTouchMove),
-        k: common_vendor.o(onTouchEnd),
-        l: common_vendor.f(serviceTabs, (tab, k0, i0) => {
+        f: common_vendor.o(onTouchStart),
+        g: common_vendor.o(onTouchMove),
+        h: common_vendor.o(onTouchEnd),
+        i: common_vendor.f(serviceTabs, (tab, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(tab),
             b: serviceTab.value === tab
@@ -286,11 +259,11 @@ const _sfc_main = {
             e: common_vendor.o(($event) => switchServiceTab(tab), tab)
           });
         }),
-        m: common_vendor.f(serviceTabs, (tab, k0, i0) => {
+        j: common_vendor.f(serviceTabs, (tab, k0, i0) => {
           return common_vendor.e({
-            a: getTabServiceItems(tab).length > 0
-          }, getTabServiceItems(tab).length > 0 ? {
-            b: common_vendor.f(getTabServiceItems(tab), (item, k1, i1) => {
+            a: dataLoading.value[tab]
+          }, dataLoading.value[tab] ? {} : getTabServiceItems(tab).length > 0 ? {
+            c: common_vendor.f(getTabServiceItems(tab), (item, k1, i1) => {
               return {
                 a: _ctx.$imgBaseUrl + item.img,
                 b: common_vendor.t(item.name),
@@ -306,37 +279,26 @@ const _sfc_main = {
                 g: common_vendor.o(($event) => navigateToServiceDetail(item.id), item.id)
               };
             })
-          } : {
-            c: common_assets._imports_5,
-            d: common_vendor.t(tab)
-          }, {
-            e: common_vendor.o(($event) => onRefresh(tab), tab),
-            f: common_vendor.o(onRefreshRestore, tab),
-            g: tab
+          } : dataLoaded.value[tab] && getTabServiceItems(tab).length === 0 ? {
+            e: common_assets._imports_0,
+            f: common_vendor.t(tab)
+          } : {}, {
+            b: getTabServiceItems(tab).length > 0,
+            d: dataLoaded.value[tab] && getTabServiceItems(tab).length === 0,
+            g: common_vendor.o(($event) => onRefresh(tab), tab),
+            h: common_vendor.o(onRefreshRestore, tab),
+            i: tab
           });
         }),
-        n: refreshing.value,
-        o: currentTabIndex.value,
-        p: common_vendor.o(onSwiperChange),
-        q: showCityPicker.value
-      }, showCityPicker.value ? {
-        r: common_vendor.o(($event) => showCityPicker.value = false),
-        s: common_vendor.f(cityList.value, (cityItem, index, i0) => {
-          return common_vendor.e({
-            a: common_vendor.t(cityItem.name),
-            b: cityIndex.value === index
-          }, cityIndex.value === index ? {} : {}, {
-            c: index,
-            d: common_vendor.n({
-              active: cityIndex.value === index
-            }),
-            e: common_vendor.o(($event) => selectCity(index), index)
-          });
-        }),
-        t: common_vendor.o(() => {
-        }),
-        v: common_vendor.o(($event) => showCityPicker.value = false)
-      } : {});
+        k: refreshing.value,
+        l: currentTabIndex.value,
+        m: common_vendor.o(onSwiperChange),
+        n: common_vendor.o(onCitySelected),
+        o: common_vendor.o(($event) => showCityPicker.value = $event),
+        p: common_vendor.p({
+          visible: showCityPicker.value
+        })
+      };
     };
   }
 };

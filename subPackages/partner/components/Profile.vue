@@ -14,6 +14,18 @@
         <view class="profile-info">
           <text class="profile-name">{{ applicationInfo?.nickname || '友伴用户' }}</text>
           
+          <!-- 等级信息 -->
+          <view class="level-info" v-if="currentLevel" @click="goToLevelPage">
+            <image :src="currentLevel.icon_url" class="level-icon" mode="aspectFit" />
+            <text class="level-name">{{ currentLevel.level_name }}陪伴师</text>
+            <text class="commission-rate">分成比例 {{ (currentLevel.commission_rate * 100).toFixed(0) }}%</text>
+          </view>
+          
+          <!-- 成长值信息 -->
+          <view class="growth-info" v-if="applicationInfo?.growth_value !== undefined">
+            <text class="growth-text">成长值：{{ applicationInfo.growth_value || 0 }}</text>
+          </view>
+          
           <view class="order-status" v-if="applicationInfo && applicationInfo.can_accept_orders == 'N'">
             <view class="order-status-content">
               <text class="order-status-text" :class="getOrderStatusClass(applicationInfo.can_accept_orders)">
@@ -59,6 +71,11 @@
           <text class="function-text">数据统计</text>
           <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
         </view>
+        <view class="function-item" @click="handleFunctionClick('level')">
+          <view class="function-icon">🏆</view>
+          <text class="function-text">友伴等级说明</text>
+          <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
+        </view>
         <view class="function-item" @click="handleFunctionClick('settings')">
           <view class="function-icon">⚙️</view>
           <text class="function-text">设置</text>
@@ -77,8 +94,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import VideoUploadModal from './VideoUploadModal.vue'
+import { useLevelStore } from '@/stores/level.js'
 
 // 定义props
 const props = defineProps({
@@ -88,10 +106,19 @@ const props = defineProps({
   }
 })
 
+// 获取全局level store
+const levelStore = useLevelStore()
+
 // 视频上传弹框状态
 const showVideoUploadModal = ref(false)
 
-
+// 计算当前等级信息
+const currentLevel = computed(() => {
+  if (!props.applicationInfo?.level_order || !levelStore.sortedServiceLevels.length) {
+    return null
+  }
+  return levelStore.sortedServiceLevels.find(level => level.level_order === props.applicationInfo.level_order)
+})
 
 // 获取接单状态样式类
 const getOrderStatusClass = (canAcceptOrders) => {
@@ -102,6 +129,13 @@ const getOrderStatusClass = (canAcceptOrders) => {
 const goToDataEdit = () => {
   uni.navigateTo({
     url: '/subPackages/partner/DataEdetion/index'
+  })
+}
+
+// 跳转到等级说明页面
+const goToLevelPage = () => {
+  uni.navigateTo({
+    url: '/subPackages/partner/level/index'
   })
 }
 
@@ -144,6 +178,11 @@ const handleFunctionClick = (functionName) => {
         icon: 'none'
       })
       break
+    case 'level':
+      uni.navigateTo({
+        url: '/subPackages/partner/level/index'
+      })
+      break
     case 'settings':
       uni.showToast({
         title: '设置功能开发中',
@@ -168,6 +207,37 @@ const handleVideoUploadSuccess = (data) => {
   console.log('视频上传成功:', data)
   // 发送事件通知父组件刷新数据
   uni.$emit('applicationStatusChanged', data)
+}
+
+// 生命周期
+onMounted(async () => {
+  // 确保服务等级列表已加载
+  await levelStore.fetchServiceLevels()
+  
+  // 监听资料更新事件
+  uni.$on('applicationStatusChanged', handleApplicationStatusChanged)
+})
+
+// 组件卸载时移除事件监听
+onUnmounted(() => {
+  uni.$off('applicationStatusChanged', handleApplicationStatusChanged)
+})
+
+// 处理申请状态变化事件
+const handleApplicationStatusChanged = (data) => {
+  console.log('收到申请状态变化事件:', data)
+  
+  // 发送事件通知父组件刷新数据
+  uni.$emit('refreshApplicationInfo')
+  
+  // 显示成功提示
+  if (data.status === 'updated') {
+    uni.showToast({
+      title: data.message || '资料更新成功',
+      icon: 'success',
+      duration: 2000
+    })
+  }
 }
 </script>
 
@@ -219,7 +289,7 @@ const handleVideoUploadSuccess = (data) => {
   font-weight: 600;
   color: #1A1A1A;
   display: block;
- 
+  margin-bottom: 12rpx;
 }
 
 .profile-id {
@@ -227,6 +297,56 @@ const handleVideoUploadSuccess = (data) => {
   color: #666666;
   display: block;
   margin-bottom: 12rpx;
+}
+
+.level-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 8rpx;
+  padding: 8rpx 12rpx;
+  background: linear-gradient(135deg, rgba(115, 99, 255, 0.08) 0%, rgba(255, 105, 222, 0.06) 100%);
+  border-radius: 16rpx;
+  border: 1rpx solid rgba(115, 99, 255, 0.12);
+  margin-right: 20rpx;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:active {
+    transform: scale(0.95);
+    background: linear-gradient(135deg, rgba(115, 99, 255, 0.12) 0%, rgba(255, 105, 222, 0.08) 100%);
+  }
+}
+
+.level-icon {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+.level-name {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #7363FF;
+}
+
+.commission-rate {
+  font-size: 20rpx;
+  color: #FF69DE;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+.growth-info {
+  margin-bottom: 8rpx;
+}
+
+.growth-text {
+  font-size: 22rpx;
+  color: #666666;
+  background: rgba(115, 99, 255, 0.05);
+  padding: 6rpx 12rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid rgba(115, 99, 255, 0.1);
 }
 
 

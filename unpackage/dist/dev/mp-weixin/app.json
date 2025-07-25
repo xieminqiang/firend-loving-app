@@ -31,13 +31,22 @@
       "root": "subPackages/partner",
       "pages": [
         "index",
-        "DataEdetion/index"
+        "DataEdetion/index",
+        "level/index"
       ]
     },
     {
       "root": "subPackages/friend",
       "pages": [
-        "apply/index"
+        "apply/index",
+        "detail"
+      ]
+    },
+    {
+      "root": "subPackages/order",
+      "pages": [
+        "index",
+        "detail"
       ]
     }
   ],
