@@ -50,7 +50,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wxd0b4ea3bfca30ec2",
+        "appid" : "wx0184fe53a1c30896",
         "setting" : {
             "urlCheck" : false
         },
@@ -60,7 +60,7 @@
                 "desc" : "获取你的具体位置信息，以便我们提供服务"
             }
         },
-        "requiredPrivateInfos" : [ "getLocation", "chooseLocation","startLocationUpdateBackground"],
+        "requiredPrivateInfos" : [ "getLocation", "chooseLocation", "startLocationUpdateBackground" ],
         "optimization" : {
             "subPackages" : true
         },

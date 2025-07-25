@@ -143,7 +143,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { searchCompanions } from '@/api/friends.js'
-import { createOrder } from '@/api/order.js'
+import { createOrder, orderParams } from '@/api/order.js'
 import { useLevelStore } from '@/stores/level.js'
 import { useCityStore } from '@/stores/city.js'
 import CitySelector from '@/components/common/CitySelector.vue'
@@ -384,6 +384,39 @@ const navigateToBooking = async (item) => {
         title: '邀约成功',
         icon: 'success'
       })
+      
+      // 调用订单创建成功接口
+      try {
+        const orderParamsData = {
+          order_id: response.data.data.order_id,
+          payment_method: 1
+        }
+        
+        const paramsResponse = await orderParams(orderParamsData)
+        console.log('订单参数接口调用成功:', paramsResponse.data)
+		
+		uni.requestPayment({
+			provider: 'wxpay',
+			...paramsResponse.data.data.pay_params,
+			success: (res) => {
+				console.log('支付成功', res);
+				uni.showToast({
+					title: '支付成功',
+					icon: 'success',
+				});
+				// 支付成功后跳转到订单列表，传递刷新参数
+			
+			},
+			fail: (err) => {
+				console.error('支付失败', JSON.stringify(err));
+			
+			},
+		});
+				
+		
+      } catch (paramsError) {
+        console.error('订单参数接口调用失败:', paramsError)
+      }
       
       // 可以在这里跳转到订单详情页或其他页面
       console.log('订单创建成功:', response.data.data)

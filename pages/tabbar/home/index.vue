@@ -203,6 +203,9 @@ onUnmounted(() => {
   if (bannerTimer) {
     clearInterval(bannerTimer)
   }
+  if (swiperChangeTimer) {
+    clearTimeout(swiperChangeTimer)
+  }
 })
 
 function nextBanner() {
@@ -342,23 +345,43 @@ const getTabCategoryId = (tabName) => {
 // 当前选项卡索引
 const currentTabIndex = ref(0)
 
+// 防抖定时器
+let swiperChangeTimer = null
+
 // 切换服务tab - 优化为懒加载
 const switchServiceTab = async (tab) => {
   const oldTab = serviceTab.value
-  serviceTab.value = tab
-  currentTabIndex.value = serviceTabs.indexOf(tab)
+  const newTab = tab
+  
+  serviceTab.value = newTab
+  currentTabIndex.value = serviceTabs.indexOf(newTab)
   
   // 如果切换到新的tab且该tab未加载数据，则加载数据
-  if (oldTab !== tab && !dataLoaded.value[tab]) {
-    await loadSingleTabData(tab)
+  if (oldTab !== newTab && !dataLoaded.value[newTab]) {
+    await loadSingleTabData(newTab)
   }
 }
 
-// swiper滑动改变时的处理（不重新加载数据）
-const onSwiperChange = (e) => {
+// swiper滑动改变时的处理（检查数据加载状态）
+const onSwiperChange = async (e) => {
   const index = e.detail.current
+  const newTab = serviceTabs[index]
+  const oldTab = serviceTab.value
+  
   currentTabIndex.value = index
-  serviceTab.value = serviceTabs[index]
+  serviceTab.value = newTab
+  
+  // 清除之前的定时器
+  if (swiperChangeTimer) {
+    clearTimeout(swiperChangeTimer)
+  }
+  
+  // 如果切换到新的tab且该tab未加载数据，则延迟加载数据（防抖）
+  if (oldTab !== newTab && !dataLoaded.value[newTab]) {
+    swiperChangeTimer = setTimeout(async () => {
+      await loadSingleTabData(newTab)
+    }, 300) // 300ms防抖延迟
+  }
 }
 
 // 获取指定选项卡的服务数据
@@ -793,7 +816,7 @@ function onCitySelected(index) {
 .category-tab {
   flex: 1;
   text-align: center;
-  padding: 14rpx 0;
+  padding: 14rpx 0 20rpx; /* 增加底部padding为指示器留出空间 */
   font-size: 28rpx;
   font-weight: 500;
   color: $text-color-secondary;
@@ -817,14 +840,15 @@ function onCitySelected(index) {
 
 .tab-indicator {
   position: absolute;
-  bottom: 3rpx;
+  bottom: 6rpx; /* 调整位置，确保不被裁剪 */
   left: 25%;
   width: 50%;
-  height: 3rpx;
+  height: 4rpx; /* 增加高度，让指示器更明显 */
   background: linear-gradient(90deg, $primary-color 0%, $highlight-color 100%);
-  border-radius: 3rpx;
+  border-radius: 2rpx;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: 0 1rpx 6rpx rgba(130, 160, 216, 0.3);
+  z-index: 2; /* 确保在最上层 */
 }
 
 /* 内容区域 */

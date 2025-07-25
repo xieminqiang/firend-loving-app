@@ -282,7 +282,8 @@
 .category-tab.data-v-30d82312 {
   flex: 1;
   text-align: center;
-  padding: 14rpx 0;
+  padding: 14rpx 0 20rpx;
+  /* 增加底部padding为指示器留出空间 */
   font-size: 28rpx;
   font-weight: 500;
   color: #666666;
@@ -303,14 +304,18 @@
 }
 .tab-indicator.data-v-30d82312 {
   position: absolute;
-  bottom: 3rpx;
+  bottom: 6rpx;
+  /* 调整位置，确保不被裁剪 */
   left: 25%;
   width: 50%;
-  height: 3rpx;
+  height: 4rpx;
+  /* 增加高度，让指示器更明显 */
   background: linear-gradient(90deg, #7363FF 0%, #FF69DE 100%);
-  border-radius: 3rpx;
+  border-radius: 2rpx;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: 0 1rpx 6rpx rgba(130, 160, 216, 0.3);
+  z-index: 2;
+  /* 确保在最上层 */
 }
 /* 内容区域 */
 .content-section.data-v-30d82312 {

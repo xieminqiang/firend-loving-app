@@ -205,7 +205,31 @@ const _sfc_main = {
             title: "邀约成功",
             icon: "success"
           });
-          common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:389", "订单创建成功:", response.data.data);
+          try {
+            const orderParamsData = {
+              order_id: response.data.data.order_id,
+              payment_method: 1
+            };
+            const paramsResponse = await api_order.orderParams(orderParamsData);
+            common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:396", "订单参数接口调用成功:", paramsResponse.data);
+            common_vendor.index.requestPayment({
+              provider: "wxpay",
+              ...paramsResponse.data.data.pay_params,
+              success: (res) => {
+                common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:402", "支付成功", res);
+                common_vendor.index.showToast({
+                  title: "支付成功",
+                  icon: "success"
+                });
+              },
+              fail: (err) => {
+                common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:411", "支付失败", JSON.stringify(err));
+              }
+            });
+          } catch (paramsError) {
+            common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:418", "订单参数接口调用失败:", paramsError);
+          }
+          common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:422", "订单创建成功:", response.data.data);
         } else {
           const errorMsg = ((_c = response.data) == null ? void 0 : _c.message) || "创建订单失败";
           common_vendor.index.showToast({
@@ -215,7 +239,7 @@ const _sfc_main = {
         }
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:402", "创建订单失败:", error);
+        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:435", "创建订单失败:", error);
         common_vendor.index.showToast({
           title: "创建订单失败，请重试",
           icon: "none"
@@ -257,9 +281,9 @@ const _sfc_main = {
         if (levelFilter.value !== "all") {
           params.level_order = parseInt(levelFilter.value);
         }
-        common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:509", "搜索参数:", params);
+        common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:542", "搜索参数:", params);
         const response = await api_friends.searchCompanions(params);
-        common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:513", "API完整响应:", response);
+        common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:546", "API完整响应:", response);
         if (response.data && response.data.code === 0) {
           const data = response.data.data;
           if (data && data.list) {
@@ -277,7 +301,7 @@ const _sfc_main = {
                   try {
                     return JSON.parse(item.services);
                   } catch (e) {
-                    common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:532", "解析services JSON失败:", e);
+                    common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:565", "解析services JSON失败:", e);
                     return [];
                   }
                 }
@@ -297,18 +321,18 @@ const _sfc_main = {
             }
             total.value = data.total || 0;
             hasMore.value = newData.length === pageSize.value;
-            common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:554", "搜索成功，共获取", newData.length, "条数据，总数:", total.value);
+            common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:587", "搜索成功，共获取", newData.length, "条数据，总数:", total.value);
             if (newData.length === 0 && isRefresh) {
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:565", "API返回数据为空");
+            common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:598", "API返回数据为空");
             if (isRefresh) {
               partnersList.value = [];
               total.value = 0;
             }
           }
         } else {
-          common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:573", "API返回错误:", response.data);
+          common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:606", "API返回错误:", response.data);
           const errorMsg = ((_a = response.data) == null ? void 0 : _a.message) || "搜索失败";
           common_vendor.index.showToast({
             title: errorMsg,
@@ -321,8 +345,8 @@ const _sfc_main = {
           }
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:587", "搜索伴友师失败:", error);
-        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:588", "错误详情:", error.response || error);
+        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:620", "搜索伴友师失败:", error);
+        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:621", "错误详情:", error.response || error);
         let errorMsg = "搜索失败，请重试";
         if (error.response && error.response.data) {
           errorMsg = error.response.data.message || errorMsg;

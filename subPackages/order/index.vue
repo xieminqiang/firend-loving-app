@@ -42,111 +42,52 @@
           class="order-card"
           @click="navigateToDetail(order.id)"
         >
-          <!-- 订单头部信息 -->
+          <!-- 订单头部（重构：左侧服务名和描述，右侧状态） -->
           <view class="order-header">
-            <view class="order-left">
-              <view class="partner-avatar">
-                <image :src="order.partnerAvatar" mode="aspectFill" />
-                <view class="partner-rating" v-if="order.partnerRating">
-                  <text class="rating-text">{{ order.partnerRating }}</text>
-                  <text class="star-icon">★</text>
-                </view>
-              </view>
-              <view class="partner-info">
-                <view class="partner-name">
-                  <text>{{ order.partnerName }}</text>
-                  <text class="partner-badge" v-if="order.isSuperPartner">超级友伴</text>
-                </view>
-                <text class="order-time">{{ order.createTime }}</text>
-              </view>
+            <view class="order-info">
+              <text class="service-name">{{ order.service_name }}</text>
+              <!-- <text class="service-desc">{{ order.service_address }}</text> -->
             </view>
             <view class="order-status" :class="getStatusClass(order.status)">
               <text class="status-text">{{ getStatusText(order.status) }}</text>
             </view>
           </view>
 
-          <!-- 订单内容 -->
-          <view class="order-content">
+          <!-- 服务信息和订单金额 -->
+          <view class="service-amount-row">
             <view class="service-info">
-              <text class="service-name">{{ order.serviceName }}</text>
-              <text class="service-price">¥{{ order.price.toFixed(2) }}</text>
+              <image :src="$imgBaseUrl + order.service_image_url" class="service-image" mode="aspectFill" />
+              <view class="service-details">
+                <view class="service-meta">
+                  
+                  <text class="service-price">¥{{ order.unit_price }}/{{ order.unit }}</text>
+                  <text class="service-duration">x{{ order.quantity }}</text>
+                </view>
+                <view class="order-amount">
+              <text class="amount-label">{{ getAmountLabel(order.status) }}</text>
+              <text class="amount-value">¥{{ order.total_amount }}</text>
             </view>
-            
-            <!-- 服务标签 -->
-            <view class="service-tags" v-if="order.tags && order.tags.length > 0">
-              <text class="service-tag" v-for="(tag, index) in order.tags" :key="index">{{ tag }}</text>
-            </view>
-
-            <view class="service-details">
-              <view class="detail-item">
-                <text class="detail-label">时长：</text>
-                <text class="detail-value">{{ order.duration }}小时</text>
-              </view>
-              <view class="detail-item">
-                <text class="detail-label">预约时间：</text>
-                <text class="detail-value">{{ order.appointmentTime }}</text>
-              </view>
-              <view class="detail-item" v-if="order.location">
-                <text class="detail-label">服务地点：</text>
-                <text class="detail-value">{{ order.location }}</text>
-              </view>
-              <view class="detail-item" v-if="order.orderNote">
-                <text class="detail-label">备注：</text>
-                <text class="detail-value note-text">{{ order.orderNote }}</text>
               </view>
             </view>
-
-            <!-- 进度展示 -->
-            <view class="order-progress" v-if="order.status === 'in-progress' && order.progress">
-              <view class="progress-header">
-                <text>服务进度</text>
-                <text>{{ order.progress }}%</text>
-              </view>
-              <view class="progress-bar">
-                <view class="progress-inner" :style="{width: order.progress + '%'}"></view>
-              </view>
-            </view>
+           
           </view>
 
-          <!-- 订单底部操作 -->
-          <view class="order-footer">
-            <view class="order-amount">
-              <text class="amount-label">实付款</text>
-              <text class="amount-value">¥{{ order.totalAmount.toFixed(2) }}</text>
-              <text class="amount-detail" v-if="order.discount > 0">已优惠¥{{ order.discount.toFixed(2) }}</text>
-            </view>
-            <view class="order-actions">
-              <!-- 根据状态显示不同按钮 -->
-              <template v-if="order.status === 'pending'">
-                <view class="countdown" v-if="order.expireTime">
-                  <text class="countdown-label">支付剩余时间:</text>
-                  <text class="countdown-value">{{ order.expireTime }}</text>
-                </view>
-                <view class="action-btn cancel-btn" @click.stop="handleCancelOrder(order)">取消订单</view>
-                <view class="action-btn primary-btn" @click.stop="handlePayOrder(order)">立即支付</view>
-              </template>
-              <template v-else-if="order.status === 'to-serve'">
-                <view class="action-btn default-btn" @click.stop="handleContactPartner(order)">
-                  <text class="icon">💬</text> 联系友伴
-                </view>
-                <view class="action-btn primary-btn" @click.stop="handleModifyOrder(order)">修改订单</view>
-              </template>
-              <template v-else-if="order.status === 'in-progress'">
-                <view class="action-btn default-btn" @click.stop="handleContactPartner(order)">
-                  <text class="icon">💬</text> 联系友伴
-                </view>
-                <view class="action-btn primary-btn" @click.stop="handleConfirmComplete(order)">确认完成</view>
-              </template>
-              <template v-else-if="order.status === 'completed'">
-                <view class="action-btn default-btn" @click.stop="handleOrderAgain(order)">再次预约</view>
-                <view class="action-btn primary-btn" @click.stop="navigateToDetail(order.id)">查看详情</view>
-              </template>
-              <template v-else-if="order.status === 'to-review'">
-                <view class="action-btn default-btn" @click.stop="handleOrderAgain(order)">再次预约</view>
-                <view class="action-btn primary-btn" @click.stop="handleReviewOrder(order)">
-                  <text class="icon">⭐</text> 立即评价
-                </view>
-              </template>
+          <!-- 下单时间 -->
+          <view class="order-time-info">
+            <text class="time-label">下单时间</text>
+            <text class="time-value">{{ formatTime(order.created_at) }}</text>
+          </view>
+
+          <!-- 操作按钮 -->
+          <view class="order-actions">
+            <view 
+              v-for="(action, actionIndex) in getOrderActions(order.status)" 
+              :key="actionIndex"
+              class="action-btn"
+              :class="action.type"
+              @click.stop="handleOrderAction(action.action, order)"
+            >
+              <text class="action-text">{{ action.text }}</text>
             </view>
           </view>
         </view>
@@ -164,6 +105,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useUserStore } from '@/stores/user.js'
+import { getOrderList } from '@/api/order.js'
 
 // 用户状态管理
 const userStore = useUserStore()
@@ -175,126 +117,52 @@ const isLoading = ref(false)
 const isLoadingMore = ref(false)
 const hasMore = ref(true)
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(20)
 
-// 订单列表数据
+// 订单列表数据缓存
+const orderListCache = ref({})
 const orderList = ref([])
 
 // 状态筛选标签
 const statusTabs = ref([
   { label: '全部', value: 'all', count: 0 },
-  { label: '待付款', value: 'pending', count: 0 },
-  { label: '待服务', value: 'to-serve', count: 0 },
-  { label: '进行中', value: 'in-progress', count: 0 },
-  { label: '已完成', value: 'completed', count: 0 },
-  { label: '待评价', value: 'to-review', count: 0 }
+  { label: '待付款', value: 'pending_payment', count: 0 },
+  { label: '待服务', value: 'pending_service', count: 0 },
+  { label: '进行中', value: 'in_service', count: 0 },
+  { label: '已完成', value: 'completed', count: 0 }
 ])
 
-// 模拟订单数据
-const mockOrders = [
-  {
-    id: 'O20230001',
-    partnerName: '小王',
-    partnerAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&q=80',
-    partnerRating: 4.9,
-    isSuperPartner: true,
-    serviceName: '家居顾问 - 高级套餐',
-    tags: ['专业指导', '首次优惠'],
-    createTime: '2023-09-01 14:30',
-    status: 'pending',
-    price: 150,
-    duration: 2,
-    appointmentTime: '2023-09-10 10:00',
-    location: '用户指定地点',
-    totalAmount: 300,
-    discount: 50,
-    expireTime: '23:45:30',
-    orderNote: ''
-  },
-  {
-    id: 'O20230002',
-    partnerName: '张琳',
-    partnerAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&q=80',
-    partnerRating: 4.8,
-    serviceName: '摄影师 - 人像写真',
-    tags: ['室外拍摄', '提供化妆'],
-    createTime: '2023-08-25 09:15',
-    status: 'to-serve',
-    price: 200,
-    duration: 1.5,
-    appointmentTime: '2023-09-05 14:00',
-    location: '市中心摄影棚',
-    totalAmount: 300,
-    discount: 0,
-    orderNote: ''
-  },
-  {
-    id: 'O20230003',
-    partnerName: '李明',
-    partnerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80',
-    partnerRating: 4.7,
-    serviceName: 'K歌达人 - 专业指导',
-    tags: ['一对一指导', '录音'],
-    createTime: '2023-08-20 18:30',
-    status: 'in-progress',
-    price: 120,
-    duration: 3,
-    appointmentTime: '2023-09-02 19:00',
-    location: '城西KTV',
-    totalAmount: 360,
-    discount: 0,
-    progress: 75,
-    orderNote: '需要提前准备歌单'
-  },
-  {
-    id: 'O20230004',
-    partnerName: '王芳',
-    partnerAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80',
-    partnerRating: 5.0,
-    isSuperPartner: true,
-    serviceName: '心理咨询 - 标准课程',
-    tags: ['资深心理师', '保密咨询'],
-    createTime: '2023-08-15 10:00',
-    status: 'completed',
-    price: 300,
-    duration: 1,
-    appointmentTime: '2023-08-20 15:30',
-    location: '线上视频',
-    totalAmount: 300,
-    discount: 0,
-    orderNote: ''
-  },
-  {
-    id: 'O20230005',
-    partnerName: '陈磊',
-    partnerAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80',
-    partnerRating: 4.6,
-    serviceName: '健身教练 - 私人定制',
-    tags: ['器械训练', '体能提升'],
-    createTime: '2023-08-10 08:45',
-    status: 'to-review',
-    price: 180,
-    duration: 1.5,
-    appointmentTime: '2023-08-18 10:00',
-    location: '悦动健身中心',
-    totalAmount: 270,
-    discount: 0,
-    orderNote: ''
-  }
-]
+
 
 onMounted(() => {
+  // 首次加载时只加载当前状态的数据，计数会在loadOrderList中自动更新
   loadOrderList()
-  updateStatusCounts()
 })
 
 // 切换状态筛选
-const switchStatus = (status) => {
+const switchStatus = async (status) => {
+  if (currentStatus.value === status) return // 避免重复切换
+  
   currentStatus.value = status
-  page.value = 1
-  hasMore.value = true
-  orderList.value = []
-  loadOrderList()
+  
+  // 检查缓存中是否已有该状态的数据
+  if (orderListCache.value[status]) {
+    // 从缓存恢复数据
+    orderList.value = orderListCache.value[status].list
+    page.value = orderListCache.value[status].page
+    hasMore.value = orderListCache.value[status].hasMore
+  } else {
+    // 缓存中没有数据，需要请求
+    page.value = 1
+    hasMore.value = true
+    orderList.value = []
+    
+    try {
+      await loadOrderList()
+    } catch (error) {
+      console.error('切换状态失败:', error)
+    }
+  }
 }
 
 // 加载订单列表
@@ -304,31 +172,41 @@ const loadOrderList = async () => {
   isLoading.value = true
   
   try {
-    // 模拟API请求
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // 根据状态筛选订单
-    let filteredOrders = mockOrders
-    if (currentStatus.value !== 'all') {
-      filteredOrders = mockOrders.filter(order => order.status === currentStatus.value)
+    const params = {
+      page: page.value,
+      page_size: pageSize.value,
+      status_group: currentStatus.value
     }
     
-    // 分页处理
-    const start = (page.value - 1) * pageSize.value
-    const end = start + pageSize.value
-    const pageOrders = filteredOrders.slice(start, end)
-    
-    if (page.value === 1) {
-      orderList.value = pageOrders
+    const response = await getOrderList(params)
+    console.log("response.data",response.data)
+    if (response.data.code === 0) {
+      const { list, total } = response.data.data
+
+      
+      if (page.value === 1) {
+        orderList.value = list || []
+        // 更新当前状态的计数
+        updateCurrentStatusCount(total)
+      } else {
+        orderList.value.push(...(list || []))
+      }
+      
+      hasMore.value = orderList.value.length < total
+      
+      // 缓存当前状态的数据
+      orderListCache.value[currentStatus.value] = {
+        list: [...orderList.value],
+        page: page.value,
+        hasMore: hasMore.value
+      }
     } else {
-      orderList.value.push(...pageOrders)
+      throw new Error(response.msg || '获取订单列表失败')
     }
-    
-    hasMore.value = pageOrders.length === pageSize.value
   } catch (error) {
     console.error('加载订单列表失败:', error)
     uni.showToast({
-      title: '加载失败',
+      title: error.message || '加载失败',
       icon: 'none'
     })
   } finally {
@@ -336,26 +214,46 @@ const loadOrderList = async () => {
   }
 }
 
-// 更新状态计数
-const updateStatusCounts = () => {
-  statusTabs.value.forEach(tab => {
-    if (tab.value === 'all') {
-      tab.count = mockOrders.length
-    } else {
-      tab.count = mockOrders.filter(order => order.status === tab.value).length
+// 更新当前状态的计数（不需要额外API请求）
+const updateCurrentStatusCount = (total) => {
+  const currentTab = statusTabs.value.find(tab => tab.value === currentStatus.value)
+  if (currentTab) {
+    currentTab.count = total || 0
+  }
+}
+
+// 更新状态计数（用于需要单独获取计数的场景）
+const updateStatusCounts = async () => {
+  try {
+    // 只更新当前状态的计数，避免重复请求
+    const currentTab = statusTabs.value.find(tab => tab.value === currentStatus.value)
+    if (currentTab) {
+      const response = await getOrderList({ page: 1, page_size: 1, status_group: currentStatus.value })
+      if (response.data.code === 0) {
+        currentTab.count = response.data.data?.total || 0
+      }
     }
-  })
+  } catch (error) {
+    console.error('更新状态计数失败:', error)
+  }
 }
 
 // 下拉刷新
 const onRefresh = async () => {
+  if (isRefreshing.value) return // 防止重复刷新
+  
   isRefreshing.value = true
   page.value = 1
   hasMore.value = true
   
+  // 清除当前状态的缓存，强制重新加载
+  delete orderListCache.value[currentStatus.value]
+  
   try {
     await loadOrderList()
-    updateStatusCounts()
+    
+    // 模拟加载时间，确保用户能看到刷新动画
+    await new Promise(resolve => setTimeout(resolve, 800))
   } catch (error) {
     console.error('刷新失败:', error)
   } finally {
@@ -387,11 +285,12 @@ const loadMore = async () => {
 // 获取状态样式类
 const getStatusClass = (status) => {
   const statusMap = {
-    'pending': 'status-pending',
-    'to-serve': 'status-to-serve',
-    'in-progress': 'status-in-progress',
-    'completed': 'status-completed',
-    'to-review': 'status-to-review'
+    1: 'status-pending',      // 待付款
+    2: 'status-to-serve',     // 待服务（已支付待确认）
+    3: 'status-to-serve',     // 待服务（已确认待到达）
+    4: 'status-to-serve',     // 待服务（已到达待开始）
+    5: 'status-in-progress',  // 进行中
+    6: 'status-completed'     // 已完成
   }
   return statusMap[status] || 'status-default'
 }
@@ -399,57 +298,86 @@ const getStatusClass = (status) => {
 // 获取状态文本
 const getStatusText = (status) => {
   const statusMap = {
-    'pending': '待付款',
-    'to-serve': '待服务',
-    'in-progress': '进行中',
-    'completed': '已完成',
-    'to-review': '待评价'
+    1: '待付款',
+    2: '待服务',
+    3: '待服务',
+    4: '待服务',
+    5: '进行中',
+    6: '已完成'
   }
   return statusMap[status] || '未知状态'
 }
 
+// 获取金额标签文本
+const getAmountLabel = (status) => {
+  if (status === 1) {
+    return '需付款：'
+  } else if (status === 2 || status === 3 || status === 4 || status === 5 || status === 6) {
+    return '实付款：'
+  } else {
+    return '订单金额：'
+  }
+}
+
+// 获取订单操作按钮
+const getOrderActions = (status) => {
+  const actionMap = {
+    1: [ // 待付款
+      { text: '取消订单', action: 'cancel', type: 'secondary' },
+      { text: '立即支付', action: 'pay', type: 'primary' }
+    ],
+    2: [ // 待服务（已支付待确认）
+      { text: '取消订单', action: 'cancel', type: 'secondary' },
+      { text: '联系友伴师', action: 'contact', type: 'primary' }
+    ],
+    3: [ // 待服务（已确认待到达）
+      { text: '取消订单', action: 'cancel', type: 'secondary' },
+      { text: '联系友伴师', action: 'contact', type: 'primary' }
+    ],
+    4: [ // 待服务（已到达待开始）
+      { text: '取消订单', action: 'cancel', type: 'secondary' },
+      { text: '联系友伴师', action: 'contact', type: 'primary' }
+    ],
+    5: [ // 进行中
+      { text: '续钟', action: 'extend', type: 'primary' },
+      { text: '联系友伴师', action: 'contact', type: 'secondary' }
+    ],
+    6: [ // 已完成
+      { text: '再次预约', action: 'rebook', type: 'primary' }
+    ]
+  }
+  return actionMap[status] || []
+}
+
 // 处理订单操作
-const handleModifyOrder = (order) => {
-  console.log('修改订单', order.id)
-  uni.showToast({
-    title: '修改订单功能开发中',
-    icon: 'none'
-  })
-}
-
-const handleConfirmComplete = (order) => {
-  console.log('确认完成', order.id)
-  uni.showModal({
-    title: '确认完成',
-    content: '确认服务已完成吗？',
-    confirmText: '确认',
-    cancelText: '取消',
-    success: (res) => {
-      if (res.confirm) {
-        uni.showToast({
-          title: '服务已完成',
-          icon: 'success'
-        })
-        // 刷新列表
-        onRefresh()
-      }
-    }
-  })
-}
-
-const handleOrderAgain = (order) => {
-  console.log('再次预约', order.id)
-  uni.showToast({
-    title: '再次预约功能开发中',
-    icon: 'none'
-  })
+const handleOrderAction = (action, order) => {
+  switch (action) {
+    case 'cancel':
+      handleCancelOrder(order)
+      break
+    case 'pay':
+      handlePayOrder(order)
+      break
+    case 'contact':
+      handleContactPartner(order)
+      break
+    case 'extend':
+      handleExtendOrder(order)
+      break
+    case 'rebook':
+      handleRebookOrder(order)
+      break
+    case 'review':
+      handleReviewOrder(order)
+      break
+  }
 }
 
 // 取消订单
 const handleCancelOrder = (order) => {
   uni.showModal({
     title: '取消订单',
-    content: `确定要取消订单 ${order.id} 吗？`,
+    content: '确定要取消这个订单吗？',
     confirmText: '确定取消',
     cancelText: '再想想',
     success: (res) => {
@@ -468,70 +396,71 @@ const handleCancelOrder = (order) => {
 
 // 支付订单
 const handlePayOrder = (order) => {
-  console.log('支付订单', order.id)
-  uni.showToast({
-    title: '支付功能开发中',
-    icon: 'none'
+  uni.navigateTo({
+    url: `/subPackages/order/payment?orderId=${order.id}`
   })
 }
 
 // 联系友伴师
 const handleContactPartner = (order) => {
-  uni.showModal({
-    title: '联系友伴师',
-    content: `是否拨打 ${order.partnerName} 的电话？`,
-    confirmText: '拨打',
-    cancelText: '取消',
-    success: (res) => {
-      if (res.confirm) {
-        // 这里应该调用友伴师的电话
-        uni.makePhoneCall({
-          phoneNumber: '13800138000'
-        })
+  if (order.companion_id) {
+    uni.showModal({
+      title: '联系友伴师',
+      content: `是否拨打友伴师 #${order.companion_id} 的电话？`,
+      confirmText: '拨打',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          // 这里应该调用友伴师的电话
+          uni.makePhoneCall({
+            phoneNumber: '13800138000'
+          })
+        }
       }
-    }
-  })
+    })
+  }
 }
 
 // 续钟
 const handleExtendOrder = (order) => {
-  console.log('续钟', order.id)
-  uni.showToast({
-    title: '续钟功能开发中',
-    icon: 'none'
+  uni.navigateTo({
+    url: `/subPackages/order/extend?orderId=${order.id}`
   })
 }
 
 // 再次预约
 const handleRebookOrder = (order) => {
-  console.log('再次预约', order.id)
-  uni.showToast({
-    title: '再次预约功能开发中',
-    icon: 'none'
+  uni.navigateTo({
+    url: `/subPackages/order/rebook?orderId=${order.id}`
   })
 }
 
 // 评价订单
 const handleReviewOrder = (order) => {
-  console.log('评价订单', order.id)
-  uni.showToast({
-    title: '评价功能开发中',
-    icon: 'none'
+  uni.navigateTo({
+    url: `/subPackages/order/review?orderId=${order.id}`
   })
 }
 
 // 跳转到订单详情
 const navigateToDetail = (orderId) => {
-  console.log('查看订单详情', orderId)
-  uni.showToast({
-    title: '订单详情功能开发中',
-    icon: 'none'
+  uni.navigateTo({
+    url: `/subPackages/order/detail?orderId=${orderId}`
   })
 }
 
 // 格式化时间
 const formatTime = (timeStr) => {
-  return timeStr // 直接返回时间字符串，因为已经是格式化好的
+  const date = new Date(timeStr)
+  
+  // 格式化为 YYYY-MM-DD HH:mm 格式
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  
+  return `${year}-${month}-${day} ${hours}:${minutes}`
 }
 </script>
 
@@ -541,6 +470,7 @@ const formatTime = (timeStr) => {
   background-color: #F7F8FA;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 /* 状态筛选栏 */
@@ -598,6 +528,7 @@ const formatTime = (timeStr) => {
 .order-list {
   flex: 1;
   padding: 24rpx;
+  height: 0;
 }
 
 /* 空状态 */
@@ -636,9 +567,9 @@ const formatTime = (timeStr) => {
 
 .order-card {
   background: #FFFFFF;
-  border-radius: 24rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.1);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
   border: 1rpx solid #f0f0f0;
 }
 
@@ -646,282 +577,175 @@ const formatTime = (timeStr) => {
 .order-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 32rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  align-items: flex-start;
+  margin-bottom: 24rpx;
 }
 
-.order-left {
-  display: flex;
-  align-items: center;
+.order-info {
+  flex: 1;
 }
 
-.partner-avatar {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  overflow: hidden;
-  margin-right: 24rpx;
-  border: 1rpx solid #eee;
-  position: relative;
-}
-
-.partner-avatar image {
-  width: 100%;
-  height: 100%;
-}
-
-.partner-rating {
-  position: absolute;
-  bottom: -4rpx;
-  right: -4rpx;
-  background: #ffbb00;
-  color: white;
-  border-radius: 20rpx;
-  font-size: 20rpx;
-  padding: 2rpx 8rpx;
-  display: flex;
-  align-items: center;
-  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.2);
-  font-weight: 600;
-}
-
-.rating-text {
-  font-size: 20rpx;
-  margin-right: 4rpx;
-}
-
-.star-icon {
-  font-size: 16rpx;
-}
-
-.partner-name {
-  font-size: 30rpx;
+.order-number {
+  font-size: 28rpx;
+  color: #1A1A1A;
   font-weight: 500;
-  color: #333;
   margin-bottom: 8rpx;
-  display: flex;
-  align-items: center;
-}
-
-.partner-badge {
-  font-size: 20rpx;
-  background: linear-gradient(90deg, #7363FF 0%, #8b5cf6 100%);
-  color: white;
-  padding: 4rpx 12rpx;
-  border-radius: 20rpx;
-  margin-left: 12rpx;
+  display: block;
 }
 
 .order-time {
   font-size: 24rpx;
-  color: #999;
+  color: #999999;
 }
 
 .order-status {
-  font-size: 28rpx;
+  font-size: 24rpx;
   font-weight: 500;
 }
 
 .status-pending {
-  color: #f59e0b;
+  color: #ff6b35;
 }
 
 .status-to-serve {
-  color: #7363FF;
+  color: #007bff;
 }
 
 .status-in-progress {
-  color: #3b82f6;
+  color: #28a745;
 }
 
 .status-completed {
-  color: #10b981;
+  color: #6c757d;
 }
 
-.status-to-review {
-  color: #ec4899;
-}
 
-.status-cancelled {
-  color: #9ca3af;
-}
 
-/* 订单内容 */
-.order-content {
-  padding: 32rpx;
+/* 服务信息和订单金额行 */
+.service-amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+  padding-bottom: 24rpx;
   border-bottom: 1rpx solid #f0f0f0;
 }
 
+/* 服务信息 */
 .service-info {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 16rpx;
+  align-items: flex-start;
+  flex: 1;
 }
 
-.service-name {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #333;
-}
-
-.service-price {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #333;
-}
-
-/* 服务标签 */
-.service-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-bottom: 24rpx;
-}
-
-.service-tag {
-  background: #f0f2fd;
-  border-radius: 20rpx;
-  padding: 4rpx 16rpx;
-  font-size: 22rpx;
-  color: #7363FF;
+.service-image {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  margin-right: 24rpx;
+  flex-shrink: 0;
 }
 
 .service-details {
-  display: flex;
+  flex: 1;
   flex-direction: column;
-  gap: 12rpx;
 }
 
-.detail-item {
-  font-size: 26rpx;
-  color: #666;
-}
-
-.detail-label {
-  color: #999;
-  margin-right: 8rpx;
-}
-
-.note-text {
-  color: #777;
-  font-style: italic;
-}
-
-/* 进度条 */
-.order-progress {
-  margin-top: 24rpx;
-  padding-top: 24rpx;
-  border-top: 1rpx dashed #eee;
-}
-
-.progress-header {
+.service-meta {
   display: flex;
   justify-content: space-between;
+  gap: 8rpx;
+  align-items: flex-start;
+}
+
+.service-duration {
   font-size: 26rpx;
-  color: #666;
-  margin-bottom: 12rpx;
+  color: #1a1a1a;
 }
 
-.progress-bar {
-  height: 12rpx;
-  background: #f0f2fd;
-  border-radius: 6rpx;
-  overflow: hidden;
+.service-price {
+  font-size: 28rpx;
+  color: #1a1a1a;
+  font-weight: 600;
 }
 
-.progress-inner {
-  height: 100%;
-  background: linear-gradient(90deg, #7363FF 0%, #8b5cf6 100%);
-  border-radius: 6rpx;
+/* 下单时间信息 */
+.order-time-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
 }
 
-/* 订单底部 */
-.order-footer {
-  padding: 32rpx;
+.time-label {
+  font-size: 26rpx;
+  color: #666666;
 }
 
+.time-value {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+/* 订单金额 */
 .order-amount {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-bottom: 32rpx;
+  align-items: flex-end;
+  text-align: right;
+  align-self: flex-end;
+  margin-top: 30rpx;
 }
 
 .amount-label {
-  font-size: 28rpx;
-  color: #666;
-  margin-right: 16rpx;
+  font-size: 26rpx;
+  color: #666666;
 }
 
 .amount-value {
-  font-size: 36rpx;
-  font-weight: 600;
+  font-size: 30rpx;
   color: #f43f5e;
+  font-weight: 600;
 }
 
-.amount-detail {
-  font-size: 24rpx;
-  color: #999;
-  margin-left: 16rpx;
-}
-
+/* 操作按钮 */
 .order-actions {
   display: flex;
+  gap: 16rpx;
   justify-content: flex-end;
-  gap: 24rpx;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.countdown {
-  padding: 8rpx 16rpx;
-  background: #fff5f5;
-  color: #f43f5e;
-  border-radius: 20rpx;
-  font-size: 24rpx;
-  margin-right: auto;
-}
-
-.countdown-label {
-  margin-right: 8rpx;
-}
-
-.countdown-value {
-  font-weight: 600;
 }
 
 .action-btn {
   padding: 16rpx 32rpx;
-  border-radius: 40rpx;
-  font-size: 28rpx;
+  border-radius: 99999rpx;
+  font-size: 26rpx;
   font-weight: 500;
-  cursor: pointer;
+  transition: all 0.3s ease;
   border: 1rpx solid;
-  display: flex;
-  align-items: center;
+  box-sizing: border-box;
 }
 
-.action-btn .icon {
-  margin-right: 8rpx;
+.action-btn.primary {
+  background: #7363FF;
+  color: #FFFFFF;
+  border-color: #7363FF;
 }
 
-.cancel-btn {
-  border: 1rpx solid #d1d5db;
-  background: white;
-  color: #6b7280;
+.action-btn.primary:active {
+  background: #6354e6;
+  transform: scale(0.96);
 }
 
-.default-btn {
-  border: 1rpx solid #d1d5db;
-  background: white;
-  color: #6b7280;
+.action-btn.secondary {
+  background: #FFFFFF;
+  color: #666666;
+  border-color: #e9ecef;
 }
 
-.primary-btn {
-  background: linear-gradient(90deg, #7363FF 0%, #8b5cf6 100%);
-  color: white;
-  box-shadow: 0 4rpx 16rpx rgba(115, 99, 255, 0.2);
+.action-btn.secondary:active {
+  background: #f8f9fa;
+  transform: scale(0.96);
 }
 
 /* 加载更多 */
