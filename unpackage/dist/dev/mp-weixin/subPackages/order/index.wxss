@@ -134,6 +134,12 @@
 .status-completed.data-v-c7cccef5 {
   color: #6c757d;
 }
+.status-cancelled.data-v-c7cccef5 {
+  color: #b0b0b0;
+}
+.status-refunded.data-v-c7cccef5 {
+  color: #00bcd4;
+}
 
 /* 服务信息和订单金额行 */
 .service-amount-row.data-v-c7cccef5 {
@@ -173,9 +179,8 @@
   color: #1a1a1a;
 }
 .service-price.data-v-c7cccef5 {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #1a1a1a;
-  font-weight: 600;
 }
 
 /* 下单时间信息 */
@@ -199,10 +204,9 @@
 /* 订单金额 */
 .order-amount.data-v-c7cccef5 {
   display: flex;
-  align-items: flex-end;
-  text-align: right;
-  align-self: flex-end;
-  margin-top: 30rpx;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 40rpx;
 }
 .amount-label.data-v-c7cccef5 {
   font-size: 26rpx;
@@ -226,8 +230,12 @@
   font-size: 26rpx;
   font-weight: 500;
   transition: all 0.3s ease;
-  border: 1rpx solid;
+  border: 1rpx solid transparent;
   box-sizing: border-box;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .action-btn.primary.data-v-c7cccef5 {
   background: #7363FF;

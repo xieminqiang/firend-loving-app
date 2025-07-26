@@ -82,7 +82,7 @@ const _sfc_main = {
       var _a, _b, _c, _d, _e, _f, _g;
       return common_vendor.e({
         a: statusBarHeight.value + "px",
-        b: common_assets._imports_0$4,
+        b: common_assets._imports_0$6,
         c: common_vendor.o(goBack),
         d: (_a = currentLevel.value) == null ? void 0 : _a.icon_url,
         e: common_vendor.t(((_b = currentLevel.value) == null ? void 0 : _b.level_name) || "见习"),

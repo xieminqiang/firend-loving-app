@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const api_user = require("../../api/user.js");
+const stores_level = require("../../stores/level.js");
 if (!Math) {
   (Workbench + Profile)();
 }
@@ -10,6 +11,7 @@ const Profile = () => "./components/Profile.js";
 const _sfc_main = {
   __name: "index",
   setup(__props) {
+    const levelStore = stores_level.useLevelStore();
     const statusBarHeight = common_vendor.ref(0);
     const currentTabIndex = common_vendor.ref(0);
     const applicationInfo = common_vendor.ref(null);
@@ -27,23 +29,24 @@ const _sfc_main = {
       common_vendor.index.$off("refreshApplicationInfo", handleRefreshApplicationInfo);
     });
     const handleApplicationStatusChanged = (event) => {
-      common_vendor.index.__f__("log", "at subPackages/partner/index.vue:133", "收到申请状态变化事件:", event);
+      common_vendor.index.__f__("log", "at subPackages/partner/index.vue:136", "收到申请状态变化事件:", event);
       if (event.type === "video_uploaded") {
-        common_vendor.index.__f__("log", "at subPackages/partner/index.vue:137", "视频上传成功，刷新申请信息");
+        common_vendor.index.__f__("log", "at subPackages/partner/index.vue:140", "视频上传成功，刷新申请信息");
         loadApplicationInfo();
+        levelStore.clearServiceLevels();
       }
     };
     const handleRefreshApplicationInfo = () => {
-      common_vendor.index.__f__("log", "at subPackages/partner/index.vue:150", "收到刷新申请信息事件");
+      common_vendor.index.__f__("log", "at subPackages/partner/index.vue:156", "收到刷新申请信息事件");
       loadApplicationInfo();
     };
     const onRefresh = async () => {
-      common_vendor.index.__f__("log", "at subPackages/partner/index.vue:156", "开始下拉刷新");
+      common_vendor.index.__f__("log", "at subPackages/partner/index.vue:162", "开始下拉刷新");
       refreshing.value = true;
       try {
         await loadApplicationInfo();
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/partner/index.vue:165", "下拉刷新失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/partner/index.vue:171", "下拉刷新失败:", error);
         common_vendor.index.showToast({
           title: "刷新失败，请重试",
           icon: "error",
@@ -56,30 +59,30 @@ const _sfc_main = {
       }
     };
     const onRefreshRestore = () => {
-      common_vendor.index.__f__("log", "at subPackages/partner/index.vue:183", "刷新状态恢复");
+      common_vendor.index.__f__("log", "at subPackages/partner/index.vue:189", "刷新状态恢复");
     };
     const onRefreshAbort = () => {
-      common_vendor.index.__f__("log", "at subPackages/partner/index.vue:188", "刷新状态中止");
+      common_vendor.index.__f__("log", "at subPackages/partner/index.vue:194", "刷新状态中止");
       refreshing.value = false;
     };
     const loadApplicationInfo = async () => {
       var _a, _b;
       try {
-        common_vendor.index.__f__("log", "at subPackages/partner/index.vue:195", "开始请求申请信息");
+        common_vendor.index.__f__("log", "at subPackages/partner/index.vue:201", "开始请求申请信息");
         const response = await api_user.getApplicatioInfo();
-        common_vendor.index.__f__("log", "at subPackages/partner/index.vue:197", "申请信息请求成功:", response);
+        common_vendor.index.__f__("log", "at subPackages/partner/index.vue:203", "申请信息请求成功:", response);
         if (response.data && response.data.code === 0) {
           applicationInfo.value = response.data.data;
-          common_vendor.index.__f__("log", "at subPackages/partner/index.vue:201", "申请信息:", applicationInfo.value);
+          common_vendor.index.__f__("log", "at subPackages/partner/index.vue:207", "申请信息:", applicationInfo.value);
           dataReady.value = true;
-          common_vendor.index.__f__("log", "at subPackages/partner/index.vue:205", "数据准备完成，可以渲染Workbench组件");
+          common_vendor.index.__f__("log", "at subPackages/partner/index.vue:211", "数据准备完成，可以渲染Workbench组件");
         } else {
-          common_vendor.index.__f__("warn", "at subPackages/partner/index.vue:207", "获取申请信息失败:", ((_a = response.data) == null ? void 0 : _a.msg) || "未知错误");
+          common_vendor.index.__f__("warn", "at subPackages/partner/index.vue:213", "获取申请信息失败:", ((_a = response.data) == null ? void 0 : _a.msg) || "未知错误");
           dataReady.value = true;
           throw new Error(((_b = response.data) == null ? void 0 : _b.msg) || "获取申请信息失败");
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/partner/index.vue:215", "获取申请信息失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/partner/index.vue:221", "获取申请信息失败:", error);
         dataReady.value = true;
         throw error;
       }
@@ -96,7 +99,7 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: statusBarHeight.value + "px",
-        b: common_assets._imports_0$4,
+        b: common_assets._imports_0$6,
         c: common_vendor.o(goBack),
         d: !dataReady.value
       }, !dataReady.value ? {} : {

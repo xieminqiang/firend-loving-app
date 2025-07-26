@@ -14,7 +14,7 @@ const _sfc_main = {
     };
     return (_ctx, _cache) => {
       return {
-        a: common_assets._imports_0$6,
+        a: common_assets._imports_0$8,
         b: common_vendor.t(currentCity.value),
         c: common_assets._imports_1$1,
         d: common_vendor.o(handleClick)

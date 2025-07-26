@@ -95,7 +95,7 @@
         <!-- 加载更多 -->
         <view v-if="hasMore && orderList.length > 0" class="load-more">
           <text v-if="isLoadingMore" class="loading-text">加载中...</text>
-          <text v-else class="load-more-text">上拉加载更多</text>
+          <!-- <text v-else class="load-more-text">上拉加载更多</text> -->
         </view>
       </view>
     </scroll-view>
@@ -103,9 +103,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user.js'
-import { getOrderList } from '@/api/order.js'
+import { getOrderList, cancelOrder } from '@/api/order.js'
 
 // 用户状态管理
 const userStore = useUserStore()
@@ -132,11 +133,31 @@ const statusTabs = ref([
   { label: '已完成', value: 'completed', count: 0 }
 ])
 
-
-
-onMounted(() => {
-  // 首次加载时只加载当前状态的数据，计数会在loadOrderList中自动更新
+// 处理页面参数
+onLoad((options) => {
+  console.log('订单页面接收到的参数:', options)
+  if (options.status) {
+    console.log('设置订单状态为:', options.status)
+    currentStatus.value = options.status
+    // 重置页面状态
+    page.value = 1
+    hasMore.value = true
+    orderList.value = []
+    // 清除缓存，强制重新加载
+    delete orderListCache.value[options.status]
+  } else {
+    console.log('没有传递状态参数，使用默认状态: all')
+    currentStatus.value = 'all'
+  }
+  
+  // 在onLoad中加载数据，这是唯一的数据加载入口
+  console.log('onLoad中加载数据，当前状态:', currentStatus.value)
   loadOrderList()
+})
+
+// 监听状态变化
+watch(currentStatus, (newStatus, oldStatus) => {
+  console.log('状态变化:', oldStatus, '->', newStatus)
 })
 
 // 切换状态筛选
@@ -290,7 +311,9 @@ const getStatusClass = (status) => {
     3: 'status-to-serve',     // 待服务（已确认待到达）
     4: 'status-to-serve',     // 待服务（已到达待开始）
     5: 'status-in-progress',  // 进行中
-    6: 'status-completed'     // 已完成
+    6: 'status-completed',    // 已完成
+    7: 'status-cancelled',    // 已取消
+    8: 'status-refunded'      // 已退款
   }
   return statusMap[status] || 'status-default'
 }
@@ -303,7 +326,9 @@ const getStatusText = (status) => {
     3: '待服务',
     4: '待服务',
     5: '进行中',
-    6: '已完成'
+    6: '已完成',
+    7: '已取消',
+    8: '已退款'
   }
   return statusMap[status] || '未知状态'
 }
@@ -328,22 +353,28 @@ const getOrderActions = (status) => {
     ],
     2: [ // 待服务（已支付待确认）
       { text: '取消订单', action: 'cancel', type: 'secondary' },
-      { text: '联系友伴师', action: 'contact', type: 'primary' }
+      { text: '联系友伴', action: 'contact', type: 'primary' }
     ],
     3: [ // 待服务（已确认待到达）
       { text: '取消订单', action: 'cancel', type: 'secondary' },
-      { text: '联系友伴师', action: 'contact', type: 'primary' }
+      { text: '联系友伴', action: 'contact', type: 'primary' }
     ],
     4: [ // 待服务（已到达待开始）
       { text: '取消订单', action: 'cancel', type: 'secondary' },
-      { text: '联系友伴师', action: 'contact', type: 'primary' }
+      { text: '联系友伴', action: 'contact', type: 'primary' }
     ],
     5: [ // 进行中
       { text: '续钟', action: 'extend', type: 'primary' },
-      { text: '联系友伴师', action: 'contact', type: 'secondary' }
+      { text: '联系友伴', action: 'contact', type: 'secondary' }
     ],
     6: [ // 已完成
       { text: '再次预约', action: 'rebook', type: 'primary' }
+    ],
+    7: [ // 已取消
+      { text: '删除订单', action: 'delete', type: 'secondary' }
+    ],
+    8: [ // 已退款
+      { text: '删除订单', action: 'delete', type: 'secondary' }
     ]
   }
   return actionMap[status] || []
@@ -370,6 +401,9 @@ const handleOrderAction = (action, order) => {
     case 'review':
       handleReviewOrder(order)
       break
+    case 'delete':
+      handleDeleteOrder(order)
+      break
   }
 }
 
@@ -380,15 +414,41 @@ const handleCancelOrder = (order) => {
     content: '确定要取消这个订单吗？',
     confirmText: '确定取消',
     cancelText: '再想想',
-    success: (res) => {
+    success: async (res) => {
       if (res.confirm) {
-        // 调用取消订单API
-        uni.showToast({
-          title: '订单已取消',
-          icon: 'success'
-        })
-        // 刷新列表
-        onRefresh()
+        try {
+          // 显示加载提示
+          uni.showLoading({
+            title: '取消中...'
+          })
+          
+          // 调用取消订单API
+          const cancelData = {
+            order_id: order.id,
+            cancel_reason: '用户取消'
+          }
+          
+          const response = await cancelOrder(cancelData)
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '订单已取消',
+              icon: 'success'
+            })
+            // 刷新列表
+            onRefresh()
+          } else {
+            throw new Error(response.data.msg || '取消订单失败')
+          }
+        } catch (error) {
+          console.error('取消订单失败:', error)
+          uni.showToast({
+            title: error.message || '取消订单失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
       }
     }
   })
@@ -439,6 +499,36 @@ const handleRebookOrder = (order) => {
 const handleReviewOrder = (order) => {
   uni.navigateTo({
     url: `/subPackages/order/review?orderId=${order.id}`
+  })
+}
+
+// 删除订单
+const handleDeleteOrder = (order) => {
+  uni.showModal({
+    title: '删除订单',
+    content: '确定要删除这个订单吗？删除后不可恢复。',
+    confirmText: '删除',
+    cancelText: '取消',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          // 如果有后端API，调用API
+          // await deleteOrder({ order_id: order.id });
+
+          // 前端移除
+          orderList.value = orderList.value.filter(o => o.id !== order.id)
+          uni.showToast({
+            title: '订单已删除',
+            icon: 'success'
+          })
+        } catch (error) {
+          uni.showToast({
+            title: error.message || '删除失败',
+            icon: 'none'
+          })
+        }
+      }
+    }
   })
 }
 
@@ -619,6 +709,12 @@ const formatTime = (timeStr) => {
   color: #6c757d;
 }
 
+.status-cancelled {
+  color: #b0b0b0;
+}
+.status-refunded {
+  color: #00bcd4;
+}
 
 
 /* 服务信息和订单金额行 */
@@ -664,9 +760,9 @@ const formatTime = (timeStr) => {
 }
 
 .service-price {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #1a1a1a;
-  font-weight: 600;
+
 }
 
 /* 下单时间信息 */
@@ -692,10 +788,13 @@ const formatTime = (timeStr) => {
 /* 订单金额 */
 .order-amount {
   display: flex;
-  align-items: flex-end;
-  text-align: right;
-  align-self: flex-end;
-  margin-top: 30rpx;
+  // align-items: flex-end;
+  // text-align: right;
+  // align-self: flex-end;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 40rpx;
+ 
 }
 
 .amount-label {
@@ -722,8 +821,13 @@ const formatTime = (timeStr) => {
   font-size: 26rpx;
   font-weight: 500;
   transition: all 0.3s ease;
-  border: 1rpx solid;
+  border: 1rpx solid transparent;
   box-sizing: border-box;
+  height: 72rpx;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .action-btn.primary {

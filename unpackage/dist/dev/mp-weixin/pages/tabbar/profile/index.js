@@ -32,27 +32,25 @@ const _sfc_main = {
     const couponsCount = common_vendor.ref(3);
     const orderCounts = common_vendor.ref({
       pending: 2,
-      inProgress: 1,
-      toReview: 3
+      inProgress: 1
     });
     const handleLoginSuccess = (data) => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:351", "收到登录成功事件:", data);
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:341", "收到登录成功事件:", data);
       loadUserData();
     };
     const handleLogoutSuccess = () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:358", "收到退出登录事件");
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:348", "收到退出登录事件");
       accountBalance.value = "0.00";
       couponsCount.value = 0;
       orderCounts.value = {
         pending: 0,
-        inProgress: 0,
-        toReview: 0
+        inProgress: 0
       };
       applicationInfo.value = null;
       applicationStatus.value = "";
     };
     const handleApplicationStatusChanged = (data) => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:374", "收到申请状态变化事件:", data);
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:363", "收到申请状态变化事件:", data);
       loadApplicationInfo();
     };
     common_vendor.onMounted(() => {
@@ -70,16 +68,16 @@ const _sfc_main = {
     });
     const loadUserData = async () => {
       var _a;
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:413", "开始加载用户数据 - isLoggedIn:", isLoggedIn.value);
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:414", "当前用户状态:", userStore.userInfo);
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:402", "开始加载用户数据 - isLoggedIn:", isLoggedIn.value);
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:403", "当前用户状态:", userStore.userInfo);
       if (isLoggedIn.value) {
         try {
-          common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:419", "用户已登录，开始请求用户信息");
+          common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:408", "用户已登录，开始请求用户信息");
           const response = await api_user.getUserInfo();
-          common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:421", "用户信息请求成功:", response);
+          common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:410", "用户信息请求成功:", response);
           if (response.data && response.data.code === 0) {
             const userData = response.data.data;
-            common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:426", "解析用户数据:", userData);
+            common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:415", "解析用户数据:", userData);
             const userInfo2 = {
               nickname: userData.nick_name || "",
               phone: userData.phone || "",
@@ -89,21 +87,21 @@ const _sfc_main = {
             };
             userStore.setUserInfo(userInfo2);
           } else {
-            common_vendor.index.__f__("warn", "at pages/tabbar/profile/index.vue:443", "获取用户信息失败:", ((_a = response.data) == null ? void 0 : _a.msg) || "未知错误");
+            common_vendor.index.__f__("warn", "at pages/tabbar/profile/index.vue:432", "获取用户信息失败:", ((_a = response.data) == null ? void 0 : _a.msg) || "未知错误");
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:446", "获取用户信息失败:", error);
+          common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:435", "获取用户信息失败:", error);
         }
         await loadApplicationInfo();
       } else {
-        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:452", "用户未登录，跳过获取用户信息");
+        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:441", "用户未登录，跳过获取用户信息");
       }
     };
     const loadApplicationInfo = async () => {
       try {
-        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:459", "开始请求申请信息");
+        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:448", "开始请求申请信息");
         const response = await api_user.getApplicatioInfo();
-        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:461", "申请信息请求成功:", response);
+        common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:450", "申请信息请求成功:", response);
         if (response.data && response.data.code === 0) {
           applicationInfo.value = response.data.data;
         }
@@ -176,8 +174,10 @@ const _sfc_main = {
       });
     };
     const navigateToOrders = (status) => {
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:540", "跳转到订单页面，状态:", status);
+      const encodedStatus = encodeURIComponent(status);
       common_vendor.index.navigateTo({
-        url: `/subPackages/order/index?status=${status}`
+        url: `/subPackages/order/index?status=${encodedStatus}`
       });
     };
     const navigateToPromotion = () => {
@@ -292,13 +292,13 @@ const _sfc_main = {
       });
     };
     const onRefresh = async () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:688", "开始下拉刷新");
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:679", "开始下拉刷新");
       isRefreshing.value = true;
       try {
         await loadUserData();
         await new Promise((resolve) => setTimeout(resolve, 800));
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:699", "刷新失败:", error);
+        common_vendor.index.__f__("error", "at pages/tabbar/profile/index.vue:690", "刷新失败:", error);
         common_vendor.index.showToast({
           title: "刷新失败",
           icon: "none",
@@ -309,7 +309,7 @@ const _sfc_main = {
       }
     };
     const onRefreshRestore = () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:711", "刷新动画结束");
+      common_vendor.index.__f__("log", "at pages/tabbar/profile/index.vue:702", "刷新动画结束");
       isRefreshing.value = false;
     };
     const formatPhone = (phone) => {
@@ -328,92 +328,85 @@ const _sfc_main = {
       } : {
         d: common_vendor.t(((_a = userInfo.value.nickname) == null ? void 0 : _a.charAt(0)) || "用")
       }, {
-        e: common_vendor.t(userInfo.value.nickname || "随伴行用户"),
-        f: common_assets._imports_0$2,
-        g: common_vendor.t(formatPhone(userInfo.value.phone) || "未绑定手机号"),
-        h: userInfo.value.levelProgress + "%",
-        i: common_vendor.t(userInfo.value.level || 1),
-        j: common_vendor.o(navigateToUserDetail)
+        e: common_vendor.t(userInfo.value.nickname || ""),
+        f: common_vendor.t(formatPhone(userInfo.value.phone) || "未绑定手机号"),
+        g: userInfo.value.levelProgress + "%",
+        h: common_vendor.t(userInfo.value.level || 1),
+        i: common_vendor.o(navigateToUserDetail)
       }) : {
+        j: common_assets._imports_0$4,
         k: common_assets._imports_1$4,
-        l: common_assets._imports_2$3,
-        m: common_assets._imports_4$1,
-        n: common_assets._imports_4$2,
-        o: common_vendor.o(navigateToLogin)
+        l: common_assets._imports_4$1,
+        m: common_assets._imports_3$3,
+        n: common_vendor.o(navigateToLogin)
       }, {
-        p: statusBarHeight.value + "px",
-        q: common_assets._imports_5$2,
-        r: common_vendor.o(($event) => handleActionClick("wallet")),
-        s: common_assets._imports_6,
-        t: couponsCount.value > 0
+        o: statusBarHeight.value + "px",
+        p: common_assets._imports_4$2,
+        q: common_vendor.o(($event) => handleActionClick("wallet")),
+        r: common_assets._imports_5$2,
+        s: couponsCount.value > 0
       }, couponsCount.value > 0 ? {
-        v: common_vendor.t(couponsCount.value)
+        t: common_vendor.t(couponsCount.value)
       } : {}, {
-        w: common_vendor.o(($event) => handleActionClick("coupons")),
-        x: common_assets._imports_1$4,
-        y: common_vendor.o(($event) => handleActionClick("favorites")),
-        z: common_assets._imports_7,
-        A: common_vendor.o(($event) => handleActionClick("history")),
-        B: common_assets._imports_0$2,
-        C: common_vendor.o(navigateToBillDetails),
-        D: common_vendor.t(accountBalance.value),
-        E: common_vendor.o(handleWithdraw),
-        F: common_vendor.o(handleRecharge),
-        G: common_assets._imports_0$2,
-        H: common_vendor.o(($event) => navigateToOrders("all")),
-        I: common_assets._imports_3$2,
-        J: orderCounts.value.pending > 0
+        v: common_vendor.o(($event) => handleActionClick("coupons")),
+        w: common_assets._imports_0$4,
+        x: common_vendor.o(($event) => handleActionClick("favorites")),
+        y: common_assets._imports_6,
+        z: common_vendor.o(($event) => handleActionClick("history")),
+        A: common_assets._imports_0$3,
+        B: common_vendor.o(navigateToBillDetails),
+        C: common_vendor.t(accountBalance.value),
+        D: common_vendor.o(handleWithdraw),
+        E: common_vendor.o(handleRecharge),
+        F: common_assets._imports_0$3,
+        G: common_vendor.o(($event) => navigateToOrders("all")),
+        H: common_assets._imports_3$2,
+        I: orderCounts.value.pending > 0
       }, orderCounts.value.pending > 0 ? {
-        K: common_vendor.t(orderCounts.value.pending)
+        J: common_vendor.t(orderCounts.value.pending)
       } : {}, {
-        L: common_vendor.o(($event) => navigateToOrders("pending")),
-        M: common_assets._imports_1$4,
-        N: common_vendor.o(($event) => navigateToOrders("to-serve")),
-        O: common_assets._imports_2$3,
-        P: orderCounts.value.inProgress > 0
+        K: common_vendor.o(($event) => navigateToOrders("pending_payment")),
+        L: common_assets._imports_0$4,
+        M: common_vendor.o(($event) => navigateToOrders("pending_service")),
+        N: common_assets._imports_1$4,
+        O: orderCounts.value.inProgress > 0
       }, orderCounts.value.inProgress > 0 ? {
-        Q: common_vendor.t(orderCounts.value.inProgress)
+        P: common_vendor.t(orderCounts.value.inProgress)
       } : {}, {
-        R: common_vendor.o(($event) => navigateToOrders("in-progress")),
-        S: common_assets._imports_9,
-        T: common_vendor.o(($event) => navigateToOrders("completed")),
-        U: common_assets._imports_10,
-        V: orderCounts.value.toReview > 0
-      }, orderCounts.value.toReview > 0 ? {
-        W: common_vendor.t(orderCounts.value.toReview)
-      } : {}, {
-        X: common_vendor.o(($event) => navigateToOrders("to-review")),
-        Y: common_assets._imports_11,
-        Z: common_vendor.o(navigateToPromotion),
-        aa: common_assets._imports_12,
-        ab: common_vendor.o(navigateToReportReward),
-        ac: common_assets._imports_13,
-        ad: applicationInfo.value && applicationInfo.value.status && applicationInfo.value.status === "approved"
+        Q: common_vendor.o(($event) => navigateToOrders("in_service")),
+        R: common_assets._imports_9,
+        S: common_vendor.o(($event) => navigateToOrders("completed")),
+        T: common_assets._imports_10,
+        U: common_vendor.o(navigateToPromotion),
+        V: common_assets._imports_11,
+        W: common_vendor.o(navigateToReportReward),
+        X: common_assets._imports_12,
+        Y: applicationInfo.value && applicationInfo.value.status && applicationInfo.value.status === "approved"
       }, applicationInfo.value && applicationInfo.value.status && applicationInfo.value.status === "approved" ? {} : {}, {
-        ae: common_vendor.o(navigateToPartnerRegistration),
-        af: common_assets._imports_2$2,
-        ag: common_vendor.o(navigateToCooperation),
-        ah: common_assets._imports_15,
-        ai: common_vendor.o(handleEmergencyCall),
-        aj: common_assets._imports_16,
-        ak: common_vendor.o(navigateToHelp),
+        Z: common_vendor.o(navigateToPartnerRegistration),
+        aa: common_assets._imports_2$1,
+        ab: common_vendor.o(navigateToCooperation),
+        ac: common_assets._imports_14,
+        ad: common_vendor.o(handleEmergencyCall),
+        ae: common_assets._imports_15,
+        af: common_vendor.o(navigateToHelp),
+        ag: common_assets._imports_16,
+        ah: common_vendor.o(navigateToRefund),
+        ai: common_assets._imports_4$1,
+        aj: common_assets._imports_0$3,
+        ak: common_vendor.o(navigateToPrivacySettings),
         al: common_assets._imports_17,
-        am: common_vendor.o(navigateToRefund),
-        an: common_assets._imports_4$1,
-        ao: common_assets._imports_0$2,
-        ap: common_vendor.o(navigateToPrivacySettings),
-        aq: common_assets._imports_18,
-        ar: common_assets._imports_0$2,
-        as: common_vendor.o(navigateToNotificationSettings),
-        at: common_assets._imports_19,
-        av: common_assets._imports_0$2,
-        aw: common_vendor.o(navigateToCustomerService),
-        ax: common_assets._imports_20,
-        ay: common_assets._imports_0$2,
-        az: common_vendor.o(navigateToSystemSettings),
-        aA: isRefreshing.value,
-        aB: common_vendor.o(onRefresh),
-        aC: common_vendor.o(onRefreshRestore)
+        am: common_assets._imports_0$3,
+        an: common_vendor.o(navigateToNotificationSettings),
+        ao: common_assets._imports_18,
+        ap: common_assets._imports_0$3,
+        aq: common_vendor.o(navigateToCustomerService),
+        ar: common_assets._imports_19,
+        as: common_assets._imports_0$3,
+        at: common_vendor.o(navigateToSystemSettings),
+        av: isRefreshing.value,
+        aw: common_vendor.o(onRefresh),
+        ax: common_vendor.o(onRefreshRestore)
       });
     };
   }

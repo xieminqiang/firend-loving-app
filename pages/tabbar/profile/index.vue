@@ -24,10 +24,8 @@
             </view>
             <view class="user-details">
               <view class="name-row">
-                <view class="user-name">{{ userInfo.nickname || '随伴行用户' }}</view>
-                <view class="profile-arrow">
-                  <image src="@/static/icons/common/arrow-right.png" class="arrow-icon" mode="aspectFit" />
-                </view>
+                <view class="user-name">{{ userInfo.nickname || '' }}</view>
+            
               </view>
               <view class="user-phone">{{ formatPhone(userInfo.phone) || '未绑定手机号' }}</view>
               <view class="user-auth">
@@ -162,20 +160,20 @@
             </view>
           </view>
           <view class="orders-grid">
-            <view class="order-item" @click="navigateToOrders('pending')">
+            <view class="order-item" @click="navigateToOrders('pending_payment')">
               <view class="order-icon">
                 <image src="@/static/icons/profile/credit-card.png" class="order-icon-img" mode="aspectFit" />
                 <text v-if="orderCounts.pending > 0" class="order-badge">{{ orderCounts.pending }}</text>
               </view>
               <text class="order-text">待付款</text>
             </view>
-            <view class="order-item" @click="navigateToOrders('to-serve')">
+            <view class="order-item" @click="navigateToOrders('pending_service')">
               <view class="order-icon">
                 <image src="@/static/icons/profile/heart.png" class="order-icon-img" mode="aspectFit" />
               </view>
               <text class="order-text">待服务</text>
             </view>
-            <view class="order-item" @click="navigateToOrders('in-progress')">
+            <view class="order-item" @click="navigateToOrders('in_service')">
               <view class="order-icon">
                 <image src="@/static/icons/profile/clock.png" class="order-icon-img" mode="aspectFit" />
                 <text v-if="orderCounts.inProgress > 0" class="order-badge">{{ orderCounts.inProgress }}</text>
@@ -187,13 +185,6 @@
                 <image src="@/static/icons/profile/check.png" class="order-icon-img" mode="aspectFit" />
               </view>
               <text class="order-text">已完成</text>
-            </view>
-            <view class="order-item" @click="navigateToOrders('to-review')">
-              <view class="order-icon">
-                <image src="@/static/icons/profile/comment.png" class="order-icon-img" mode="aspectFit" />
-                <text v-if="orderCounts.toReview > 0" class="order-badge">{{ orderCounts.toReview }}</text>
-              </view>
-              <text class="order-text">待评价</text>
             </view>
           </view>
         </view>
@@ -342,8 +333,7 @@ const accountBalance = ref('0.00')
 const couponsCount = ref(3)
 const orderCounts = ref({
   pending: 2,
-  inProgress: 1,
-  toReview: 3
+  inProgress: 1
 })
 
 // 监听登录成功事件
@@ -361,8 +351,7 @@ const handleLogoutSuccess = () => {
   couponsCount.value = 0
   orderCounts.value = {
     pending: 0,
-    inProgress: 0,
-    toReview: 0
+    inProgress: 0
   }
   // 清除申请信息
   applicationInfo.value = null
@@ -548,8 +537,10 @@ const navigateToBillDetails = () => {
 }
 
 const navigateToOrders = (status) => {
+  console.log('跳转到订单页面，状态:', status)
+  const encodedStatus = encodeURIComponent(status)
   uni.navigateTo({
-    url: `/subPackages/order/index?status=${status}`
+    url: `/subPackages/order/index?status=${encodedStatus}`
   })
 }
 
@@ -1449,7 +1440,7 @@ const formatPhone = (phone) => {
   align-items: center;
   color: #666666;
   font-size: 24rpx;
-  padding: 4rpx 8rpx;
+  padding: 4rpx 10rpx;
   border-radius: 12rpx;
   background: #f8f9fa;
   transition: all 0.2s;
@@ -1465,8 +1456,8 @@ const formatPhone = (phone) => {
 }
 
 .details-arrow {
-  width: 16rpx;
-  height: 16rpx;
+  width: 18rpx;
+  height: 18rpx;
   opacity: 0.6;
 }
 
@@ -1559,7 +1550,7 @@ const formatPhone = (phone) => {
   align-items: center;
   font-size: 24rpx;
   color: #666666;
-  padding: 4rpx 8rpx;
+  padding: 4rpx 10rpx;
   border-radius: 12rpx;
   background: #f8f9fa;
   transition: all 0.2s;
@@ -1575,15 +1566,15 @@ const formatPhone = (phone) => {
 }
 
 .view-all-arrow {
-  width: 16rpx;
-  height: 16rpx;
-  opacity: 0.6;
+  width: 18rpx;
+  height: 18rpx;
+ 
 }
 
 /* 订单管理 - 简化设计 */
 .orders-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0 16rpx;
 }
 

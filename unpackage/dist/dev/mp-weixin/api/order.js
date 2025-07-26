@@ -21,6 +21,14 @@ const orderParams = (data) => {
     data
   });
 };
+const cancelOrder = (data) => {
+  return config_http.http({
+    url: "/front/order/cancel",
+    method: "POST",
+    data
+  });
+};
+exports.cancelOrder = cancelOrder;
 exports.createOrder = createOrder;
 exports.getOrderList = getOrderList;
 exports.orderParams = orderParams;

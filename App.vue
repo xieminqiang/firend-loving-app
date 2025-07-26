@@ -1,19 +1,49 @@
 <script>
 import { useLevelStore } from '@/stores/level.js'
+import { useUserStore } from '@/stores/user.js'
 
 export default {
 	onLaunch: function() {
 		console.log('App Launch')
+		// 应用启动时清除等级列表缓存，确保获取最新数据
+		this.clearServiceLevels()
 		// 初始化时获取服务等级列表
 		this.initServiceLevels()
 	},
 	onShow: function() {
 		console.log('App Show')
+		// 应用从后台恢复时，检查是否需要更新等级列表
+		this.checkAndUpdateServiceLevels()
 	},
 	onHide: function() {
 		console.log('App Hide')
 	},
 	methods: {
+		// 清除服务等级列表
+		clearServiceLevels() {
+			try {
+				const levelStore = useLevelStore()
+				levelStore.clearServiceLevels()
+				console.log('服务等级列表已清除')
+			} catch (error) {
+				console.error('清除服务等级列表失败:', error)
+			}
+		},
+		
+		// 检查并更新服务等级列表
+		async checkAndUpdateServiceLevels() {
+			try {
+				const levelStore = useLevelStore()
+				// 如果数据过期或为空，重新获取
+				if (levelStore.needUpdate || levelStore.serviceLevels.length === 0) {
+					console.log('检测到等级列表需要更新，重新获取...')
+					await levelStore.fetchServiceLevels()
+				}
+			} catch (error) {
+				console.error('检查更新服务等级列表失败:', error)
+			}
+		},
+		
 		async initServiceLevels() {
 			try {
 				const levelStore = useLevelStore()

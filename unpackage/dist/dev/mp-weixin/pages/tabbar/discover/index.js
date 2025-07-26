@@ -456,7 +456,7 @@ const _sfc_main = {
           }) : {}, {
             l: !feed.isLiked
           }, !feed.isLiked ? {
-            m: common_assets._imports_2$1
+            m: common_assets._imports_2
           } : {
             n: common_assets._imports_3
           }, {

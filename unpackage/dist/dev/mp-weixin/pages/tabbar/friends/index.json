@@ -1,5 +1,4 @@
 {
-  "navigationBarTitleText": "友伴",
   "navigationStyle": "custom",
   "usingComponents": {
     "city-selector": "../../../components/common/CitySelector",

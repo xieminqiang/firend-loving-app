@@ -648,7 +648,7 @@
   align-items: center;
   color: #666666;
   font-size: 24rpx;
-  padding: 4rpx 8rpx;
+  padding: 4rpx 10rpx;
   border-radius: 12rpx;
   background: #f8f9fa;
   transition: all 0.2s;
@@ -661,8 +661,8 @@
   margin-right: 6rpx;
 }
 .details-arrow.data-v-4cb51321 {
-  width: 16rpx;
-  height: 16rpx;
+  width: 18rpx;
+  height: 18rpx;
   opacity: 0.6;
 }
 .balance-amount.data-v-4cb51321 {
@@ -743,7 +743,7 @@
   align-items: center;
   font-size: 24rpx;
   color: #666666;
-  padding: 4rpx 8rpx;
+  padding: 4rpx 10rpx;
   border-radius: 12rpx;
   background: #f8f9fa;
   transition: all 0.2s;
@@ -756,15 +756,14 @@
   margin-right: 6rpx;
 }
 .view-all-arrow.data-v-4cb51321 {
-  width: 16rpx;
-  height: 16rpx;
-  opacity: 0.6;
+  width: 18rpx;
+  height: 18rpx;
 }
 
 /* 订单管理 - 简化设计 */
 .orders-grid.data-v-4cb51321 {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0 16rpx;
 }
 .order-item.data-v-4cb51321 {

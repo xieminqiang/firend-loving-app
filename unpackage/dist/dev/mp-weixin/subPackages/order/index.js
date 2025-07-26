@@ -23,8 +23,24 @@ const _sfc_main = {
       { label: "进行中", value: "in_service", count: 0 },
       { label: "已完成", value: "completed", count: 0 }
     ]);
-    common_vendor.onMounted(() => {
+    common_vendor.onLoad((options) => {
+      common_vendor.index.__f__("log", "at subPackages/order/index.vue:138", "订单页面接收到的参数:", options);
+      if (options.status) {
+        common_vendor.index.__f__("log", "at subPackages/order/index.vue:140", "设置订单状态为:", options.status);
+        currentStatus.value = options.status;
+        page.value = 1;
+        hasMore.value = true;
+        orderList.value = [];
+        delete orderListCache.value[options.status];
+      } else {
+        common_vendor.index.__f__("log", "at subPackages/order/index.vue:149", "没有传递状态参数，使用默认状态: all");
+        currentStatus.value = "all";
+      }
+      common_vendor.index.__f__("log", "at subPackages/order/index.vue:154", "onLoad中加载数据，当前状态:", currentStatus.value);
       loadOrderList();
+    });
+    common_vendor.watch(currentStatus, (newStatus, oldStatus) => {
+      common_vendor.index.__f__("log", "at subPackages/order/index.vue:160", "状态变化:", oldStatus, "->", newStatus);
     });
     const switchStatus = async (status) => {
       if (currentStatus.value === status)
@@ -41,7 +57,7 @@ const _sfc_main = {
         try {
           await loadOrderList();
         } catch (error) {
-          common_vendor.index.__f__("error", "at subPackages/order/index.vue:163", "切换状态失败:", error);
+          common_vendor.index.__f__("error", "at subPackages/order/index.vue:184", "切换状态失败:", error);
         }
       }
     };
@@ -56,7 +72,7 @@ const _sfc_main = {
           status_group: currentStatus.value
         };
         const response = await api_order.getOrderList(params);
-        common_vendor.index.__f__("log", "at subPackages/order/index.vue:182", "response.data", response.data);
+        common_vendor.index.__f__("log", "at subPackages/order/index.vue:203", "response.data", response.data);
         if (response.data.code === 0) {
           const { list, total } = response.data.data;
           if (page.value === 1) {
@@ -75,7 +91,7 @@ const _sfc_main = {
           throw new Error(response.msg || "获取订单列表失败");
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/order/index.vue:207", "加载订单列表失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/order/index.vue:228", "加载订单列表失败:", error);
         common_vendor.index.showToast({
           title: error.message || "加载失败",
           icon: "none"
@@ -101,7 +117,7 @@ const _sfc_main = {
         await loadOrderList();
         await new Promise((resolve) => setTimeout(resolve, 800));
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/order/index.vue:258", "刷新失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/order/index.vue:279", "刷新失败:", error);
       } finally {
         isRefreshing.value = false;
       }
@@ -117,7 +133,7 @@ const _sfc_main = {
       try {
         await loadOrderList();
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/order/index.vue:278", "加载更多失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/order/index.vue:299", "加载更多失败:", error);
         page.value--;
       } finally {
         isLoadingMore.value = false;
@@ -135,8 +151,12 @@ const _sfc_main = {
         // 待服务（已到达待开始）
         5: "status-in-progress",
         // 进行中
-        6: "status-completed"
+        6: "status-completed",
         // 已完成
+        7: "status-cancelled",
+        // 已取消
+        8: "status-refunded"
+        // 已退款
       };
       return statusMap[status] || "status-default";
     };
@@ -147,7 +167,9 @@ const _sfc_main = {
         3: "待服务",
         4: "待服务",
         5: "进行中",
-        6: "已完成"
+        6: "已完成",
+        7: "已取消",
+        8: "已退款"
       };
       return statusMap[status] || "未知状态";
     };
@@ -170,26 +192,34 @@ const _sfc_main = {
         2: [
           // 待服务（已支付待确认）
           { text: "取消订单", action: "cancel", type: "secondary" },
-          { text: "联系友伴师", action: "contact", type: "primary" }
+          { text: "联系友伴", action: "contact", type: "primary" }
         ],
         3: [
           // 待服务（已确认待到达）
           { text: "取消订单", action: "cancel", type: "secondary" },
-          { text: "联系友伴师", action: "contact", type: "primary" }
+          { text: "联系友伴", action: "contact", type: "primary" }
         ],
         4: [
           // 待服务（已到达待开始）
           { text: "取消订单", action: "cancel", type: "secondary" },
-          { text: "联系友伴师", action: "contact", type: "primary" }
+          { text: "联系友伴", action: "contact", type: "primary" }
         ],
         5: [
           // 进行中
           { text: "续钟", action: "extend", type: "primary" },
-          { text: "联系友伴师", action: "contact", type: "secondary" }
+          { text: "联系友伴", action: "contact", type: "secondary" }
         ],
         6: [
           // 已完成
           { text: "再次预约", action: "rebook", type: "primary" }
+        ],
+        7: [
+          // 已取消
+          { text: "删除订单", action: "delete", type: "secondary" }
+        ],
+        8: [
+          // 已退款
+          { text: "删除订单", action: "delete", type: "secondary" }
         ]
       };
       return actionMap[status] || [];
@@ -197,7 +227,7 @@ const _sfc_main = {
     const handleOrderAction = (action, order) => {
       switch (action) {
         case "cancel":
-          handleCancelOrder();
+          handleCancelOrder(order);
           break;
         case "pay":
           handlePayOrder(order);
@@ -214,6 +244,9 @@ const _sfc_main = {
         case "review":
           handleReviewOrder(order);
           break;
+        case "delete":
+          handleDeleteOrder(order);
+          break;
       }
     };
     const handleCancelOrder = (order) => {
@@ -222,13 +255,35 @@ const _sfc_main = {
         content: "确定要取消这个订单吗？",
         confirmText: "确定取消",
         cancelText: "再想想",
-        success: (res) => {
+        success: async (res) => {
           if (res.confirm) {
-            common_vendor.index.showToast({
-              title: "订单已取消",
-              icon: "success"
-            });
-            onRefresh();
+            try {
+              common_vendor.index.showLoading({
+                title: "取消中..."
+              });
+              const cancelData = {
+                order_id: order.id,
+                cancel_reason: "用户取消"
+              };
+              const response = await api_order.cancelOrder(cancelData);
+              if (response.data.code === 0) {
+                common_vendor.index.showToast({
+                  title: "订单已取消",
+                  icon: "success"
+                });
+                onRefresh();
+              } else {
+                throw new Error(response.data.msg || "取消订单失败");
+              }
+            } catch (error) {
+              common_vendor.index.__f__("error", "at subPackages/order/index.vue:444", "取消订单失败:", error);
+              common_vendor.index.showToast({
+                title: error.message || "取消订单失败",
+                icon: "none"
+              });
+            } finally {
+              common_vendor.index.hideLoading();
+            }
           }
         }
       });
@@ -268,6 +323,30 @@ const _sfc_main = {
     const handleReviewOrder = (order) => {
       common_vendor.index.navigateTo({
         url: `/subPackages/order/review?orderId=${order.id}`
+      });
+    };
+    const handleDeleteOrder = (order) => {
+      common_vendor.index.showModal({
+        title: "删除订单",
+        content: "确定要删除这个订单吗？删除后不可恢复。",
+        confirmText: "删除",
+        cancelText: "取消",
+        success: async (res) => {
+          if (res.confirm) {
+            try {
+              orderList.value = orderList.value.filter((o) => o.id !== order.id);
+              common_vendor.index.showToast({
+                title: "订单已删除",
+                icon: "success"
+              });
+            } catch (error) {
+              common_vendor.index.showToast({
+                title: error.message || "删除失败",
+                icon: "none"
+              });
+            }
+          }
+        }
       });
     };
     const navigateToDetail = (orderId) => {

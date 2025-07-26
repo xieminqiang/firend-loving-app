@@ -123,7 +123,7 @@ const _sfc_main = {
       return common_vendor.e({
         a: loading.value
       }, loading.value ? {} : !error.value ? common_vendor.e({
-        c: common_assets._imports_0$4,
+        c: common_assets._imports_0$6,
         d: common_vendor.o(goBack),
         e: _ctx.$imgBaseUrl + serviceDetail.value.image_url,
         f: common_vendor.o(onImageError),
@@ -161,7 +161,7 @@ const _sfc_main = {
           });
         })
       } : {}, {
-        r: common_assets._imports_2$4,
+        r: common_assets._imports_2$2,
         s: common_vendor.t(serviceDetail.value.description || "暂无详细说明")
       }) : {}, {
         b: !error.value,

@@ -610,14 +610,14 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: statusBarHeight.value + "px",
-        b: common_assets._imports_0$4,
+        b: common_assets._imports_0$6,
         c: common_vendor.o(goBack),
         d: formData.nickname,
         e: common_vendor.o(($event) => formData.nickname = $event.detail.value),
-        f: common_assets._imports_1$2,
+        f: common_assets._imports_0$2,
         g: formData.gender === "male" ? 1 : "",
         h: common_vendor.o(($event) => selectGender("male")),
-        i: common_assets._imports_2,
+        i: common_assets._imports_1$2,
         j: formData.gender === "female" ? 1 : "",
         k: common_vendor.o(($event) => selectGender("female")),
         l: formData.age,

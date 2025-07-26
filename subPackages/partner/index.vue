@@ -91,6 +91,9 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import Workbench from './components/Workbench.vue'
 import Profile from './components/Profile.vue'
 import { getApplicatioInfo } from '@/api/user.js'
+import { useLevelStore } from '@/stores/level.js'
+
+const levelStore = useLevelStore()
 
 // 状态栏高度
 const statusBarHeight = ref(0)
@@ -136,6 +139,9 @@ const handleApplicationStatusChanged = (event) => {
     // 视频上传成功，刷新申请信息
     console.log('视频上传成功，刷新申请信息')
     loadApplicationInfo()
+    
+    // 清除等级列表缓存，确保获取最新的等级信息
+    levelStore.clearServiceLevels()
     
     // 显示成功提示
     // uni.showToast({

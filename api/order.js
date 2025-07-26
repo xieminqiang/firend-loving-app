@@ -26,3 +26,12 @@ export const orderParams = (data) => {
     data
   })
 }
+
+// 取消订单
+export const cancelOrder = (data) => {
+  return http({
+    url: '/front/order/cancel',
+    method: 'POST',
+    data
+  })
+}

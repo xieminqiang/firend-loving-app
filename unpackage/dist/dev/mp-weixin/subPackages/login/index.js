@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const api_user = require("../../api/user.js");
 const stores_user = require("../../stores/user.js");
+const stores_level = require("../../stores/level.js");
 if (!Array) {
   const _component_uni_popup = common_vendor.resolveComponent("uni-popup");
   _component_uni_popup();
@@ -11,12 +12,13 @@ const _sfc_main = {
   __name: "index",
   setup(__props) {
     const userStore = stores_user.useUserStore();
+    const levelStore = stores_level.useLevelStore();
     const popup = common_vendor.ref(null);
     const isPopupOpen = common_vendor.ref(true);
     const hasAgreed = common_vendor.ref(false);
     common_vendor.onLoad(async () => {
       const systemInfo = common_vendor.index.getSystemInfoSync();
-      common_vendor.index.__f__("log", "at subPackages/login/index.vue:99", "系统信息:", systemInfo);
+      common_vendor.index.__f__("log", "at subPackages/login/index.vue:101", "系统信息:", systemInfo);
       setTimeout(() => {
         if (popup.value) {
           popup.value.open();
@@ -60,7 +62,7 @@ const _sfc_main = {
     };
     const getPhoneNumber = async (e) => {
       var _a;
-      common_vendor.index.__f__("log", "at subPackages/login/index.vue:165", "getPhoneNumber event:", e);
+      common_vendor.index.__f__("log", "at subPackages/login/index.vue:167", "getPhoneNumber event:", e);
       const res = e.detail;
       if (!res.code) {
         common_vendor.index.showToast({
@@ -82,6 +84,7 @@ const _sfc_main = {
         common_vendor.index.hideLoading();
         if (result.data && result.data.code === 0) {
           userStore.setUserInfo(result.data.data.token);
+          levelStore.clearServiceLevels();
           common_vendor.index.$emit("loginSuccess", {
             userInfo: result.data.data
           });
@@ -103,7 +106,7 @@ const _sfc_main = {
         }
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at subPackages/login/index.vue:232", "登录失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/login/index.vue:237", "登录失败:", error);
         common_vendor.index.showToast({
           title: "登录失败，请重试",
           icon: "none"
@@ -112,7 +115,7 @@ const _sfc_main = {
     };
     return (_ctx, _cache) => {
       return {
-        a: common_assets._imports_0$3,
+        a: common_assets._imports_0$5,
         b: common_vendor.o(handleBack),
         c: common_assets._imports_1$5,
         d: common_vendor.o(getPhoneNumber),

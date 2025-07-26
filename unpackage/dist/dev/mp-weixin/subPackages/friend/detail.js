@@ -101,7 +101,7 @@ const _sfc_main = {
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_assets._imports_0$4,
+        a: common_assets._imports_0$6,
         b: common_vendor.o(goBack),
         c: user.value.avatar,
         d: common_vendor.t(user.value.nickname),
@@ -137,7 +137,7 @@ const _sfc_main = {
             b: idx
           };
         }),
-        s: common_assets._imports_2$2,
+        s: common_assets._imports_2$1,
         t: common_assets._imports_3$2,
         v: common_assets._imports_4$1,
         w: common_vendor.f(tabs, (tab, idx, i0) => {

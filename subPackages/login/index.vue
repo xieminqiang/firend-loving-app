@@ -32,7 +32,7 @@
       <!-- Logo和标题区域 -->
       <view class="header-section">
         <view class="logo-container">
-          <image src="/static/logo.png" class="logo" mode="aspectFill"></image>
+          <image src="@/static/logo.png" class="logo" mode="aspectFill"></image>
           <view class="logo-glow"></view>
         </view>
         <view class="title-container">
@@ -86,9 +86,11 @@
 import { ref } from 'vue'
 import { wxLogin } from '@/api/user.js'
 import { useUserStore } from '@/stores/user.js'
+import { useLevelStore } from '@/stores/level.js'
 import { onLoad } from '@dcloudio/uni-app'
 
 const userStore = useUserStore()
+const levelStore = useLevelStore()
 const popup = ref(null)
 const isPopupOpen = ref(true)
 const hasAgreed = ref(false)
@@ -205,6 +207,9 @@ const getPhoneNumber = async (e) => {
       // 保存用户信息
       userStore.setUserInfo(result.data.data.token)
       
+      // 清除等级列表缓存，确保获取用户相关的等级信息
+      levelStore.clearServiceLevels()
+      
       // 发送登录成功事件，通知其他页面刷新数据
       uni.$emit('loginSuccess', {
         userInfo: result.data.data
@@ -268,13 +273,13 @@ const getPhoneNumber = async (e) => {
   justify-content: center;
   background: rgba(255, 255, 255, 0.15);
   border-radius: 50%;
-  backdrop-filter: blur(10rpx);
+
   margin-top: 10px;
 }
 
 .back-icon {
-  width: 32rpx;
-  height: 32rpx;
+  width: 36rpx;
+  height: 36rpx;
   filter: brightness(0) saturate(100%) invert(100%);
 }
 
@@ -599,7 +604,7 @@ const getPhoneNumber = async (e) => {
 
 .link-text {
   color: #FFEAA7;
-  text-decoration: underline;
+
   font-weight: 500;
 }
 

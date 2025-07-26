@@ -2,6 +2,7 @@
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
 const stores_level = require("./stores/level.js");
+require("./stores/user.js");
 const stores_index = require("./stores/index.js");
 if (!Math) {
   "./pages/tabbar/home/index.js";
@@ -24,23 +25,47 @@ if (!Math) {
 }
 const _sfc_main = {
   onLaunch: function() {
-    common_vendor.index.__f__("log", "at App.vue:6", "App Launch");
+    common_vendor.index.__f__("log", "at App.vue:7", "App Launch");
+    this.clearServiceLevels();
     this.initServiceLevels();
   },
   onShow: function() {
-    common_vendor.index.__f__("log", "at App.vue:11", "App Show");
+    common_vendor.index.__f__("log", "at App.vue:14", "App Show");
+    this.checkAndUpdateServiceLevels();
   },
   onHide: function() {
-    common_vendor.index.__f__("log", "at App.vue:14", "App Hide");
+    common_vendor.index.__f__("log", "at App.vue:19", "App Hide");
   },
   methods: {
+    // 清除服务等级列表
+    clearServiceLevels() {
+      try {
+        const levelStore = stores_level.useLevelStore();
+        levelStore.clearServiceLevels();
+        common_vendor.index.__f__("log", "at App.vue:27", "服务等级列表已清除");
+      } catch (error) {
+        common_vendor.index.__f__("error", "at App.vue:29", "清除服务等级列表失败:", error);
+      }
+    },
+    // 检查并更新服务等级列表
+    async checkAndUpdateServiceLevels() {
+      try {
+        const levelStore = stores_level.useLevelStore();
+        if (levelStore.needUpdate || levelStore.serviceLevels.length === 0) {
+          common_vendor.index.__f__("log", "at App.vue:39", "检测到等级列表需要更新，重新获取...");
+          await levelStore.fetchServiceLevels();
+        }
+      } catch (error) {
+        common_vendor.index.__f__("error", "at App.vue:43", "检查更新服务等级列表失败:", error);
+      }
+    },
     async initServiceLevels() {
       try {
         const levelStore = stores_level.useLevelStore();
         await levelStore.fetchServiceLevels();
-        common_vendor.index.__f__("log", "at App.vue:21", "服务等级列表初始化完成");
+        common_vendor.index.__f__("log", "at App.vue:51", "服务等级列表初始化完成");
       } catch (error) {
-        common_vendor.index.__f__("error", "at App.vue:23", "初始化服务等级列表失败:", error);
+        common_vendor.index.__f__("error", "at App.vue:53", "初始化服务等级列表失败:", error);
       }
     }
   }

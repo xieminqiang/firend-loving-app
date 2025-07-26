@@ -71,19 +71,21 @@
 
 <script setup>
 	import {
-		ref,
-		reactive,
-		computed,
-		onMounted,
-		onUnmounted
-	} from 'vue'
-	import {
-		onShow,
-		onLoad
-	} from '@dcloudio/uni-app';
-	import { useUserStore } from '@/stores/user.js'
-	
-	const userStore = useUserStore()   
+	ref,
+	reactive,
+	computed,
+	onMounted,
+	onUnmounted
+} from 'vue'
+import {
+	onShow,
+	onLoad
+} from '@dcloudio/uni-app';
+import { useUserStore } from '@/stores/user.js'
+import { useLevelStore } from '@/stores/level.js'
+
+const userStore = useUserStore()
+const levelStore = useLevelStore()   
 	
 	// 使用computed响应式计算登录状态
 	const isLogin = computed(() => {
@@ -198,6 +200,9 @@
 		    
 		    // 清除用户信息
 		    userStore.clearUserInfo()
+		    
+		    // 清除等级列表缓存，确保下次登录时获取最新数据
+		    levelStore.clearServiceLevels()
 		    
 		    // 发送退出登录事件，通知其他页面刷新
 		    uni.$emit('logoutSuccess')
