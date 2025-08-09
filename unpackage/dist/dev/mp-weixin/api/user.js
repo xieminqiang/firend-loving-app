@@ -81,12 +81,28 @@ const getServiceLevels = () => {
     method: "GET"
   });
 };
+const getCompanionSchedule = (data) => {
+  return config_http.http({
+    url: "/front/companion/schedule",
+    method: "GET",
+    data
+  });
+};
+const saveCompanionSchedule = (data) => {
+  return config_http.http({
+    url: "/front/companion/schedule",
+    method: "PUT",
+    data
+  });
+};
 exports.createCompanionApplication = createCompanionApplication;
 exports.getApplicatioInfo = getApplicatioInfo;
+exports.getCompanionSchedule = getCompanionSchedule;
 exports.getPersonalityTags = getPersonalityTags;
 exports.getServiceLevels = getServiceLevels;
 exports.getServicesByCities = getServicesByCities;
 exports.getUserInfo = getUserInfo;
+exports.saveCompanionSchedule = saveCompanionSchedule;
 exports.updateCompanionApplication = updateCompanionApplication;
 exports.updateCompanionOnlineStatus = updateCompanionOnlineStatus;
 exports.uploadCompanionVideo = uploadCompanionVideo;

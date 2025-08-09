@@ -1,18 +1,5 @@
 <template>
   <view class="level-container">
-    <!-- 顶部状态栏适配 -->
-    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
-    
-    <!-- 顶部导航栏 -->
-    <view class="nav-bar">
-      <view class="back-btn" @click="goBack">
-        <image src="@/static/icons/common/arrow-left.png" class="back-icon" mode="aspectFit" />
-        <text class="back-text">返回</text>
-      </view>
-      <text class="nav-title">等级中心</text>
-      <view class="placeholder"></view>
-    </view>
-    
     <!-- 主内容区域 -->
     <view class="main-content">
       <scroll-view 
@@ -198,7 +185,6 @@ import { getApplicatioInfo } from '@/api/user.js'
 import { useLevelStore } from '@/stores/level.js'
 
 // 响应式数据
-const statusBarHeight = ref(0)
 const isRefreshing = ref(false)
 const currentLevel = ref(null)
 const userGrowthValue = ref(0)
@@ -223,10 +209,7 @@ const progressPercentage = computed(() => {
   return Math.min(percentage, 100)
 })
 
-// 方法
-const goBack = () => {
-  uni.navigateBack()
-}
+
 
 const onRefresh = async () => {
   isRefreshing.value = true
@@ -293,10 +276,6 @@ const loadData = async () => {
 
 // 生命周期
 onMounted(() => {
-  // 获取状态栏高度
-  const systemInfo = uni.getSystemInfoSync()
-  statusBarHeight.value = systemInfo.statusBarHeight || 0
-  
   // 加载数据
   loadData()
 })
@@ -304,59 +283,27 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .level-container {
-  min-height: 100vh;
+  height: 100vh;
   background: linear-gradient(135deg, #F7F8FA 0%, #FFFFFF 100%);
-}
-
-.status-bar {
-  background: #FFFFFF;
-}
-
-.nav-bar {
-  background: #FFFFFF;
-  height: 88rpx;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 32rpx;
-  border-bottom: 1rpx solid #f0f0f0;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  flex-direction: column;
 }
 
-.back-btn {
-  display: flex;
-  align-items: center;
-  padding: 10rpx;
-}
 
-.back-icon {
-  width: 32rpx;
-  height: 32rpx;
-  margin-right: 10rpx;
-}
-
-.back-text {
-  font-size: 28rpx;
-  color: #666666;
-}
-
-.nav-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1A1A1A;
-}
-
-.placeholder {
-  width: 80rpx;
-}
 
 .main-content {
   flex: 1;
-  padding: 20rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  height: 0; /* 关键：让flex子元素能够正确计算高度 */
 }
 
 .scroll-container {
-  height: calc(100vh - 200rpx);
+  height: 100%;
+  box-sizing: border-box;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .modern-card {
@@ -412,6 +359,7 @@ onMounted(() => {
 .current-level-card {
   background: #FFFFFF;
   color: #1A1A1A;
+  margin-top: 20rpx;
 }
 
 .level-header {

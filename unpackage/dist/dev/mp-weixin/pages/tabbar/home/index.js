@@ -216,7 +216,7 @@ const _sfc_main = {
           await cityStore.loadCityList();
         }
         common_vendor.index.__f__("log", "at pages/tabbar/home/index.vue:466", `下拉刷新${tab}选项卡数据`);
-        await loadSingleTabData(tab, true);
+        await loadSingleTabData(tab, false);
         await new Promise((resolve) => setTimeout(resolve, 800));
       } catch (error) {
         common_vendor.index.__f__("error", "at pages/tabbar/home/index.vue:471", "刷新失败:", error);
@@ -295,7 +295,7 @@ const _sfc_main = {
               };
             })
           } : dataLoaded.value[tab] && getTabServiceItems(tab).length === 0 ? {
-            e: common_assets._imports_0,
+            e: common_assets._imports_3,
             f: common_vendor.t(tab)
           } : {}, {
             b: getTabServiceItems(tab).length > 0,

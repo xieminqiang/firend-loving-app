@@ -1,17 +1,6 @@
 <template>
   <view class="data-edition-container">
-    <!-- 顶部状态栏适配 -->
-    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
-    
-    <!-- 顶部导航栏 -->
-    <view class="nav-bar">
-      <view class="back-btn" @click="goBack">
-        <image src="@/static/icons/common/arrow-left.png" class="back-icon" mode="aspectFit" />
-        <text class="back-text">返回</text>
-      </view>
-      <text class="nav-title">资料编辑</text>
 
-    </view>
     
     <!-- 主内容区域 -->
     <view class="main-content">

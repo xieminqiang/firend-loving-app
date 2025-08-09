@@ -17,7 +17,7 @@ import pinia from './stores'
 
 export function createApp() {
   const app = createSSRApp(App)
-    app.config.globalProperties.$imgBaseUrl = 'https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com';
+    app.config.globalProperties.$imgBaseUrl = 'https://sbx-server.oss-cn-shenzhen.aliyuncs.com';
   app.use(pinia)
   return {
     app

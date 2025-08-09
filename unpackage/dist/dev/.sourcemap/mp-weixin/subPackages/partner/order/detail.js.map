@@ -1,0 +1,1 @@
+{"version":3,"file":"detail.js","sources":["subPackages/partner/order/detail.vue?type=page"],"sourcesContent":["import MiniProgramPage from '/Users/xiaoqiang/Documents/friemd/firend-loving-app/subPackages/partner/order/detail.vue'\nwx.createPage(MiniProgramPage)"],"names":[],"mappings":";;;;;;;AACA,GAAG,WAAW,eAAe;"}

@@ -66,9 +66,9 @@
                    <view class="partner-meta">{{ p.age }}  ·  {{p.height }}cm  ·  {{ p.weight  }}kg</view>
 
                 </view>
-                <view class="partner-meta-distance" v-if="p.distance > 0">
+                <view class="partner-meta-distance" >
                   <image src="/static/icons/friend/address.png" class="distance-icon" mode="aspectFit" />
-                  <text>{{ p.distance }}km</text>
+                  <text>{{ p.distance }}</text>
                 </view>
 
               </view>
@@ -79,7 +79,7 @@
               </view>
               <view class="partner-actions flex-between">
                 <view ></view>
-                <view class="schedule-btn" @click.stop="navigateToBooking(p)">
+                <view class="schedule-btn" @click.stop="openServicePopup(p)">
                   <text>立即邀约</text>
                 </view>
               </view>
@@ -137,12 +137,52 @@
       v-model:visible="showCityPicker" 
       @city-selected="onCitySelected"
     />
+
+    <!-- 服务选择弹窗 -->
+    <uni-popup ref="servicePopup" type="bottom" :mask-click="true" @close="closeServicePopup" round="20" :safe-area="false">
+      <view class="service-popup-content">
+        <view class="service-popup-header">
+          <text class="service-popup-title">选择服务项目</text>
+          <view class="close-popup-btn" @click="closeServicePopup">
+            <image src="@/static/icons/friend/close.png" class="close-popup-icon" mode="aspectFit" />
+          </view>
+        </view>
+        <view class="service-popup-body">
+          <scroll-view 
+            class="service-scroll-view" 
+            scroll-y="true"
+            :scroll-top="scrollTop"
+            :scroll-with-animation="true"
+          >
+            <view v-if="currentPartnerServices.length > 0" class="service-list">
+              <view class="service-item" v-for="item in currentPartnerServices" :key="item.title">
+                <image :src="item.img" class="service-img" mode="aspectFill" />
+                <view class="service-info">
+                  <text class="service-title">{{ item.title }}</text>
+                  <view class="service-tags">
+                    <text v-for="tag in item.tags" :key="tag" class="service-tag">{{ tag }}</text>
+                  </view>
+                  <view class="service-bottom-row">
+                    <text class="service-price">{{ item.price }}元/{{ item.unit || '小时' }}起</text>
+                    <view class="order-btn" @click="goToSubmit(item)">去下单</view>
+                  </view>
+                </view>
+              </view>
+            </view>
+            <view v-else class="empty-service-state">
+              <image src="/static/images/empty.png" class="empty-service-icon" mode="aspectFit" />
+              <text class="empty-service-text">~暂无服务项目~</text>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </uni-popup>
   </view>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { searchCompanions } from '@/api/friends.js'
+import { searchCompanions, getCityServices } from '@/api/friends.js'
 import { createOrder, orderParams } from '@/api/order.js'
 import { useLevelStore } from '@/stores/level.js'
 import { useCityStore } from '@/stores/city.js'
@@ -265,7 +305,7 @@ const getFilterOptions = computed(function() {
       // 动态生成级别选项，使用全局缓存的服务等级列表
       ...levelStore.sortedServiceLevels.map(level => ({
         value: level.level_order.toString(),
-        label: `${level.level_name}级别`,
+        label: `${level.level_name}`,
         icon: level.icon_url || '/static/icons/friend/star.png'
       }))
     ],
@@ -345,99 +385,74 @@ const refreshRecommend = () => {
   searchCompanionsData(true)
 }
 
-// 立即邀约 - 创建订单
-const navigateToBooking = async (item) => {
- 
+// 服务选择弹窗相关数据
+const servicePopup = ref(null)
+const currentPartnerServices = ref([])
+const currentPartner = ref(null)
+const scrollTop = ref(0)
 
-  try {
-    // 显示加载提示
-    uni.showLoading({
-      title: '创建订单中...'
-    })
-
+// 打开服务选择弹窗
+const openServicePopup = async (partner) => {
+  currentPartner.value = partner
   
-    // 构建订单参数
-    const orderData = {
-      companion_id: item.id,
-      service_id: 3, // 取第一个服务ID
-      city_code: cityStore.currentCityCode || 110100, // 当前选中的城市代码
-      quantity: 3, // 固定数量
-      service_address: "北京市朝阳区三里屯", // 固定地址
-      service_date: "2025-01-28", // 固定日期
-      service_time: "14:00-16:00", // 固定时间
-      remark: "请准时到达", // 固定备注
-      user_latitude: cityStore.userLocation?.latitude || 39.9042, // 用户当前纬度
-      user_longitude: cityStore.userLocation?.longitude || 116.4074 // 用户当前经度
+  try {
+    // 获取该友伴师的服务信息
+    const requestParams = {
+      city_code: cityStore.currentCityCode,
+      application_id: partner.id
     }
-
-    console.log('创建订单参数:', orderData)
-
-    // 调用创建订单接口
-    const response = await createOrder(orderData)
-
-    // 隐藏加载提示
-    uni.hideLoading()
-
+    
+    // 添加经纬度参数
+    if (latitude.value && longitude.value) {
+      requestParams.latitude = parseFloat(latitude.value)
+      requestParams.longitude = parseFloat(longitude.value)
+    }
+    
+    const response = await getCityServices(requestParams)
+    
     if (response.data && response.data.code === 0) {
-      // 创建成功
-      uni.showToast({
-        title: '邀约成功',
-        icon: 'success'
-      })
-      
-      // 调用订单创建成功接口
-      try {
-        const orderParamsData = {
-          order_id: response.data.data.order_id,
-          payment_method: 1
-        }
-        
-        const paramsResponse = await orderParams(orderParamsData)
-        console.log('订单参数接口调用成功:', paramsResponse.data)
+      const data = response.data.data
+      if (data && data.services && data.services.length > 0) {
+        currentPartnerServices.value = data.services.map(service => ({
+          title: service.service_name,
+          img: "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com" + service.service_image_url || '',
+          tags: service.service_tags || [],
+          price: service.price,
+          service_id: service.service_id,
+          price_template_id: service.price_template_id || '',
+          unit: service.unit,
+          min_quantity: service.min_quantity
 		
-		uni.requestPayment({
-			provider: 'wxpay',
-			...paramsResponse.data.data.pay_params,
-			success: (res) => {
-				console.log('支付成功', res);
-				uni.showToast({
-					title: '支付成功',
-					icon: 'success',
-				});
-				// 支付成功后跳转到订单列表，传递刷新参数
-			
-			},
-			fail: (err) => {
-				console.error('支付失败', JSON.stringify(err));
-			
-			},
-		});
-				
-		
-      } catch (paramsError) {
-        console.error('订单参数接口调用失败:', paramsError)
+        })) 
+	
+      } else {
+        currentPartnerServices.value = []
       }
-      
-      // 可以在这里跳转到订单详情页或其他页面
-      console.log('订单创建成功:', response.data.data)
     } else {
-      // 创建失败
-      const errorMsg = response.data?.message || '创建订单失败'
-      uni.showToast({
-        title: errorMsg,
-        icon: 'none'
-      })
+      currentPartnerServices.value = []
     }
   } catch (error) {
-    // 隐藏加载提示
-    uni.hideLoading()
-    
-    console.error('创建订单失败:', error)
-    uni.showToast({
-      title: '创建订单失败，请重试',
-      icon: 'none'
-    })
+    console.error('获取服务信息失败:', error)
+    currentPartnerServices.value = []
   }
+  
+  servicePopup.value.open()
+}
+
+// 关闭服务选择弹窗
+const closeServicePopup = () => {
+  servicePopup.value.close()
+}
+
+// 跳转到订单提交页面
+const goToSubmit = (item) => {
+  console.log('选择服务:', item)
+  closeServicePopup()
+  
+  // 跳转到订单提交页面
+  uni.navigateTo({
+    url: `/subPackages/order/submit?service_id=${item.service_id}&price_template_id=${item.price_template_id || ''}&companion_id=${currentPartner.value.id}&level_order=${currentPartner.value.level_order || ''}&nickname=${currentPartner.value.name}`
+  })
 }
 
 // 导航到详情页
@@ -527,6 +542,7 @@ const searchCompanionsData = async (isRefresh = false) => {
     if (latitude.value && longitude.value) {
       params.latitude = latitude.value
       params.longitude = longitude.value
+    
     }
     
     // 添加筛选条件
@@ -555,7 +571,7 @@ const searchCompanionsData = async (isRefresh = false) => {
           age: item.age,
           height: item.height,
           weight: item.weight,
-          distance: item.distance ? parseFloat(item.distance) : 0,
+          distance: item.distance,
           tags: item.tags || [],
           services: (() => {
             if (typeof item.services === 'string') {
@@ -568,7 +584,7 @@ const searchCompanionsData = async (isRefresh = false) => {
             }
             return item.services || []
           })(), // 安全解析JSON字符串数组
-          avatar: item.photos && item.photos.length > 0 ? item.photos[0] : 'https://images.pexels.com/photos/1391498/pexels-photo-1391498.jpeg?auto=compress&cs=tinysrgb&w=120&h=160&fit=crop',
+          avatar: item.avatar ,
           online: item.is_online === 1,
           bookable: item.can_accept_orders === 'Y'
         }))
@@ -679,6 +695,8 @@ const onCitySelected = async (index) => {
   // 重新搜索数据
   await searchCompanionsData(true)
 }
+
+
 
 onMounted(async () => {
   // 获取状态栏高度和胶囊按钮信息
@@ -1164,6 +1182,158 @@ onUnmounted(() => {
   font-size: 28rpx;
   color: #666666;
   font-weight: 500;
+}
+
+/* 服务选择弹窗样式 */
+.service-popup-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+  border-radius: 24rpx 24rpx 0 0;
+  overflow: hidden;
+}
+
+.service-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  border-bottom: 1rpx solid rgba(115, 99, 255, 0.1);
+}
+
+.service-popup-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.close-popup-btn {
+  padding: 8rpx;
+}
+
+.close-popup-icon {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+.service-popup-body {
+  flex: 1;
+  padding: 24rpx 32rpx;
+  box-sizing: border-box;
+}
+
+.service-scroll-view {
+  height: 600rpx;
+  width: 100%;
+}
+
+.service-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  padding-bottom: 20rpx;
+}
+
+.service-item {
+  display: flex;
+  align-items: center;
+
+
+  box-sizing: border-box;
+}
+
+.service-img {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+}
+
+.service-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.service-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.service-title {
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+}
+
+.service-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 8rpx;
+}
+
+.service-tag {
+  font-size: 18rpx;
+  color: #7363FF;
+  background: rgba(115, 99, 255, 0.1);
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid rgba(115, 99, 255, 0.2);
+}
+
+.service-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8rpx;
+}
+
+.service-price {
+  font-size: 24rpx;
+  color: #f43f5e;
+  font-weight: 600;
+}
+
+.order-btn {
+  width: 160rpx;
+  height: 64rpx;
+  border-radius: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4rpx 12rpx rgba(115, 99, 255, 0.3);
+}
+
+.empty-service-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 60rpx;
+  text-align: center;
+}
+
+.empty-service-icon {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 32rpx;
+  opacity: 0.6;
+}
+
+.empty-service-text {
+  font-size: 32rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+  margin-bottom: 16rpx;
 }
 
 </style> 

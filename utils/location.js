@@ -11,8 +11,8 @@ let locationCache = {
   timestamp: 0
 }
 
-// 缓存有效期（毫秒）- 30分钟
-const CACHE_DURATION = 5 * 60 * 1000
+// 缓存有效期（毫秒）- 1分钟
+const CACHE_DURATION = 2 * 60 * 1000
 
 // 位置变化阈值（米）- 如果位置变化小于此值，使用缓存地址
 const LOCATION_THRESHOLD = 100

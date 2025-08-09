@@ -5,8 +5,12 @@ const api_user = require("../../api/user.js");
 const stores_user = require("../../stores/user.js");
 const stores_level = require("../../stores/level.js");
 if (!Array) {
-  const _component_uni_popup = common_vendor.resolveComponent("uni-popup");
-  _component_uni_popup();
+  const _easycom_uni_popup2 = common_vendor.resolveComponent("uni-popup");
+  _easycom_uni_popup2();
+}
+const _easycom_uni_popup = () => "../../uni_modules/uni-popup/components/uni-popup/uni-popup.js";
+if (!Math) {
+  _easycom_uni_popup();
 }
 const _sfc_main = {
   __name: "index",
@@ -115,7 +119,7 @@ const _sfc_main = {
     };
     return (_ctx, _cache) => {
       return {
-        a: common_assets._imports_0$5,
+        a: common_assets._imports_0$2,
         b: common_vendor.o(handleBack),
         c: common_assets._imports_1$5,
         d: common_vendor.o(getPhoneNumber),

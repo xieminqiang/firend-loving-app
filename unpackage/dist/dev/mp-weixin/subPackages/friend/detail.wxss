@@ -1,15 +1,15 @@
 
 .personal-data-container.data-v-21c5b98b {
     background: #fff;
-    min-height: 100vh;
+    height: 100vh;
     font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
 }
 .profile-header-block.data-v-21c5b98b {
-    margin-top: 50rpx;
-    background: #f8f9fb;
+    margin-top: 0;
+
     border-radius: 0 0 32rpx 32rpx;
     box-shadow: 0 4rpx 24rpx rgba(115,99,255,0.06);
-    padding: 36rpx 32rpx 24rpx 10rpx;
+    padding: 0rpx 0rpx 24rpx 20rpx;
     margin-bottom: 0;
     position: relative;
     z-index: 11;
@@ -26,25 +26,16 @@
     min-width: 0;
     padding-right: 20rpx; /* 为胶囊按钮留出空间 */
 }
-.back-btn-icon.data-v-21c5b98b {
-    width: 50rpx;
-    height: 50rpx;
-    display: block;
-    margin-right: 12rpx;
-    padding-left: 16rpx;
-    filter: grayscale(1) brightness(1.8);
-}
 .avatar-wrap.data-v-21c5b98b {
     position: relative;
     margin-right: 18rpx;
 }
 .avatar.data-v-21c5b98b {
-    width: 80rpx;
-    height: 80rpx;
+    width: 72rpx;
+    height: 72rpx;
     border-radius: 50%;
-    border: 4rpx solid #fff;
+ 
     object-fit: cover;
-    box-shadow: 0 4rpx 16rpx rgba(115,99,255,0.10);
 }
 .online-dot.data-v-21c5b98b {
     position: absolute;
@@ -69,11 +60,11 @@
     gap: 10rpx;
 }
 .nickname.data-v-21c5b98b {
-    font-size: 24rpx;
+    font-size: 26rpx;
     font-weight: 600;
     color: #222;
     margin-right: 4rpx;
-    max-width: 180rpx;
+    max-width: 200rpx;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -96,7 +87,7 @@
     margin-top: 8rpx;
     max-width: 100%;
     word-break: break-all;
-    margin-right: 60px;
+    margin-right: 20rpx;
 }
 .user-tag.data-v-21c5b98b {
     font-size: 18rpx;
@@ -116,12 +107,12 @@
 }
 .banner-swiper-inner.data-v-21c5b98b {
     width: 100%;
-    height: 340rpx;
+    height: 420rpx;
     overflow: hidden;
 }
 .banner-img.data-v-21c5b98b {
     width: 100%;
-    height: 340rpx;
+    height: 420rpx;
     object-fit: cover;
 }
 .profile-meta-topbar.data-v-21c5b98b {
@@ -296,10 +287,9 @@
     align-items: center;
     background: #fff;
     border-radius: 24rpx;
-    margin: 32rpx 24rpx 0 24rpx;
+    margin: 0rpx 24rpx 0 24rpx;
     box-shadow: 0 4rpx 24rpx rgba(115,99,255,0.06);
     padding: 0 8rpx;
-    height: 90rpx;
 }
 .profile-tab.data-v-21c5b98b {
     flex: 1;

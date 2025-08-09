@@ -16,7 +16,7 @@
           <view v-if="isLoggedIn" class="user-profile" @click="navigateToUserDetail">
             <view class="avatar-container">
               <view class="avatar-circle">
-                <image v-if="userInfo.avatar" :src="userInfo.avatar" class="avatar-img" mode="aspectFill" />
+                <image v-if="userInfo.head_img" :src="$imgBaseUrl + userInfo.head_img" class="avatar-img" mode="aspectFill" />
                 <text v-else class="avatar-placeholder">{{ userInfo.nickname?.charAt(0) || '用' }}</text>
                 <view class="avatar-border"></view>
               </view>
@@ -28,33 +28,12 @@
             
               </view>
               <view class="user-phone">{{ formatPhone(userInfo.phone) || '未绑定手机号' }}</view>
-              <view class="user-auth">
-                <view class="level-progress">
-                  <view class="level-bar">
-                    <view class="level-progress-inner" :style="{ width: userInfo.levelProgress + '%' }"></view>
-                    <view class="level-glow"></view>
-                  </view>
-                  <text class="level-text">Lv.{{ userInfo.level || 1 }}</text>
-                </view>
-              </view>
+              
             </view>
           </view>
 
           <!-- 未登录状态 -->
           <view v-else class="login-prompt">
-            <!-- 装饰性背景元素 -->
-            <view class="bg-decoration">
-              <view class="floating-dot dot-1"></view>
-              <view class="floating-dot dot-2"></view>
-              <view class="floating-dot dot-3"></view>
-              <view class="floating-dot dot-4"></view>
-              <view class="floating-stars">
-                <view class="star star-1">✨</view>
-                <view class="star star-2">💫</view>
-                <view class="star star-3">⭐</view>
-              </view>
-            </view>
-            
             <view class="prompt-content">
               
               <!-- 文字内容 -->
@@ -63,27 +42,18 @@
                 <view class="welcome-subtitle">登录后解锁更多精彩功能</view>
               </view>
               
-              <!-- 功能亮点 -->
+                            <!-- 功能亮点 -->
               <view class="quick-benefits">
                 <view class="benefit-item">
-                  <view class="benefit-icon-wrapper">
-                    <image src="@/static/icons/profile/heart.png" class="benefit-icon" mode="aspectFit" />
-                    <view class="icon-glow"></view>
-                  </view>
+                  <image src="@/static/icons/profile/heart.png" class="benefit-icon" mode="aspectFit" />
                   <text class="benefit-text">兴趣匹配</text>
                 </view>
                 <view class="benefit-item">
-                  <view class="benefit-icon-wrapper">
-                    <image src="@/static/icons/profile/clock.png" class="benefit-icon" mode="aspectFit" />
-                    <view class="icon-glow"></view>
-                  </view>
+                  <image src="@/static/icons/profile/clock.png" class="benefit-icon" mode="aspectFit" />
                   <text class="benefit-text">快速预约</text>
                 </view>
                 <view class="benefit-item">
-                  <view class="benefit-icon-wrapper">
-                    <image src="@/static/icons/profile/shield.png" class="benefit-icon" mode="aspectFit" />
-                    <view class="icon-glow"></view>
-                  </view>
+                  <image src="@/static/icons/profile/shield.png" class="benefit-icon" mode="aspectFit" />
                   <text class="benefit-text">安全保障</text>
                 </view>
               </view>
@@ -92,7 +62,7 @@
               <view class="login-btn" @click="navigateToLogin">
                 <view class="btn-shine"></view>
                 <text class="login-btn-text">立即登录</text>
-                <image src="@/static/icons/common/jiantou.png" class="login-arrow" mode="aspectFit" />
+      
               </view>
             </view>
           </view>
@@ -100,56 +70,6 @@
       <!-- 页面内容 -->
       <view class="profile-content">
       
-
-        <!-- 快捷功能区 -->
-        <view class="quick-actions">
-          <view class="action-item" @click="handleActionClick('wallet')">
-            <view class="action-icon wallet-icon">
-              <image src="@/static/icons/profile/wallet.png" class="icon-img" mode="aspectFit" />
-            </view>
-            <text class="action-text">我的钱包</text>
-          </view>
-          <view class="action-item" @click="handleActionClick('coupons')">
-            <view class="action-icon coupon-icon">
-              <image src="@/static/icons/profile/coupon.png" class="icon-img" mode="aspectFit" />
-              <text v-if="couponsCount > 0" class="action-badge">{{ couponsCount }}</text>
-            </view>
-            <text class="action-text">优惠券</text>
-          </view>
-          <view class="action-item" @click="handleActionClick('favorites')">
-            <view class="action-icon favorite-icon">
-              <image src="@/static/icons/profile/heart.png" class="icon-img" mode="aspectFit" />
-            </view>
-            <text class="action-text">我的收藏</text>
-          </view>
-          <view class="action-item" @click="handleActionClick('history')">
-            <view class="action-icon history-icon">
-              <image src="@/static/icons/profile/history.png" class="icon-img" mode="aspectFit" />
-            </view>
-            <text class="action-text">浏览历史</text>
-          </view>
-        </view>
-
-        <!-- 账户余额卡片 -->
-        <view class="account-card">
-          <view class="card-header">
-            <text class="card-title">账户余额(元)</text>
-            <view class="view-details" @click="navigateToBillDetails">
-              <text class="details-text">账单明细</text>
-              <image src="@/static/icons/common/arrow-right.png" class="details-arrow" mode="aspectFit" />
-            </view>
-          </view>
-          <view class="balance-amount">¥ {{ accountBalance }}</view>
-          <view class="card-actions">
-            <view class="action-btn withdraw-btn" @click="handleWithdraw">
-              <text>立即提现</text>
-            </view>
-            <view class="action-btn recharge-btn" @click="handleRecharge">
-              <text>充值</text>
-            </view>
-          </view>
-        </view>
-        
         <!-- 订单管理 -->
         <view class="section-container">
           <view class="section-header">
@@ -162,27 +82,28 @@
           <view class="orders-grid">
             <view class="order-item" @click="navigateToOrders('pending_payment')">
               <view class="order-icon">
-                <image src="@/static/icons/profile/credit-card.png" class="order-icon-img" mode="aspectFit" />
+                <image src="@/static/icons/profile/dai_order.png" class="order-icon-img" mode="aspectFit" />
                 <text v-if="orderCounts.pending > 0" class="order-badge">{{ orderCounts.pending }}</text>
               </view>
               <text class="order-text">待付款</text>
             </view>
             <view class="order-item" @click="navigateToOrders('pending_service')">
               <view class="order-icon">
-                <image src="@/static/icons/profile/heart.png" class="order-icon-img" mode="aspectFit" />
+                <image src="@/static/icons/profile/daifuwu.png" class="order-icon-img" mode="aspectFit" />
+                <text v-if="orderCounts.pending_service > 0" class="order-badge">{{ orderCounts.pending_service }}</text>
               </view>
               <text class="order-text">待服务</text>
             </view>
             <view class="order-item" @click="navigateToOrders('in_service')">
               <view class="order-icon">
-                <image src="@/static/icons/profile/clock.png" class="order-icon-img" mode="aspectFit" />
+                <image src="@/static/icons/profile/fwzh.png" class="order-icon-img" mode="aspectFit" />
                 <text v-if="orderCounts.inProgress > 0" class="order-badge">{{ orderCounts.inProgress }}</text>
               </view>
               <text class="order-text">进行中</text>
             </view>
             <view class="order-item" @click="navigateToOrders('completed')">
               <view class="order-icon">
-                <image src="@/static/icons/profile/check.png" class="order-icon-img" mode="aspectFit" />
+                <image src="@/static/icons/profile/yiwancheng.png" class="order-icon-img" mode="aspectFit" />
               </view>
               <text class="order-text">已完成</text>
             </view>
@@ -190,7 +111,7 @@
         </view>
         
         <!-- 推广中心 -->
-        <view class="promotion-banner" @click="navigateToPromotion">
+        <!-- <view class="promotion-banner" @click="navigateToPromotion">
           <view class="promotion-content">
             <view class="promotion-info">
               <text class="promotion-title">邀请好友 得奖励</text>
@@ -201,76 +122,29 @@
               <text class="promotion-btn-text">立即邀请</text>
             </view>
           </view>
-        </view>
+        </view> -->
         
-        <!-- 常用功能 -->
-        <view class="section-container">
-          <view class="section-header">
-            <text class="section-title">常用功能</text>
-          </view>
-          <view class="features-grid">
-            <view class="feature-item" @click="navigateToReportReward">
-              <view class="feature-icon">
-                <image src="@/static/icons/profile/megaphone.png" class="feature-icon-img" mode="aspectFit" />
-              </view>
-              <text class="feature-text">举报有奖</text>
-            </view>
-            <view class="feature-item" @click="navigateToPartnerRegistration">
-              <view class="feature-icon">
-                <image src="@/static/icons/profile/flag.png" class="feature-icon-img" mode="aspectFit" />
-              </view>
-              <text class="feature-text" v-if="applicationInfo && applicationInfo.status && applicationInfo.status === 'approved'">友伴端</text>
-              <text class="feature-text" v-else>友伴入驻</text>
-            </view>
-            <view class="feature-item" @click="navigateToCooperation">
-              <view class="feature-icon">
-                <image src="@/static/icons/profile/handshake.png" class="feature-icon-img" mode="aspectFit" />
-              </view>
-              <text class="feature-text">合作加盟</text>
-            </view>
-            <view class="feature-item" @click="handleEmergencyCall">
-              <view class="feature-icon">
-                <image src="@/static/icons/profile/warning.png" class="feature-icon-img" mode="aspectFit" />
-              </view>
-              <text class="feature-text">一键报警</text>
-            </view>
-            <view class="feature-item" @click="navigateToHelp">
-              <view class="feature-icon">
-                <image src="@/static/icons/profile/help.png" class="feature-icon-img" mode="aspectFit" />
-              </view>
-              <text class="feature-text">帮助中心</text>
-            </view>
-            <view class="feature-item" @click="navigateToRefund">
-              <view class="feature-icon">
-                <image src="@/static/icons/profile/refund.png" class="feature-icon-img" mode="aspectFit" />
-              </view>
-              <text class="feature-text">退款售后</text>
-            </view>
-          </view>
-        </view>
+
         
         <!-- 设置列表 -->
         <view class="settings-list">
-          <view class="setting-item" @click="navigateToPrivacySettings">
+          <view class="setting-item" @click="navigateToPartnerRegistration">
             <view class="setting-icon">
-              <image src="@/static/icons/profile/shield.png" class="setting-icon-img" mode="aspectFit" />
+              <image src="@/static/icons/profile/friendship.png" class="setting-icon-img" mode="aspectFit" />
             </view>
-            <text class="setting-text">隐私设置</text>
-            <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
-          </view>
-          <view class="setting-item" @click="navigateToNotificationSettings">
-            <view class="setting-icon">
-              <image src="@/static/icons/profile/bell.png" class="setting-icon-img" mode="aspectFit" />
-            </view>
-            <text class="setting-text">消息通知</text>
+            <text class="setting-text" v-if="applicationInfo && applicationInfo.status && applicationInfo.status === 'approved'">友伴端</text>
+            <text class="setting-text" v-else>友伴入驻</text>
             <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
           </view>
           <view class="setting-item" @click="navigateToCustomerService">
             <view class="setting-icon">
-              <image src="@/static/icons/profile/headset.png" class="setting-icon-img" mode="aspectFit" />
+              <image src="@/static/icons/profile/kefu.png" class="setting-icon-img" mode="aspectFit" />
             </view>
             <text class="setting-text">联系客服</text>
             <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
+            <!-- #ifdef MP-WEIXIN -->
+            <button open-type="contact" class="kf_btn" @tap.stop></button>
+            <!-- #endif -->
           </view>
           <view class="setting-item" @click="navigateToSystemSettings">
             <view class="setting-icon">
@@ -282,7 +156,7 @@
         </view>
         
         <view class="app-version">
-          随伴行 v1.0.0
+          随伴行
         </view>
       </view>
     </scroll-view>
@@ -290,9 +164,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted,  computed } from 'vue'
+
+import {
+	onShow,
+	onLoad
+} from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user.js'
 import { getUserInfo, getApplicatioInfo } from '@/api/user.js'
+import { getOrderCount } from '@/api/order.js'
 
 // 用户状态管理
 const userStore = useUserStore()
@@ -317,23 +197,13 @@ const userInfo = computed(() => {
   if (isLoggedIn.value) {
     return userStore.userInfo
   }
-  return {
-    nickname: '用户昵称',
-    phone: '150****1947',
-    city: '南昌市',
-    avatar: '',
-    realNameAuth: false,
-    level: 1,
-    levelProgress: 10
-  }
+
 })
 
 // 数据状态
-const accountBalance = ref('0.00')
-const couponsCount = ref(3)
 const orderCounts = ref({
-  pending: 2,
-  inProgress: 1
+  pending: 0,
+  inProgress: 0
 })
 
 // 监听登录成功事件
@@ -341,14 +211,14 @@ const handleLoginSuccess = (data) => {
   console.log('收到登录成功事件:', data)
   // 重新加载用户数据
   loadUserData()
+  // 获取订单数量
+  loadOrderCount()
 }
 
 // 监听退出登录事件
 const handleLogoutSuccess = () => {
   console.log('收到退出登录事件')
   // 清除本地数据，状态会自动更新
-  accountBalance.value = '0.00'
-  couponsCount.value = 0
   orderCounts.value = {
     pending: 0,
     inProgress: 0
@@ -390,6 +260,13 @@ onMounted(() => {
   uni.$on('applicationStatusChanged', handleApplicationStatusChanged)
 })
 
+onShow(() => {
+  // 页面显示时，如果已登录则获取订单数量
+  if (isLoggedIn.value) {
+    loadOrderCount()
+  }
+})
+
 onUnmounted(() => {
   // 移除事件监听
   uni.$off('loginSuccess', handleLoginSuccess)
@@ -414,18 +291,10 @@ const loadUserData = async () => {
         const userData = response.data.data
         console.log('解析用户数据:', userData)
         
-        // 构造用户信息对象，映射字段名
-        const userInfo = {
-          nickname: userData.nick_name || '',
-          phone: userData.phone || '',
-          avatar: userData.head_img || '',
-          access_token: userStore.userInfo.access_token || '',
-          refresh_token: userStore.userInfo.refresh_token || '',
-         
-        }
+   
         
         // 更新用户状态
-         userStore.setUserInfo(userInfo)
+         userStore.setUserInfo(userData)
      
      
       } else {
@@ -437,6 +306,8 @@ const loadUserData = async () => {
 
     // 加载申请信息
     await loadApplicationInfo()
+    // 加载订单数量
+    await loadOrderCount()
   } else {
     console.log('用户未登录，跳过获取用户信息')
   }
@@ -458,6 +329,31 @@ const loadApplicationInfo = async () => {
   }
 }
 
+// 加载订单数量统计
+const loadOrderCount = async () => {
+  try {
+    console.log('开始请求订单数量统计')
+    const response = await getOrderCount()
+    console.log('订单数量统计请求成功:', response)
+    
+    if (response.data && response.data.code === 0) {
+      const data = response.data.data
+      console.log('待服务订单数:', data.pending_service_count)
+      console.log('待付款订单数:', data.pending_payment_count)
+      console.log('进行中订单数:', data.in_service_count)
+      
+      // 更新订单数量
+      orderCounts.value = {
+        pending: data.pending_payment_count || 0,
+        pending_service: data.pending_service_count || 0,
+        inProgress: data.in_service_count || 0
+      }
+    }
+  } catch (error) {
+    console.error('获取订单数量失败:', error)
+  }
+}
+
 // 导航到登录页面
 const navigateToLogin = () => {
   uni.navigateTo({
@@ -465,39 +361,7 @@ const navigateToLogin = () => {
   })
 }
 
-// 处理功能点击（需要登录验证）
-const handleActionClick = (action) => {
-  if (!isLoggedIn.value) {
-    uni.showModal({
-      title: '提示',
-      content: '请先登录后再使用此功能',
-      confirmText: '去登录',
-      cancelText: '取消',
-      success: (res) => {
-        if (res.confirm) {
-          navigateToLogin()
-        }
-      }
-    })
-    return
-  }
-  
-  // 已登录，执行对应功能
-  switch (action) {
-    case 'wallet':
-      navigateToWallet()
-      break
-    case 'coupons':
-      navigateToCoupons()
-      break
-    case 'favorites':
-      navigateToFavorites()
-      break
-    case 'history':
-      navigateToHistory()
-      break
-  }
-}
+
 
 // 导航方法
 const navigateToUserDetail = () => {
@@ -506,35 +370,7 @@ const navigateToUserDetail = () => {
   })
 }
 
-const navigateToWallet = () => {
-  uni.navigateTo({
-    url: '/subPackages/profile/wallet/index'
-  })
-}
 
-const navigateToCoupons = () => {
-  uni.navigateTo({
-    url: '/subPackages/profile/coupons/index'
-  })
-}
-
-const navigateToFavorites = () => {
-  uni.navigateTo({
-    url: '/subPackages/profile/favorites/index'
-  })
-}
-
-const navigateToHistory = () => {
-  uni.navigateTo({
-    url: '/subPackages/profile/history/index'
-  })
-}
-
-const navigateToBillDetails = () => {
-  uni.navigateTo({
-    url: '/subPackages/profile/bill-details/index'
-  })
-}
 
 const navigateToOrders = (status) => {
   console.log('跳转到订单页面，状态:', status)
@@ -547,12 +383,6 @@ const navigateToOrders = (status) => {
 const navigateToPromotion = () => {
   uni.navigateTo({
     url: '/subPackages/profile/promotion/index'
-  })
-}
-
-const navigateToReportReward = () => {
-  uni.navigateTo({
-    url: '/subPackages/profile/report-reward/index'
   })
 }
 
@@ -571,35 +401,7 @@ const navigateToPartnerRegistration = () => {
   }
 }
 
-const navigateToCooperation = () => {
-  uni.navigateTo({
-    url: '/subPackages/profile/cooperation/index'
-  })
-}
 
-const navigateToHelp = () => {
-  uni.navigateTo({
-    url: '/subPackages/profile/help/index'
-  })
-}
-
-const navigateToRefund = () => {
-  uni.navigateTo({
-    url: '/subPackages/profile/refund/index'
-  })
-}
-
-const navigateToPrivacySettings = () => {
-  uni.navigateTo({
-    url: '/subPackages/profile/privacy-settings/index'
-  })
-}
-
-const navigateToNotificationSettings = () => {
-  uni.navigateTo({
-    url: '/subPackages/profile/notification-settings/index'
-  })
-}
 
 const navigateToCustomerService = () => {
   uni.navigateTo({
@@ -613,66 +415,7 @@ const navigateToSystemSettings = () => {
   })
 }
 
-// 操作方法
-const handleWithdraw = () => {
-  if (!isLoggedIn.value) {
-    uni.showModal({
-      title: '提示',
-      content: '请先登录后再使用此功能',
-      confirmText: '去登录',
-      cancelText: '取消',
-      success: (res) => {
-        if (res.confirm) {
-          navigateToLogin()
-        }
-      }
-    })
-    return
-  }
-  
-  uni.showToast({
-    title: '提现功能待开发',
-    icon: 'none'
-  })
-}
 
-const handleRecharge = () => {
-  if (!isLoggedIn.value) {
-    uni.showModal({
-      title: '提示',
-      content: '请先登录后再使用此功能',
-      confirmText: '去登录',
-      cancelText: '取消',
-      success: (res) => {
-        if (res.confirm) {
-          navigateToLogin()
-        }
-      }
-    })
-    return
-  }
-  
-  uni.showToast({
-    title: '充值功能待开发',
-    icon: 'none'
-  })
-}
-
-const handleEmergencyCall = () => {
-  uni.showModal({
-    title: '一键报警',
-    content: '是否拨打紧急电话 110？',
-    confirmText: '拨打',
-    cancelText: '取消',
-    success: (res) => {
-      if (res.confirm) {
-        uni.makePhoneCall({
-          phoneNumber: '110'
-        })
-      }
-    }
-  })
-}
 
 // 下拉刷新处理
 const onRefresh = async () => {
@@ -722,7 +465,7 @@ const formatPhone = (phone) => {
 
 /* 顶部个人信息区 - 保留品牌渐变 */
 .profile-header {
-  padding: 32rpx 0 40rpx;
+  padding: 30rpx 0 30rpx;
   background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
   color: #FFFFFF;
   border-radius: 0 0 40rpx 40rpx;
@@ -768,12 +511,7 @@ const formatPhone = (phone) => {
   line-height: 1.4;
 }
 
-.user-auth {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12rpx;
-}
+/* .user-auth removed */
 
 /* 未登录状态样式 */
 .login-prompt {
@@ -786,86 +524,7 @@ const formatPhone = (phone) => {
   padding: 0 32rpx;
 }
 
-.bg-decoration {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
 
-.floating-dot {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  animation: float-dot 4s ease-in-out infinite;
-  backdrop-filter: blur(4rpx);
-}
-
-.dot-1 {
-  width: 24rpx;
-  height: 24rpx;
-  top: 15%;
-  left: 12%;
-  animation-delay: 0s;
-}
-
-.dot-2 {
-  width: 18rpx;
-  height: 18rpx;
-  top: 35%;
-  right: 18%;
-  animation-delay: 1.5s;
-}
-
-.dot-3 {
-  width: 16rpx;
-  height: 16rpx;
-  bottom: 25%;
-  left: 22%;
-  animation-delay: 3s;
-}
-
-.dot-4 {
-  width: 14rpx;
-  height: 14rpx;
-  top: 55%;
-  left: 30%;
-  animation-delay: 4.5s;
-}
-
-.floating-stars {
-  position: absolute;
-  top: 10%;
-  left: 20%;
-  right: 10%;
-  bottom: 20%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10rpx;
-}
-
-.star {
-  font-size: 20rpx;
-  opacity: 0.8;
-  animation: float-star 3s ease-in-out infinite;
-}
-
-.star-1 {
-  animation-delay: 0s;
-}
-
-.star-2 {
-  animation-delay: 1s;
-}
-
-.star-3 {
-  animation-delay: 2s;
-}
 
 .prompt-content {
   display: flex;
@@ -949,7 +608,7 @@ const formatPhone = (phone) => {
   justify-content: center;
   align-items: center;
   margin-bottom: 32rpx;
-  gap: 48rpx;
+  gap: 60rpx;
   flex-wrap: wrap;
 }
 
@@ -960,42 +619,20 @@ const formatPhone = (phone) => {
   min-width: 80rpx;
 }
 
-.benefit-icon-wrapper {
-  position: relative;
-  width: 36rpx;
-  height: 36rpx;
-  margin-bottom: 10rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.3s ease;
-}
-
 .benefit-icon {
-  width: 36rpx;
-  height: 36rpx;
+  width: 40rpx;
+  height: 40rpx;
   filter: brightness(0) saturate(100%) invert(100%);
   opacity: 0.9;
   transition: all 0.3s ease;
+  margin-bottom: 10rpx;
 }
 
 .benefit-text {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: rgba(255, 255, 255, 0.8);
   font-weight: 500;
   white-space: nowrap;
-}
-
-.icon-glow {
-  position: absolute;
-  top: -4rpx;
-  left: -4rpx;
-  right: -4rpx;
-  bottom: -4rpx;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: glow-pulse 2s ease-in-out infinite;
-  z-index: 1;
 }
 
 .login-btn {
@@ -1004,12 +641,11 @@ const formatPhone = (phone) => {
   justify-content: center;
   background: rgba(255, 255, 255, 0.25);
   border: 1rpx solid rgba(255, 255, 255, 0.35);
-  border-radius: 36rpx;
-  padding: 20rpx 40rpx;
-  backdrop-filter: blur(15rpx);
+  border-radius:999rpx;
+  padding: 10rpx 28rpx;
+
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.12);
-  min-width: 240rpx;
+
   position: relative;
   overflow: hidden;
 }
@@ -1058,8 +694,7 @@ const formatPhone = (phone) => {
   font-size: 28rpx;
   font-weight: 600;
   color: #FFFFFF;
-  margin-right: 12rpx;
-  text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.1);
+ 
 }
 
 .login-arrow {
@@ -1090,28 +725,7 @@ const formatPhone = (phone) => {
   opacity: 0.8;
 }
 
-/* 动画效果优化 */
-@keyframes float-dot {
-  0%, 100% {
-    transform: translateY(0px) scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translateY(-12rpx) scale(1.15);
-    opacity: 1;
-  }
-}
 
-@keyframes float-star {
-  0%, 100% {
-    transform: translateY(0px) scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translateY(-8rpx) scale(1.05);
-    opacity: 1;
-  }
-}
 
 @keyframes pulse-glow {
   0%, 100% {
@@ -1310,226 +924,18 @@ const formatPhone = (phone) => {
   padding-bottom: 80rpx;
 }
 
-/* 快捷功能区 - 简化设计 */
-.quick-actions {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
-  padding: 32rpx 0;
-  margin-bottom: 24rpx;
-  border: 1rpx solid #f0f0f0;
-}
 
-.action-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: all 0.2s;
-  
-  &:active {
-    transform: scale(0.96);
-  }
-}
 
-.action-icon {
-  position: relative;
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 16rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 12rpx;
-  transition: all 0.2s;
-}
 
-/* 功能图标配色 - 使用简约单色 */
-.wallet-icon {
-  background: #f8f9fa;
-  border: 1rpx solid #e9ecef;
-}
-
-.coupon-icon {
-  background: #f8f9fa;
-  border: 1rpx solid #e9ecef;
-}
-
-.favorite-icon {
-  background: #f8f9fa;
-  border: 1rpx solid #e9ecef;
-}
-
-.history-icon {
-  background: #f8f9fa;
-  border: 1rpx solid #e9ecef;
-}
-
-.icon-img {
-  width: 32rpx;
-  height: 32rpx;
-  filter: brightness(0) saturate(100%) invert(42%) sepia(12%) saturate(1142%) hue-rotate(184deg) brightness(97%) contrast(90%);
-}
-
-.action-badge {
-  position: absolute;
-  top: -8rpx;
-  right: -8rpx;
-  background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
-  color: #FFFFFF;
-  font-size: 20rpx;
-  font-weight: 600;
-  border-radius: 50%;
-  min-width: 28rpx;
-  height: 28rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4rpx 12rpx rgba(255, 71, 87, 0.4);
-  border: 2rpx solid rgba(255, 255, 255, 0.9);
-  animation: badge-pulse 2s ease-in-out infinite;
-  z-index: 10;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -2rpx;
-    left: -2rpx;
-    right: -2rpx;
-    bottom: -2rpx;
-    background: linear-gradient(135deg, rgba(255, 71, 87, 0.3) 0%, rgba(255, 55, 66, 0.3) 100%);
-    border-radius: 50%;
-    z-index: -1;
-    animation: badge-glow 2s ease-in-out infinite alternate;
-  }
-}
-
-.action-text {
-  font-size: 24rpx;
-  color: #666666;
-  font-weight: 400;
-}
-
-/* 账户余额卡片 - 极简设计 */
-.account-card {
-  background: #FFFFFF;
-  border: 1rpx solid #f0f0f0;
-  padding: 32rpx;
-  border-radius: 16rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 28rpx;
-  color: #666666;
-  margin-bottom: 16rpx;
-}
-
-.card-title {
-  font-weight: 500;
-  color: #1A1A1A;
-}
-
-.view-details {
-  display: flex;
-  align-items: center;
-  color: #666666;
-  font-size: 24rpx;
-  padding: 4rpx 10rpx;
-  border-radius: 12rpx;
-  background: #f8f9fa;
-  transition: all 0.2s;
-}
-
-.view-details:active {
-  background: #e9ecef;
-  transform: scale(0.96);
-}
-
-.details-text {
-  margin-right: 6rpx;
-}
-
-.details-arrow {
-  width: 18rpx;
-  height: 18rpx;
-  opacity: 0.6;
-}
-
-.balance-amount {
-  font-size: 48rpx;
-  font-weight: 600;
-  margin: 16rpx 0 24rpx;
-  color: #1A1A1A;
-}
-
-.card-actions {
-  display: flex;
-  gap: 30rpx;
-}
-
-.action-btn {
-  flex: 1;
-  padding: 16rpx 0;
-  border-radius: 12rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 26rpx;
-  font-weight: 500;
-  transition: all 0.2s;
-  min-height: 72rpx;
-}
-
-.withdraw-btn {
-  background: #f8f9fa;
-  color: #1A1A1A;
-  border: 1rpx solid #e9ecef;
-}
-
-.withdraw-btn:active {
-  background: #e9ecef;
-  transform: scale(0.98);
-}
-
-.recharge-btn {
-  background: #7363FF;
-  color: white;
-  border: 1rpx solid #7363FF;
-}
-
-.recharge-btn:active {
-  background: #6354e6;
-  transform: scale(0.98);
-}
-
-.btn-icon-wrapper {
-  width: 24rpx;
-  height: 24rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 8rpx;
-}
-
-.btn-icon-text {
-  font-size: 16rpx;
-  line-height: 1;
-}
 
 /* 通用区块样式 - 简化设计 */
 .section-container {
   background: #FFFFFF;
-  border: 1rpx solid #f0f0f0;
-  padding: 24rpx;
-  border-radius: 16rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+
+  padding: 20rpx;
+  border-radius: 20rpx;
+  margin-bottom: 20rpx;
+
 }
 
 .section-header {
@@ -1584,6 +990,7 @@ const formatPhone = (phone) => {
   align-items: center;
   padding: 16rpx 0;
   transition: all 0.2s;
+ 
 }
 
 .order-item:active {
@@ -1592,11 +999,7 @@ const formatPhone = (phone) => {
 
 .order-icon {
   position: relative;
-  width: 64rpx;
-  height: 64rpx;
-  background: #f8f9fa;
-  border: 1rpx solid #e9ecef;
-  border-radius: 12rpx;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1604,14 +1007,11 @@ const formatPhone = (phone) => {
   transition: all 0.2s;
 }
 
-.order-item:active .order-icon {
-  background: #e9ecef;
-}
-
 .order-icon-img {
-  width: 28rpx;
-  height: 28rpx;
-  filter: brightness(0) saturate(100%) invert(42%) sepia(12%) saturate(1142%) hue-rotate(184deg) brightness(97%) contrast(90%);
+  width: 58rpx;
+  height: 58rpx;
+
+
 }
 
 .order-badge {
@@ -1628,23 +1028,9 @@ const formatPhone = (phone) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4rpx 12rpx rgba(255, 71, 87, 0.4);
-  border: 2rpx solid rgba(255, 255, 255, 0.9);
-  animation: badge-pulse 2s ease-in-out infinite;
+
   z-index: 10;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -2rpx;
-    left: -2rpx;
-    right: -2rpx;
-    bottom: -2rpx;
-    background: linear-gradient(135deg, rgba(255, 71, 87, 0.3) 0%, rgba(255, 55, 66, 0.3) 100%);
-    border-radius: 50%;
-    z-index: -1;
-    animation: badge-glow 2s ease-in-out infinite alternate;
-  }
+
 }
 
 .order-text {
@@ -1737,69 +1123,25 @@ const formatPhone = (phone) => {
   font-weight: 500;
 }
 
-/* 常用功能 - 简化设计 */
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24rpx 16rpx;
-}
 
-.feature-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: all 0.2s;
-}
-
-.feature-item:active {
-  transform: scale(0.96);
-}
-
-.feature-icon {
-  width: 72rpx;
-  height: 72rpx;
-  background: #f8f9fa;
-  border: 1rpx solid #e9ecef;
-  border-radius: 16rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 12rpx;
-  transition: all 0.2s;
-}
-
-.feature-item:active .feature-icon {
-  background: #e9ecef;
-}
-
-.feature-icon-img {
-  width: 32rpx;
-  height: 32rpx;
-  filter: brightness(0) saturate(100%) invert(42%) sepia(12%) saturate(1142%) hue-rotate(184deg) brightness(97%) contrast(90%);
-}
-
-.feature-text {
-  font-size: 22rpx;
-  color: #666666;
-  font-weight: 400;
-}
 
 /* 设置列表 */
 .settings-list {
   background: #FFFFFF;
-  border: 1rpx solid #f0f0f0;
-  border-radius: 16rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+
+  border-radius: 20rpx;
+  margin-bottom: 20rpx;
+
   overflow: hidden;
 }
 
 .setting-item {
   display: flex;
   align-items: center;
-  padding: 24rpx;
+  padding: 28rpx;
   border-bottom: 1rpx solid #f0f0f0;
   transition: all 0.2s;
+  position: relative;
 }
 
 .setting-item:last-child {
@@ -1808,15 +1150,11 @@ const formatPhone = (phone) => {
 
 .setting-item:active {
   background: #f8f9fa;
-  transform: scale(0.98);
+
 }
 
 .setting-icon {
-  width: 40rpx;
-  height: 40rpx;
-  background: #f8f9fa;
-  border: 1rpx solid #e9ecef;
-  border-radius: 8rpx;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1829,9 +1167,9 @@ const formatPhone = (phone) => {
 }
 
 .setting-icon-img {
-  width: 20rpx;
-  height: 20rpx;
-  filter: brightness(0) saturate(100%) invert(42%) sepia(12%) saturate(1142%) hue-rotate(184deg) brightness(97%) contrast(90%);
+  width: 36rpx;
+  height: 36rpx;
+
 }
 
 .setting-text {
@@ -1842,9 +1180,29 @@ const formatPhone = (phone) => {
 }
 
 .setting-arrow {
-  width: 16rpx;
-  height: 16rpx;
-  opacity: 0.6;
+  width: 32rpx;
+  height:  32rpx;
+
+}
+
+/* 微信客服透明覆盖按钮 */
+.kf_btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  opacity: 0;
+  border: none;
+  z-index: 5;
+}
+.kf_btn::after {
+  border: none;
 }
 
 /* 应用版本 */

@@ -1,49 +1,23 @@
 /* 项目主题变量 */
 .level-container.data-v-637ded03 {
-  min-height: 100vh;
+  height: 100vh;
   background: linear-gradient(135deg, #F7F8FA 0%, #FFFFFF 100%);
-}
-.status-bar.data-v-637ded03 {
-  background: #FFFFFF;
-}
-.nav-bar.data-v-637ded03 {
-  background: #FFFFFF;
-  height: 88rpx;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 32rpx;
-  border-bottom: 1rpx solid #f0f0f0;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
-}
-.back-btn.data-v-637ded03 {
-  display: flex;
-  align-items: center;
-  padding: 10rpx;
-}
-.back-icon.data-v-637ded03 {
-  width: 32rpx;
-  height: 32rpx;
-  margin-right: 10rpx;
-}
-.back-text.data-v-637ded03 {
-  font-size: 28rpx;
-  color: #666666;
-}
-.nav-title.data-v-637ded03 {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1A1A1A;
-}
-.placeholder.data-v-637ded03 {
-  width: 80rpx;
+  flex-direction: column;
 }
 .main-content.data-v-637ded03 {
   flex: 1;
-  padding: 20rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  height: 0;
+  /* 关键：让flex子元素能够正确计算高度 */
 }
 .scroll-container.data-v-637ded03 {
-  height: calc(100vh - 200rpx);
+  height: 100%;
+  box-sizing: border-box;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 .modern-card.data-v-637ded03 {
   background: #FFFFFF;
@@ -88,6 +62,7 @@
 .current-level-card.data-v-637ded03 {
   background: #FFFFFF;
   color: #1A1A1A;
+  margin-top: 20rpx;
 }
 .level-header.data-v-637ded03 {
   display: flex;

@@ -8,7 +8,7 @@
             v-for="(tab, index) in statusTabs" 
             :key="index"
             class="filter-tab"
-            :class="{ active: currentStatus === tab.value }"
+            :class="{ active: currentTabIndex === index }"
             @click="switchStatus(tab.value)"
           >
             <text class="tab-text">{{ tab.label }}</text>
@@ -17,102 +17,125 @@
       </scroll-view>
     </view>
 
-    <!-- 订单列表 -->
-    <scroll-view 
-      class="order-list"
-      scroll-y="true"
-      refresher-enabled="true"
-      :refresher-triggered="isRefreshing"
-      @refresherrefresh="onRefresh"
-      @refresherrestore="onRefreshRestore"
-      @scrolltolower="loadMore"
-    >
-      <!-- 空状态 -->
-      <view v-if="orderList.length === 0 && !isLoading" class="empty-state">
-        <image src="@/static/images/empty.png" class="empty-image" mode="aspectFit" />
-        <text class="empty-text">暂无订单</text>
-        <text class="empty-desc">快去发现更多精彩服务吧</text>
-      </view>
-
-      <!-- 订单卡片列表 -->
-      <view v-else class="order-cards">
-        <view 
-          v-for="order in orderList" 
-          :key="order.id"
-          class="order-card"
-          @click="navigateToDetail(order.id)"
-        >
-          <!-- 订单头部（重构：左侧服务名和描述，右侧状态） -->
-          <view class="order-header">
-            <view class="order-info">
-              <text class="service-name">{{ order.service_name }}</text>
-              <!-- <text class="service-desc">{{ order.service_address }}</text> -->
+    <!-- 订单列表滑动容器 -->
+    <view class="order-content">
+      <swiper
+        class="order-swiper"
+        :current="currentTabIndex"
+        @change="onSwiperChange"
+        :indicator-dots="false"
+        :circular="false"
+        :autoplay="false"
+        :duration="300"
+      >
+        <!-- 每个状态选项卡的内容 -->
+        <swiper-item v-for="tab in statusTabs" :key="tab.value">
+          <scroll-view 
+            class="order-scroll-view" 
+            scroll-y="true"
+            refresher-enabled="true"
+            :refresher-triggered="isRefreshing"
+            @refresherrefresh="onRefresh"
+            @refresherrestore="onRefreshRestore"
+            @scrolltolower="loadMore"
+          >
+            <!-- 空状态 -->
+            <view v-if="getTabOrderList(tab.value).length === 0 && !isLoading" class="empty-state">
+              <image src="@/static/images/empty.png" class="empty-image" mode="aspectFit" />
+              <text class="empty-text">暂无订单</text>
+              <text class="empty-desc">快去发现更多精彩服务吧</text>
             </view>
-            <view class="order-status" :class="getStatusClass(order.status)">
-              <text class="status-text">{{ getStatusText(order.status) }}</text>
-            </view>
-          </view>
 
-          <!-- 服务信息和订单金额 -->
-          <view class="service-amount-row">
-            <view class="service-info">
-              <image :src="$imgBaseUrl + order.service_image_url" class="service-image" mode="aspectFill" />
-              <view class="service-details">
-                <view class="service-meta">
-                  
-                  <text class="service-price">¥{{ order.unit_price }}/{{ order.unit }}</text>
-                  <text class="service-duration">x{{ order.quantity }}</text>
+            <!-- 订单卡片列表 -->
+            <view v-else class="order-cards">
+              <view 
+                v-for="order in getTabOrderList(tab.value)" 
+                :key="order.id"
+                class="order-card"
+                @click="navigateToDetail(order.id)"
+              >
+                <!-- 订单头部 -->
+                <view class="order-header">
+                  <view class="order-info">
+                    <text class="order-time">{{ formatTime(order.created_at) }}</text>
+                  </view>
+                  <view class="order-status" :class="getStatusClass(order.status)">
+                    <text class="status-text">{{ getStatusText(order.status) }}</text>
+                  </view>
                 </view>
-                <view class="order-amount">
-              <text class="amount-label">{{ getAmountLabel(order.status) }}</text>
-              <text class="amount-value">¥{{ order.total_amount }}</text>
-            </view>
+
+                <!-- 服务信息和订单金额 -->
+                <view class="service-amount-row">
+                  <view class="service-info">
+                    <image :src="$imgBaseUrl + order.service_image_url" class="service-image" mode="aspectFill" />
+                    <view class="service-details">
+                      <text class="service-name">{{ order.service_name }}</text>
+                      <view class="service-meta">
+                        
+                        <text class="service-price">¥{{ order.unit_price }}/{{ order.unit }}</text>
+                        <text class="service-duration">x{{ order.quantity }}</text>
+                      </view>
+                      <view class="order-amount">
+                    <text class="amount-label">{{ getAmountLabel(order.status) }}</text>
+                    <text class="amount-value">¥{{ order.total_amount }}</text>
+                  </view>
+                    </view>
+                  </view>
+                 
+                </view>
+
+                <!-- 状态4的提示语 -->
+                <view v-if="order.status === 4" class="tip-container">
+                  <view class="auto-start-tip">
+                    <image src="@/static/icons/common/shijian.png" class="tip-icon" mode="aspectFit" />
+                    <text class="tip-text">友伴师已到达，5分钟后将自动开始计时服务</text>
+                  </view>
+                </view>
+
+                <!-- 操作按钮 -->
+                <view class="order-actions">
+                  <view 
+                    v-for="(action, actionIndex) in getOrderActions(order.status)" 
+                    :key="actionIndex"
+                    class="action-btn"
+                    :class="action.type"
+                    @click.stop="handleOrderAction(action.action, order)"
+                  >
+                    <text class="action-text">{{ action.text }}</text>
+                    <!-- #ifdef MP-WEIXIN -->
+                    <button v-if="action.text === '联系客服'" open-type="contact" class="kf_btn" @tap.stop></button>
+                    <!-- #endif -->
+                  </view>
+                </view>
+              </view>
+
+              <!-- 加载更多 -->
+              <view v-if="hasMore && getTabOrderList(tab.value).length > 0" class="load-more">
+                <text v-if="isLoadingMore" class="loading-text">加载中...</text>
+                <!-- <text v-else class="load-more-text">上拉加载更多</text> -->
               </view>
             </view>
-           
-          </view>
-
-          <!-- 下单时间 -->
-          <view class="order-time-info">
-            <text class="time-label">下单时间</text>
-            <text class="time-value">{{ formatTime(order.created_at) }}</text>
-          </view>
-
-          <!-- 操作按钮 -->
-          <view class="order-actions">
-            <view 
-              v-for="(action, actionIndex) in getOrderActions(order.status)" 
-              :key="actionIndex"
-              class="action-btn"
-              :class="action.type"
-              @click.stop="handleOrderAction(action.action, order)"
-            >
-              <text class="action-text">{{ action.text }}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 加载更多 -->
-        <view v-if="hasMore && orderList.length > 0" class="load-more">
-          <text v-if="isLoadingMore" class="loading-text">加载中...</text>
-          <!-- <text v-else class="load-more-text">上拉加载更多</text> -->
-        </view>
-      </view>
-    </scroll-view>
+          </scroll-view>
+        </swiper-item>
+      </swiper>
+    </view>
   </view>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user.js'
-import { getOrderList, cancelOrder } from '@/api/order.js'
+import { useCityStore } from '@/stores/city.js'
+import { getOrderList, cancelOrder, deleteOrder, applyRefund, applyRefundAfterDeparture, startService, orderParams } from '@/api/order.js'
 
 // 用户状态管理
 const userStore = useUserStore()
+const cityStore = useCityStore()
 
 // 页面状态
 const currentStatus = ref('all')
+const currentTabIndex = ref(0)
 const isRefreshing = ref(false)
 const isLoading = ref(false)
 const isLoadingMore = ref(false)
@@ -120,9 +143,28 @@ const hasMore = ref(true)
 const page = ref(1)
 const pageSize = ref(20)
 
-// 订单列表数据缓存
+// 订单列表数据缓存 - 为每个状态维护独立的列表
 const orderListCache = ref({})
-const orderList = ref([])
+const orderListData = ref({
+  'all': [],
+  'pending_payment': [],
+  'pending_service': [],
+  'in_service': [],
+  'completed': [],
+  'cancelled': [],
+  'refunded': [],
+  'refunding': []
+})
+
+// 防抖定时器
+let swiperChangeTimer = null
+
+// 页面卸载时清除定时器
+onUnmounted(() => {
+  if (swiperChangeTimer) {
+    clearTimeout(swiperChangeTimer)
+  }
+})
 
 // 状态筛选标签
 const statusTabs = ref([
@@ -130,7 +172,10 @@ const statusTabs = ref([
   { label: '待付款', value: 'pending_payment', count: 0 },
   { label: '待服务', value: 'pending_service', count: 0 },
   { label: '进行中', value: 'in_service', count: 0 },
-  { label: '已完成', value: 'completed', count: 0 }
+  { label: '已完成', value: 'completed', count: 0 },
+  // { label: '已取消', value: 'cancelled', count: 0 },
+  // { label: '已退款', value: 'refunded', count: 0 },
+  // { label: '退款中', value: 'refunding', count: 0 }
 ])
 
 // 处理页面参数
@@ -139,15 +184,20 @@ onLoad((options) => {
   if (options.status) {
     console.log('设置订单状态为:', options.status)
     currentStatus.value = options.status
+    // 设置对应的选项卡索引
+    const statusIndex = statusTabs.value.findIndex(tab => tab.value === options.status)
+    if (statusIndex !== -1) {
+      currentTabIndex.value = statusIndex
+    }
     // 重置页面状态
     page.value = 1
     hasMore.value = true
-    orderList.value = []
     // 清除缓存，强制重新加载
     delete orderListCache.value[options.status]
   } else {
     console.log('没有传递状态参数，使用默认状态: all')
     currentStatus.value = 'all'
+    currentTabIndex.value = 0
   }
   
   // 在onLoad中加载数据，这是唯一的数据加载入口
@@ -165,18 +215,22 @@ const switchStatus = async (status) => {
   if (currentStatus.value === status) return // 避免重复切换
   
   currentStatus.value = status
+  const statusIndex = statusTabs.value.findIndex(tab => tab.value === status)
+  if (statusIndex !== -1) {
+    currentTabIndex.value = statusIndex
+  }
   
   // 检查缓存中是否已有该状态的数据
   if (orderListCache.value[status]) {
     // 从缓存恢复数据
-    orderList.value = orderListCache.value[status].list
+    orderListData.value[status] = orderListCache.value[status].list
     page.value = orderListCache.value[status].page
     hasMore.value = orderListCache.value[status].hasMore
   } else {
     // 缓存中没有数据，需要请求
     page.value = 1
     hasMore.value = true
-    orderList.value = []
+    orderListData.value[status] = []
     
     try {
       await loadOrderList()
@@ -184,6 +238,36 @@ const switchStatus = async (status) => {
       console.error('切换状态失败:', error)
     }
   }
+}
+
+// swiper滑动改变时的处理
+const onSwiperChange = async (e) => {
+  const index = e.detail.current
+  const newStatus = statusTabs.value[index].value
+  const oldStatus = currentStatus.value
+  
+  currentTabIndex.value = index
+  currentStatus.value = newStatus
+  
+  // 清除之前的定时器
+  if (swiperChangeTimer) {
+    clearTimeout(swiperChangeTimer)
+  }
+  
+  // 如果切换到新的状态且该状态未加载数据，则延迟加载数据（防抖）
+  if (oldStatus !== newStatus && !orderListCache.value[newStatus]) {
+    swiperChangeTimer = setTimeout(async () => {
+      page.value = 1
+      hasMore.value = true
+      orderListData.value[newStatus] = []
+      await loadOrderList()
+    }, 300) // 300ms防抖延迟
+  }
+}
+
+// 获取指定状态的订单列表
+const getTabOrderList = (status) => {
+  return orderListData.value[status] || []
 }
 
 // 加载订单列表
@@ -206,18 +290,18 @@ const loadOrderList = async () => {
 
       
       if (page.value === 1) {
-        orderList.value = list || []
+        orderListData.value[currentStatus.value] = list || []
         // 更新当前状态的计数
         updateCurrentStatusCount(total)
       } else {
-        orderList.value.push(...(list || []))
+        orderListData.value[currentStatus.value].push(...(list || []))
       }
       
-      hasMore.value = orderList.value.length < total
+      hasMore.value = orderListData.value[currentStatus.value].length < total
       
       // 缓存当前状态的数据
       orderListCache.value[currentStatus.value] = {
-        list: [...orderList.value],
+        list: [...orderListData.value[currentStatus.value]],
         page: page.value,
         hasMore: hasMore.value
       }
@@ -313,7 +397,10 @@ const getStatusClass = (status) => {
     5: 'status-in-progress',  // 进行中
     6: 'status-completed',    // 已完成
     7: 'status-cancelled',    // 已取消
-    8: 'status-refunded'      // 已退款
+    8: 'status-refunded',     // 已退款
+    9: 'status-refunding',    // 退款中
+    10: 'status-cancelled',   // 超时取消
+    11: 'status-to-serve'     // 待服务（已确认待开始出发）
   }
   return statusMap[status] || 'status-default'
 }
@@ -322,13 +409,16 @@ const getStatusClass = (status) => {
 const getStatusText = (status) => {
   const statusMap = {
     1: '待付款',
-    2: '待服务',
-    3: '待服务',
-    4: '待服务',
+    2: '等待接单',
+    3: '友伴已出发',
+    4: '友伴已到达',
     5: '进行中',
     6: '已完成',
     7: '已取消',
-    8: '已退款'
+    8: '已退款',
+    9: '退款中',
+    10: '超时取消',
+    11: '已接单，等待出发'
   }
   return statusMap[status] || '未知状态'
 }
@@ -337,7 +427,7 @@ const getStatusText = (status) => {
 const getAmountLabel = (status) => {
   if (status === 1) {
     return '需付款：'
-  } else if (status === 2 || status === 3 || status === 4 || status === 5 || status === 6) {
+  } else if (status === 2 || status === 3 || status === 4 || status === 5 || status === 6 || status === 11) {
     return '实付款：'
   } else {
     return '订单金额：'
@@ -352,16 +442,16 @@ const getOrderActions = (status) => {
       { text: '立即支付', action: 'pay', type: 'primary' }
     ],
     2: [ // 待服务（已支付待确认）
-      { text: '取消订单', action: 'cancel', type: 'secondary' },
+      { text: '申请退款', action: 'refund', type: 'secondary' },
       { text: '联系友伴', action: 'contact', type: 'primary' }
     ],
     3: [ // 待服务（已确认待到达）
-      { text: '取消订单', action: 'cancel', type: 'secondary' },
+      { text: '申请退款', action: 'refund', type: 'secondary' },
       { text: '联系友伴', action: 'contact', type: 'primary' }
     ],
     4: [ // 待服务（已到达待开始）
-      { text: '取消订单', action: 'cancel', type: 'secondary' },
-      { text: '联系友伴', action: 'contact', type: 'primary' }
+      { text: '申请退款', action: 'refund', type: 'secondary' },
+      { text: '开始服务', action: 'start', type: 'start' }
     ],
     5: [ // 进行中
       { text: '续钟', action: 'extend', type: 'primary' },
@@ -375,6 +465,16 @@ const getOrderActions = (status) => {
     ],
     8: [ // 已退款
       { text: '删除订单', action: 'delete', type: 'secondary' }
+    ],
+    9: [ // 退款中
+      { text: '联系客服', action: 'contact', type: 'primary' }
+    ],
+    10: [ // 超时取消
+      { text: '删除订单', action: 'delete', type: 'secondary' }
+    ],
+    11: [ // 待服务（已确认待开始出发）
+      { text: '申请退款', action: 'refund', type: 'secondary' },
+      { text: '联系友伴', action: 'contact', type: 'primary' }
     ]
   }
   return actionMap[status] || []
@@ -385,6 +485,16 @@ const handleOrderAction = (action, order) => {
   switch (action) {
     case 'cancel':
       handleCancelOrder(order)
+      break
+    case 'refund':
+      // 根据订单状态选择不同的退款处理方式
+      if (order.status === 3) {
+        handleApplyRefundAfterDeparture(order)
+      } else if (order.status === 4) {
+        handleApplyRefundAfterArrival(order)
+      } else {
+        handleApplyRefund(order)
+      }
       break
     case 'pay':
       handlePayOrder(order)
@@ -403,6 +513,9 @@ const handleOrderAction = (action, order) => {
       break
     case 'delete':
       handleDeleteOrder(order)
+      break
+    case 'start':
+      handleStartService(order)
       break
   }
 }
@@ -454,11 +567,199 @@ const handleCancelOrder = (order) => {
   })
 }
 
-// 支付订单
-const handlePayOrder = (order) => {
-  uni.navigateTo({
-    url: `/subPackages/order/payment?orderId=${order.id}`
+// 申请退款
+const handleApplyRefund = (order) => {
+  uni.showModal({
+    title: '申请退款',
+    content: '确定要申请退款吗？',
+    confirmText: '继续退款',
+    cancelText: '取消',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          // 显示加载提示
+          uni.showLoading({
+            title: '申请中...'
+          })
+          
+          // 调用申请退款API
+          const refundData = {
+            order_id: order.id,
+            refund_reason: '用户申请退款'
+          }
+          
+          const response = await applyRefund(refundData)
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '退款申请已提交',
+              icon: 'success'
+            })
+            // 刷新列表
+            onRefresh()
+          } else {
+            throw new Error(response.data.msg || '申请退款失败')
+          }
+        } catch (error) {
+          console.error('申请退款失败:', error)
+          uni.showToast({
+            title: error.message || '申请退款失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
+      }
+    }
   })
+}
+
+// 申请退款（出发后）
+const handleApplyRefundAfterDeparture = (order) => {
+  uni.showModal({
+    title: '申请退款',
+    content: '确定要申请退款吗？由于对方已出发，退款时将扣除来回程车费。',
+    confirmText: '继续退款',
+    cancelText: '取消',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          // 显示加载提示
+          uni.showLoading({
+            title: '申请中...'
+          })
+          
+          // 调用申请退款API（出发后）
+          const refundData = {
+            order_id: order.id,
+            refund_reason: '部分退款，扣除来回程车费'
+          }
+          
+          const response = await applyRefundAfterDeparture(refundData)
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '退款申请已提交',
+              icon: 'success'
+            })
+            // 刷新列表
+            onRefresh()
+          } else {
+            throw new Error(response.data.msg || '申请退款失败')
+          }
+        } catch (error) {
+          console.error('申请退款失败:', error)
+          uni.showToast({
+            title: error.message || '申请退款失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
+      }
+    }
+  })
+}
+
+// 申请退款（到达后）
+const handleApplyRefundAfterArrival = (order) => {
+  uni.showModal({
+    title: '申请退款',
+    content: '确定要申请退款吗？由于对方已到达，退款时将扣除友伴师来回程车费。',
+    confirmText: '申请退款',
+    cancelText: '取消',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          // 显示加载提示
+          uni.showLoading({
+            title: '申请中...'
+          })
+          
+          // 调用申请退款API（到达后）
+          const refundData = {
+            order_id: order.id,
+            refund_reason: '部分退款，扣除友伴师来回程车费'
+          }
+          
+          const response = await applyRefundAfterDeparture(refundData)
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '退款申请已提交',
+              icon: 'success'
+            })
+            // 刷新列表
+            onRefresh()
+          } else {
+            throw new Error(response.data.msg || '申请退款失败')
+          }
+        } catch (error) {
+          console.error('申请退款失败:', error)
+          uni.showToast({
+            title: error.message || '申请退款失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
+      }
+    }
+  })
+}
+
+// 支付订单
+const handlePayOrder = async (order) => {
+  try {
+    // 显示加载提示
+    uni.showLoading({
+      title: '处理中...'
+    })
+    
+    // 调用支付参数接口
+    const orderParamsData = {
+      order_id: order.id,
+      payment_method: 1
+    }
+    
+    const paramsResponse = await orderParams(orderParamsData)
+    
+    if (paramsResponse.data.code === 0) {
+      // 调用微信支付
+      uni.requestPayment({
+        provider: 'wxpay',
+        ...paramsResponse.data.data.pay_params,
+        success: (res) => {
+          console.log('支付成功', res);
+          uni.showToast({
+            title: '支付成功',
+            icon: 'success',
+          });
+          // 支付成功后刷新列表
+          setTimeout(() => {
+            onRefresh()
+          }, 1500)
+        },
+        fail: (err) => {
+          console.error('支付失败', JSON.stringify(err));
+          uni.showToast({
+            title: '支付失败',
+            icon: 'none'
+          })
+        },
+      });
+    } else {
+      throw new Error(paramsResponse.data.msg || '获取支付参数失败')
+    }
+  } catch (error) {
+    console.error('支付失败:', error)
+    uni.showToast({
+      title: error.message || '支付失败',
+      icon: 'none'
+    })
+  } finally {
+    uni.hideLoading()
+  }
 }
 
 // 联系友伴师
@@ -466,7 +767,7 @@ const handleContactPartner = (order) => {
   if (order.companion_id) {
     uni.showModal({
       title: '联系友伴师',
-      content: `是否拨打友伴师 #${order.companion_id} 的电话？`,
+      content: `是否拨打友伴师的电话？`,
       confirmText: '拨打',
       cancelText: '取消',
       success: (res) => {
@@ -481,6 +782,52 @@ const handleContactPartner = (order) => {
   }
 }
 
+// 开始计时服务
+const handleStartService = (order) => {
+  uni.showModal({
+    title: '开始服务',
+    content: '确认友伴师已到达并开始服务吗？',
+    confirmText: '开始服务',
+    cancelText: '取消',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          // 显示加载提示
+          uni.showLoading({
+            title: '处理中...'
+          })
+          
+          // 调用开始计时API
+          const startData = {
+            order_id: order.id
+          }
+          
+          const response = await startService(startData)
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '服务已开始',
+              icon: 'success'
+            })
+            // 刷新列表
+            onRefresh()
+          } else {
+            throw new Error(response.data.msg || '开始服务失败')
+          }
+        } catch (error) {
+          console.error('开始服务失败:', error)
+          uni.showToast({
+            title: error.message || '开始服务失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
+      }
+    }
+  })
+}
+
 // 续钟
 const handleExtendOrder = (order) => {
   uni.navigateTo({
@@ -490,9 +837,18 @@ const handleExtendOrder = (order) => {
 
 // 再次预约
 const handleRebookOrder = (order) => {
-  uni.navigateTo({
-    url: `/subPackages/order/rebook?orderId=${order.id}`
-  })
+  if (order.companion_id) {
+    let url = '/subPackages/friend/detail?id=' + order.companion_id + '&city_code=' + cityStore.currentCityCode
+    
+    uni.navigateTo({
+      url: url
+    })
+  } else {
+    uni.showToast({
+      title: '友伴信息不存在',
+      icon: 'none'
+    })
+  }
 }
 
 // 评价订单
@@ -512,20 +868,35 @@ const handleDeleteOrder = (order) => {
     success: async (res) => {
       if (res.confirm) {
         try {
-          // 如果有后端API，调用API
-          // await deleteOrder({ order_id: order.id });
-
-          // 前端移除
-          orderList.value = orderList.value.filter(o => o.id !== order.id)
-          uni.showToast({
-            title: '订单已删除',
-            icon: 'success'
+          uni.showLoading({
+            title: '删除中...'
           })
+          
+          // 调用删除订单API
+          const deleteData = {
+            order_id: order.id
+          }
+          
+          const response = await deleteOrder(deleteData)
+          
+          if (response.data.code === 0) {
+            // 前端移除
+            orderListData.value[currentStatus.value] = orderListData.value[currentStatus.value].filter(o => o.id !== order.id)
+            uni.showToast({
+              title: '订单已删除',
+              icon: 'success'
+            })
+          } else {
+            throw new Error(response.data.msg || '删除订单失败')
+          }
         } catch (error) {
+          console.error('删除订单失败:', error)
           uni.showToast({
-            title: error.message || '删除失败',
+            title: error.message || '删除订单失败',
             icon: 'none'
           })
+        } finally {
+          uni.hideLoading()
         }
       }
     }
@@ -576,7 +947,7 @@ const formatTime = (timeStr) => {
 
 .filter-tabs {
   display: flex;
-  padding: 24rpx 0;
+  padding: 0rpx 10rpx 24rpx 0;
   justify-content: space-around;
 }
 
@@ -614,11 +985,23 @@ const formatTime = (timeStr) => {
   font-weight: 600;
 }
 
-/* 订单列表 */
-.order-list {
+/* 订单列表滑动容器 */
+.order-content {
   flex: 1;
-  padding: 24rpx;
-  height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.order-swiper {
+  flex: 1;
+  height: 100%;
+}
+
+.order-scroll-view {
+  height: 100%;
+  padding: 0 24rpx;
+  box-sizing: border-box;
 }
 
 /* 空状态 */
@@ -652,7 +1035,8 @@ const formatTime = (timeStr) => {
 .order-cards {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 20rpx;
+  margin-top: 20rpx;
 }
 
 .order-card {
@@ -684,7 +1068,7 @@ const formatTime = (timeStr) => {
 }
 
 .order-time {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: #999999;
 }
 
@@ -714,6 +1098,9 @@ const formatTime = (timeStr) => {
 }
 .status-refunded {
   color: #00bcd4;
+}
+.status-refunding {
+  color: #ff9800;
 }
 
 
@@ -745,6 +1132,13 @@ const formatTime = (timeStr) => {
 .service-details {
   flex: 1;
   flex-direction: column;
+}
+
+.service-name {
+  font-size: 28rpx;
+  color: #1A1A1A;
+  margin-bottom: 8rpx;
+  display: block;
 }
 
 .service-meta {
@@ -828,6 +1222,7 @@ const formatTime = (timeStr) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .action-btn.primary {
@@ -850,6 +1245,71 @@ const formatTime = (timeStr) => {
 .action-btn.secondary:active {
   background: #f8f9fa;
   transform: scale(0.96);
+}
+
+.action-btn.start {
+  background: #F44336;
+  color: #FFFFFF;
+  border-color: #F44336;
+}
+
+.action-btn.start:active {
+  background: #d32f2f;
+  transform: scale(0.96);
+}
+
+/* 微信客服透明覆盖按钮 */
+.kf_btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  opacity: 0;
+  border: none;
+  z-index: 5;
+}
+.kf_btn::after {
+  border: none;
+}
+
+/* 提示容器 */
+.tip-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20rpx;
+}
+
+/* 自动开始服务提示 */
+.auto-start-tip {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border: 1rpx solid #ffc107;
+  border-radius: 12rpx;
+  padding: 12rpx 16rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: fit-content;
+  gap: 8rpx;
+}
+
+.tip-icon {
+  width: 34rpx;
+  height: 34rpx;
+  flex-shrink: 0;
+}
+.tip-text {
+  font-size: 24rpx;
+  color: #856404;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
 /* 加载更多 */

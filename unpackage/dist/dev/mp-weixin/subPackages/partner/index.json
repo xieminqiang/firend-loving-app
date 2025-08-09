@@ -1,6 +1,5 @@
 {
   "navigationBarTitleText": "友伴端",
-  "navigationStyle": "custom",
   "usingComponents": {
     "workbench": "./components/Workbench",
     "profile": "./components/Profile"

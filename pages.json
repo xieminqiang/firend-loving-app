@@ -94,23 +94,44 @@
 				{
 					"path": "index",
 					"style": {
-						"navigationBarTitleText": "友伴端",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "友伴端"
+						// "navigationStyle": "custom"
 					}
 				},
 				{
 					"path": "DataEdetion/index",
 					"style": {
-						"navigationBarTitleText": "友伴端",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "资料编辑"
+					
+					}
+				},
+				{
+					"path": "level/index",
+					"style": {
+						"navigationBarTitleText": "等级中心"
+						
+					}
+				},
+				{
+					"path": "order/index",
+					"style": {
+						"navigationBarTitleText": "订单中心"
+						
+					}
+				},
+				{
+					"path": "components/DataSelect",
+					"style": {
+						"navigationBarTitleText": "日期安排"
+						
 					}
 				},
 				
 				{
-					"path": "level/index",
+					"path": "order/detail",
 					"style": {
-						"navigationBarTitleText": "友伴端",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "等级中心"
+						
 					}
 				}
 			]
@@ -129,10 +150,17 @@
 				"path": "detail",
 				"style": {
 				
-					  "navigationStyle": "custom"
+					"navigationBarTitleText": ""
 				}
 			}
-			
+			,
+			{
+				"path": "friend-select",
+				"style": {
+				
+					"navigationStyle": "custom"
+				}
+			}
 		]
 	},
 	{
@@ -149,9 +177,18 @@
 				"path": "detail",
 				"style": {
 				
-					  "navigationStyle": "custom"
+					"navigationBarTitleText": "订单详情"
+				}
+			},
+			{
+				"path": "submit",
+				"style": {
+				
+					"navigationBarTitleText": ""
 				}
 			}
+			
+			
 			
 		]
 	}
@@ -159,7 +196,7 @@
 	
 	],
 	"tabBar": {
-		"color": "#BFBFBF",
+		"color": "#1A1A1A",
 		"selectedColor": "#7363FF",
 		"backgroundColor": "#FFFFFF",
 		"borderStyle": "white",

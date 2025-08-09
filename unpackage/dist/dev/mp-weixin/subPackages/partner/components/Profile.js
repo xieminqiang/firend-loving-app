@@ -55,34 +55,16 @@ const _sfc_main = {
       }
     };
     const handleFunctionClick = (functionName) => {
+      var _a;
       switch (functionName) {
-        case "service":
-          common_vendor.index.showToast({
-            title: "我的服务功能开发中",
-            icon: "none"
-          });
-          break;
-        case "review":
-          common_vendor.index.showToast({
-            title: "我的评价功能开发中",
-            icon: "none"
-          });
-          break;
-        case "statistics":
-          common_vendor.index.showToast({
-            title: "数据统计功能开发中",
-            icon: "none"
+        case "orders":
+          common_vendor.index.navigateTo({
+            url: `/subPackages/partner/order/index?companion_id=${((_a = props.applicationInfo) == null ? void 0 : _a.id) || ""}`
           });
           break;
         case "level":
           common_vendor.index.navigateTo({
             url: "/subPackages/partner/level/index"
-          });
-          break;
-        case "settings":
-          common_vendor.index.showToast({
-            title: "设置功能开发中",
-            icon: "none"
           });
           break;
       }
@@ -94,7 +76,7 @@ const _sfc_main = {
       showVideoUploadModal.value = false;
     };
     const handleVideoUploadSuccess = (data) => {
-      common_vendor.index.__f__("log", "at subPackages/partner/components/Profile.vue:207", "视频上传成功:", data);
+      common_vendor.index.__f__("log", "at subPackages/partner/components/Profile.vue:173", "视频上传成功:", data);
       common_vendor.index.$emit("applicationStatusChanged", data);
     };
     common_vendor.onMounted(async () => {
@@ -105,7 +87,7 @@ const _sfc_main = {
       common_vendor.index.$off("applicationStatusChanged", handleApplicationStatusChanged);
     });
     const handleApplicationStatusChanged = (data) => {
-      common_vendor.index.__f__("log", "at subPackages/partner/components/Profile.vue:228", "收到申请状态变化事件:", data);
+      common_vendor.index.__f__("log", "at subPackages/partner/components/Profile.vue:194", "收到申请状态变化事件:", data);
       common_vendor.index.$emit("refreshApplicationInfo");
       if (data.status === "updated") {
         common_vendor.index.showToast({
@@ -118,9 +100,9 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       var _a, _b, _c;
       return common_vendor.e({
-        a: __props.applicationInfo && __props.applicationInfo.photos && __props.applicationInfo.photos.length > 0
-      }, __props.applicationInfo && __props.applicationInfo.photos && __props.applicationInfo.photos.length > 0 ? {
-        b: __props.applicationInfo.photos[0]
+        a: __props.applicationInfo && __props.applicationInfo.avatar
+      }, __props.applicationInfo && __props.applicationInfo.avatar ? {
+        b: __props.applicationInfo.avatar
       } : {}, {
         c: common_vendor.t(((_a = __props.applicationInfo) == null ? void 0 : _a.nickname) || "友伴用户"),
         d: currentLevel.value
@@ -140,23 +122,19 @@ const _sfc_main = {
         m: common_vendor.n(getOrderStatusClass(__props.applicationInfo.can_accept_orders)),
         n: common_vendor.o(showVideoUpload)
       } : {}, {
-        o: common_assets._imports_0$3,
+        o: common_assets._imports_0,
         p: common_vendor.o(goToDataEdit),
         q: common_vendor.o(($event) => handleBalanceAction("withdraw")),
         r: common_vendor.o(($event) => handleBalanceAction("detail")),
-        s: common_assets._imports_0$3,
-        t: common_vendor.o(($event) => handleFunctionClick("service")),
-        v: common_assets._imports_0$3,
-        w: common_vendor.o(($event) => handleFunctionClick("review")),
-        x: common_assets._imports_0$3,
-        y: common_vendor.o(($event) => handleFunctionClick("statistics")),
-        z: common_assets._imports_0$3,
-        A: common_vendor.o(($event) => handleFunctionClick("level")),
-        B: common_assets._imports_0$3,
-        C: common_vendor.o(($event) => handleFunctionClick("settings")),
-        D: common_vendor.o(hideVideoUploadModal),
-        E: common_vendor.o(handleVideoUploadSuccess),
-        F: common_vendor.p({
+        s: common_assets._imports_1$10,
+        t: common_assets._imports_0,
+        v: common_vendor.o(($event) => handleFunctionClick("orders")),
+        w: common_assets._imports_2$7,
+        x: common_assets._imports_0,
+        y: common_vendor.o(($event) => handleFunctionClick("level")),
+        z: common_vendor.o(hideVideoUploadModal),
+        A: common_vendor.o(handleVideoUploadSuccess),
+        B: common_vendor.p({
           show: showVideoUploadModal.value,
           applicationInfo: __props.applicationInfo
         })

@@ -122,20 +122,20 @@ const _sfc_main = {
       }, userInfo.value.avatar ? {
         c: userInfo.value.avatar
       } : {}, {
-        d: common_assets._imports_0$7,
+        d: common_assets._imports_0$4,
         e: common_vendor.o(handleAvatarSetting)
       }) : {}, {
         f: isLogin.value
       }, isLogin.value ? {
         g: common_vendor.t(userInfo.value.nickname || "未设置昵称"),
-        h: common_assets._imports_0$7,
+        h: common_assets._imports_0$4,
         i: common_vendor.o(handleNicknameSetting)
       } : {}, {
-        j: common_assets._imports_0$7,
+        j: common_assets._imports_0$4,
         k: common_vendor.o(handlePrivacyPolicy),
-        l: common_assets._imports_0$7,
+        l: common_assets._imports_0$4,
         m: common_vendor.o(handleUserAgreement),
-        n: common_assets._imports_0$7,
+        n: common_assets._imports_0$4,
         o: common_vendor.o(handleAboutUs),
         p: isLogin.value
       }, isLogin.value ? {

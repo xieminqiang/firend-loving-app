@@ -18,10 +18,15 @@ if (!Math) {
   "./subPackages/partner/index.js";
   "./subPackages/partner/DataEdetion/index.js";
   "./subPackages/partner/level/index.js";
+  "./subPackages/partner/order/index.js";
+  "./subPackages/partner/components/DataSelect.js";
+  "./subPackages/partner/order/detail.js";
   "./subPackages/friend/apply/index.js";
   "./subPackages/friend/detail.js";
+  "./subPackages/friend/friend-select.js";
   "./subPackages/order/index.js";
   "./subPackages/order/detail.js";
+  "./subPackages/order/submit.js";
 }
 const _sfc_main = {
   onLaunch: function() {
@@ -72,7 +77,7 @@ const _sfc_main = {
 };
 function createApp() {
   const app = common_vendor.createSSRApp(_sfc_main);
-  app.config.globalProperties.$imgBaseUrl = "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com";
+  app.config.globalProperties.$imgBaseUrl = "https://sbx-server.oss-cn-shenzhen.aliyuncs.com";
   app.use(stores_index.pinia);
   return {
     app

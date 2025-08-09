@@ -169,11 +169,11 @@ export const getPersonalityTags = (params) => {
  * @param {number} params.limit - 返回数量，默认20
  * @returns {Promise} 返回热门标签列表
  */
-export const getPopularPersonalityTags = (params) => {
+export const getPopularPersonalityTags = (data) => {
   return http({
     url: '/front/service/tags/popular',
     method: 'GET',
-    params
+    data
   })
 }
 
@@ -198,5 +198,35 @@ export const getServiceLevels = () => {
   return http({
     url: '/front/companion/service-levels',
     method: 'GET'
+  })
+}
+
+/**
+ * 获取友伴师时间安排
+ * @param {Object} params - 请求参数
+ * @param {number} params.companion_id - 友伴师ID
+ * @returns {Promise} 返回时间安排信息
+ */
+export const getCompanionSchedule = (data) => {
+  return http({
+    url: '/front/companion/schedule',
+    method: 'GET',
+    data
+  })
+}
+
+/**
+ * 保存友伴师时间安排
+ * @param {Object} data - 时间安排数据
+ * @param {number} data.companion_id - 友伴师ID
+ * @param {number} data.day_of_week - 星期几 (1-7)
+ * @param {Object} data.schedule - 时间安排对象 { "00:00": 1, "00:30": 2, ... }
+ * @returns {Promise} 返回保存结果
+ */
+export const saveCompanionSchedule = (data) => {
+  return http({
+    url: '/front/companion/schedule',
+    method: 'PUT',
+    data
   })
 }

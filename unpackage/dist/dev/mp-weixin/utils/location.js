@@ -6,7 +6,7 @@ let locationCache = {
   address: "",
   timestamp: 0
 };
-const CACHE_DURATION = 5 * 60 * 1e3;
+const CACHE_DURATION = 2 * 60 * 1e3;
 const LOCATION_THRESHOLD = 100;
 const calculateDistance = (lat1, lng1, lat2, lng2) => {
   const R = 6371e3;

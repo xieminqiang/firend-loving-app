@@ -93,7 +93,7 @@
   min-height: 100%;
 }
 .content-swiper.data-v-16ee0c05 {
-  height: calc(100vh - 88rpx - 120rpx);
+  height: calc(100vh - 88rpx - 60rpx);
 }
 
 /* 底部TabBar样式 */

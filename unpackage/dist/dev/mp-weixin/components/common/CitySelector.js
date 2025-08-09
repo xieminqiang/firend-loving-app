@@ -16,7 +16,7 @@ const _sfc_main = {
       return {
         a: common_assets._imports_0$8,
         b: common_vendor.t(currentCity.value),
-        c: common_assets._imports_1$1,
+        c: common_assets._imports_1$2,
         d: common_vendor.o(handleClick)
       };
     };

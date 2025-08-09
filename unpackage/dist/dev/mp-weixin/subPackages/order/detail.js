@@ -1,232 +1,180 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
-const stores_user = require("../../stores/user.js");
+const api_order = require("../../api/order.js");
+const stores_city = require("../../stores/city.js");
 const _sfc_main = {
   __name: "detail",
   setup(__props) {
-    stores_user.useUserStore();
-    const currentStatus = common_vendor.ref("all");
-    const isRefreshing = common_vendor.ref(false);
-    const isLoading = common_vendor.ref(false);
-    const isLoadingMore = common_vendor.ref(false);
-    const hasMore = common_vendor.ref(true);
-    const page = common_vendor.ref(1);
-    const pageSize = common_vendor.ref(10);
-    const orderList = common_vendor.ref([]);
-    const statusTabs = common_vendor.ref([
-      { label: "全部", value: "all", count: 0 },
-      { label: "待付款", value: "pending", count: 0 },
-      { label: "待服务", value: "to-serve", count: 0 },
-      { label: "进行中", value: "in-progress", count: 0 },
-      { label: "已完成", value: "completed", count: 0 },
-      { label: "待评价", value: "to-review", count: 0 }
+    const orderDetail = common_vendor.ref({});
+    const orderId = common_vendor.ref(null);
+    const cityStore = stores_city.useCityStore();
+    const progressSteps = common_vendor.ref([
+      { title: "友伴接单", icon: "✓", status: "pending" },
+      { title: "友伴出发", icon: "✓", status: "pending" },
+      { title: "友伴到达", icon: "✓", status: "pending" },
+      { title: "开始服务", icon: "✓", status: "pending" },
+      { title: "服务完成", icon: "✓", status: "pending" }
     ]);
-    const mockOrders = [
-      {
-        id: 1,
-        orderNo: "SBX20241201001",
-        status: "pending",
-        createTime: "2024-12-01 14:30:00",
-        serviceName: "陪伴聊天",
-        serviceDesc: "专业陪伴，温暖聊天",
-        serviceImage: "/static/images/empty.png",
-        duration: 60,
-        price: 100,
-        totalAmount: 100,
-        partner: null
-      },
-      {
-        id: 2,
-        orderNo: "SBX20241201002",
-        status: "to-serve",
-        createTime: "2024-12-01 15:00:00",
-        serviceName: "约会陪伴",
-        serviceDesc: "浪漫约会，美好回忆",
-        serviceImage: "/static/images/empty.png",
-        duration: 120,
-        price: 200,
-        totalAmount: 200,
-        partner: {
-          name: "小美",
-          avatar: "/static/images/empty.png",
-          rating: 4.8,
-          orderCount: 156
-        }
-      },
-      {
-        id: 3,
-        orderNo: "SBX20241201003",
-        status: "in-progress",
-        createTime: "2024-12-01 16:00:00",
-        serviceName: "逛街陪伴",
-        serviceDesc: "购物达人，时尚搭配",
-        serviceImage: "/static/images/empty.png",
-        duration: 90,
-        price: 150,
-        totalAmount: 150,
-        partner: {
-          name: "小丽",
-          avatar: "/static/images/empty.png",
-          rating: 4.9,
-          orderCount: 89
-        }
-      },
-      {
-        id: 4,
-        orderNo: "SBX20241201004",
-        status: "completed",
-        createTime: "2024-12-01 17:00:00",
-        serviceName: "电影陪伴",
-        serviceDesc: "观影体验，情感交流",
-        serviceImage: "/static/images/empty.png",
-        duration: 150,
-        price: 180,
-        totalAmount: 180,
-        partner: {
-          name: "小芳",
-          avatar: "/static/images/empty.png",
-          rating: 4.7,
-          orderCount: 234
-        }
-      },
-      {
-        id: 5,
-        orderNo: "SBX20241201005",
-        status: "to-review",
-        createTime: "2024-12-01 18:00:00",
-        serviceName: "咖啡陪伴",
-        serviceDesc: "轻松聊天，心情愉悦",
-        serviceImage: "/static/images/empty.png",
-        duration: 60,
-        price: 80,
-        totalAmount: 80,
-        partner: {
-          name: "小雅",
-          avatar: "/static/images/empty.png",
-          rating: 4.6,
-          orderCount: 67
-        }
+    common_vendor.onLoad((options) => {
+      if (options.orderId) {
+        orderId.value = options.orderId;
+        loadOrderDetail();
       }
-    ];
-    common_vendor.onMounted(() => {
-      loadOrderList();
-      updateStatusCounts();
     });
-    const switchStatus = (status) => {
-      currentStatus.value = status;
-      page.value = 1;
-      hasMore.value = true;
-      orderList.value = [];
-      loadOrderList();
-    };
-    const loadOrderList = async () => {
-      if (isLoading.value)
-        return;
-      isLoading.value = true;
+    const loadOrderDetail = async () => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1e3));
-        let filteredOrders = mockOrders;
-        if (currentStatus.value !== "all") {
-          filteredOrders = mockOrders.filter((order) => order.status === currentStatus.value);
-        }
-        const start = (page.value - 1) * pageSize.value;
-        const end = start + pageSize.value;
-        const pageOrders = filteredOrders.slice(start, end);
-        if (page.value === 1) {
-          orderList.value = pageOrders;
+        common_vendor.index.showLoading({ title: "加载中..." });
+        const response = await api_order.getOrderDetail({ order_id: Number(orderId.value) });
+        common_vendor.index.__f__("log", "at subPackages/order/detail.vue:185", response.data);
+        if (response.data.code === 0) {
+          orderDetail.value = {
+            ...response.data.data.order,
+            logs: response.data.data.logs || []
+          };
+          updateProgressSteps();
         } else {
-          orderList.value.push(...pageOrders);
+          throw new Error(response.data.msg || "获取订单详情失败");
         }
-        hasMore.value = pageOrders.length === pageSize.value;
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/order/detail.vue:273", "加载订单列表失败:", error);
+        common_vendor.index.__f__("error", "at subPackages/order/detail.vue:197", "加载订单详情失败:", error);
         common_vendor.index.showToast({
-          title: "加载失败",
+          title: error.message || "加载失败",
           icon: "none"
         });
       } finally {
-        isLoading.value = false;
+        common_vendor.index.hideLoading();
       }
     };
-    const updateStatusCounts = () => {
-      statusTabs.value.forEach((tab) => {
-        if (tab.value === "all") {
-          tab.count = mockOrders.length;
-        } else {
-          tab.count = mockOrders.filter((order) => order.status === tab.value).length;
-        }
+    const updateProgressSteps = () => {
+      const logs = orderDetail.value.logs || [];
+      progressSteps.value.forEach((step) => {
+        step.status = "pending";
       });
-    };
-    const onRefresh = async () => {
-      isRefreshing.value = true;
-      page.value = 1;
-      hasMore.value = true;
-      try {
-        await loadOrderList();
-        updateStatusCounts();
-      } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/order/detail.vue:304", "刷新失败:", error);
-      } finally {
-        isRefreshing.value = false;
+      const acceptLog = logs.find((log) => log.status === 11);
+      if (acceptLog) {
+        progressSteps.value[0].status = "completed";
+      }
+      const departLog = logs.find((log) => log.status === 3);
+      if (departLog) {
+        progressSteps.value[1].status = "completed";
+      }
+      const arriveLog = logs.find((log) => log.status === 4);
+      if (arriveLog) {
+        progressSteps.value[2].status = "completed";
+      }
+      const startLog = logs.find((log) => log.status === 5);
+      if (startLog) {
+        progressSteps.value[3].status = "completed";
+      }
+      const completeLog = logs.find((log) => log.status === 6);
+      if (completeLog) {
+        progressSteps.value[4].status = "completed";
       }
     };
-    const onRefreshRestore = () => {
-      isRefreshing.value = false;
+    const getStepClass = (status) => {
+      return status;
     };
-    const loadMore = async () => {
-      if (isLoadingMore.value || !hasMore.value)
-        return;
-      isLoadingMore.value = true;
-      page.value++;
-      try {
-        await loadOrderList();
-      } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/order/detail.vue:324", "加载更多失败:", error);
-        page.value--;
-      } finally {
-        isLoadingMore.value = false;
+    const getConnectorClass = (currentStatus, nextStatus) => {
+      if (currentStatus === "completed") {
+        return "completed";
       }
+      return "pending";
     };
     const getStatusClass = (status) => {
       const statusMap = {
-        "pending": "status-pending",
-        "to-serve": "status-to-serve",
-        "in-progress": "status-in-progress",
-        "completed": "status-completed",
-        "to-review": "status-to-review"
+        1: "status-pending",
+        // 待付款
+        2: "status-to-serve",
+        // 待服务（已支付待确认）
+        3: "status-to-serve",
+        // 待服务（已确认待到达）
+        4: "status-to-serve",
+        // 待服务（已到达待开始）
+        5: "status-in-progress",
+        // 进行中
+        6: "status-completed",
+        // 已完成
+        7: "status-cancelled",
+        // 已取消
+        8: "status-refunded",
+        // 已退款
+        9: "status-refunding",
+        // 退款中
+        10: "status-cancelled",
+        // 超时取消
+        11: "status-to-serve"
+        // 待服务（已确认待开始出发）
       };
       return statusMap[status] || "status-default";
     };
     const getStatusText = (status) => {
       const statusMap = {
-        "pending": "待付款",
-        "to-serve": "待服务",
-        "in-progress": "进行中",
-        "completed": "已完成",
-        "to-review": "待评价"
+        1: "待付款",
+        2: "等待接单",
+        3: "友伴已出发",
+        4: "友伴已到达",
+        5: "进行中",
+        6: "已完成",
+        7: "已取消",
+        8: "已退款",
+        9: "退款中",
+        10: "超时取消",
+        11: "已接单，等待出发"
       };
       return statusMap[status] || "未知状态";
     };
     const getOrderActions = (status) => {
       const actionMap = {
-        "pending": [
+        1: [
+          // 待支付
           { text: "取消订单", action: "cancel", type: "secondary" },
           { text: "立即支付", action: "pay", type: "primary" }
         ],
-        "to-serve": [
-          { text: "取消订单", action: "cancel", type: "secondary" },
-          { text: "联系友伴师", action: "contact", type: "primary" }
+        2: [
+          // 已支付待确认
+          { text: "申请退款", action: "refund", type: "secondary" },
+          { text: "联系友伴", action: "contact", type: "primary" }
         ],
-        "in-progress": [
+        3: [
+          // 已出发待到达
+          { text: "申请退款", action: "refund", type: "secondary" },
+          { text: "联系友伴", action: "contact", type: "primary" }
+        ],
+        4: [
+          // 已到达待开始
+          { text: "申请退款", action: "refund", type: "secondary" },
+          { text: "开始服务", action: "start", type: "start" }
+        ],
+        5: [
+          // 服务中
           { text: "续钟", action: "extend", type: "primary" },
-          { text: "联系友伴师", action: "contact", type: "secondary" }
+          { text: "联系友伴", action: "contact", type: "secondary" }
         ],
-        "completed": [
+        6: [
+          // 已完成
           { text: "再次预约", action: "rebook", type: "primary" }
         ],
-        "to-review": [
-          { text: "立即评价", action: "review", type: "primary" }
+        7: [
+          // 已取消
+          { text: "删除订单", action: "delete", type: "secondary" }
+        ],
+        8: [
+          // 已退款
+          { text: "删除订单", action: "delete", type: "secondary" }
+        ],
+        9: [
+          // 退款中
+          { text: "联系客服", action: "contact", type: "primary" }
+        ],
+        10: [
+          // 订单超时取消
+          { text: "删除订单", action: "delete", type: "secondary" }
+        ],
+        11: [
+          // 已确认待开始出发
+          { text: "申请退款", action: "refund", type: "secondary" },
+          { text: "联系友伴", action: "contact", type: "primary" }
         ]
       };
       return actionMap[status] || [];
@@ -236,11 +184,17 @@ const _sfc_main = {
         case "cancel":
           handleCancelOrder();
           break;
+        case "refund":
+          handleApplyRefund();
+          break;
         case "pay":
           handlePayOrder(order);
           break;
         case "contact":
-          handleContactPartner(order);
+          common_vendor.index.showToast({
+            title: "联系功能暂不可用",
+            icon: "none"
+          });
           break;
         case "extend":
           handleExtendOrder(order);
@@ -248,8 +202,11 @@ const _sfc_main = {
         case "rebook":
           handleRebookOrder(order);
           break;
-        case "review":
-          handleReviewOrder(order);
+        case "delete":
+          handleDeleteOrder();
+          break;
+        case "start":
+          handleStartService();
           break;
       }
     };
@@ -265,32 +222,86 @@ const _sfc_main = {
               title: "订单已取消",
               icon: "success"
             });
-            onRefresh();
           }
         }
       });
     };
-    const handlePayOrder = (order) => {
-      common_vendor.index.navigateTo({
-        url: `/subPackages/order/payment?orderId=${order.id}`
+    const handleApplyRefund = (order) => {
+      common_vendor.index.showModal({
+        title: "申请退款",
+        content: "确定要申请退款吗？",
+        confirmText: "申请退款",
+        cancelText: "取消",
+        success: (res) => {
+          if (res.confirm) {
+            common_vendor.index.showToast({
+              title: "退款申请已提交",
+              icon: "success"
+            });
+          }
+        }
       });
     };
-    const handleContactPartner = (order) => {
-      if (order.partner) {
-        common_vendor.index.showModal({
-          title: "联系友伴师",
-          content: `是否拨打 ${order.partner.name} 的电话？`,
-          confirmText: "拨打",
-          cancelText: "取消",
-          success: (res) => {
-            if (res.confirm) {
-              common_vendor.index.makePhoneCall({
-                phoneNumber: "13800138000"
+    const handlePayOrder = async (order) => {
+      try {
+        common_vendor.index.showLoading({
+          title: "处理中..."
+        });
+        const orderParamsData = {
+          order_id: order.id,
+          payment_method: 1
+        };
+        const paramsResponse = await api_order.orderParams(orderParamsData);
+        if (paramsResponse.data.code === 0) {
+          common_vendor.index.requestPayment({
+            provider: "wxpay",
+            ...paramsResponse.data.data.pay_params,
+            success: (res) => {
+              common_vendor.index.__f__("log", "at subPackages/order/detail.vue:439", "支付成功", res);
+              common_vendor.index.showToast({
+                title: "支付成功",
+                icon: "success"
+              });
+              setTimeout(() => {
+                loadOrderDetail();
+              }, 1500);
+            },
+            fail: (err) => {
+              common_vendor.index.__f__("error", "at subPackages/order/detail.vue:450", "支付失败", JSON.stringify(err));
+              common_vendor.index.showToast({
+                title: "支付失败",
+                icon: "none"
               });
             }
-          }
+          });
+        } else {
+          throw new Error(paramsResponse.data.msg || "获取支付参数失败");
+        }
+      } catch (error) {
+        common_vendor.index.__f__("error", "at subPackages/order/detail.vue:461", "支付失败:", error);
+        common_vendor.index.showToast({
+          title: error.message || "支付失败",
+          icon: "none"
         });
+      } finally {
+        common_vendor.index.hideLoading();
       }
+    };
+    const handleStartService = (order) => {
+      common_vendor.index.showModal({
+        title: "开始服务",
+        content: "确认友伴师已到达并开始服务吗？",
+        confirmText: "开始服务",
+        cancelText: "取消",
+        success: (res) => {
+          if (res.confirm) {
+            common_vendor.index.showToast({
+              title: "服务已开始",
+              icon: "success"
+            });
+          }
+        }
+      });
     };
     const handleExtendOrder = (order) => {
       common_vendor.index.navigateTo({
@@ -298,92 +309,149 @@ const _sfc_main = {
       });
     };
     const handleRebookOrder = (order) => {
-      common_vendor.index.navigateTo({
-        url: `/subPackages/order/rebook?orderId=${order.id}`
-      });
+      if (order.companion_id) {
+        let url = "/subPackages/friend/detail?id=" + order.companion_id + "&city_code=" + cityStore.currentCityCode;
+        common_vendor.index.navigateTo({
+          url
+        });
+      } else {
+        common_vendor.index.showToast({
+          title: "友伴信息不存在",
+          icon: "none"
+        });
+      }
     };
-    const handleReviewOrder = (order) => {
-      common_vendor.index.navigateTo({
-        url: `/subPackages/order/review?orderId=${order.id}`
-      });
-    };
-    const navigateToDetail = (orderId) => {
-      common_vendor.index.navigateTo({
-        url: `/subPackages/order/detail?orderId=${orderId}`
+    const handleDeleteOrder = (order) => {
+      common_vendor.index.showModal({
+        title: "删除订单",
+        content: "确定要删除这个订单吗？删除后不可恢复。",
+        confirmText: "删除",
+        cancelText: "取消",
+        success: (res) => {
+          if (res.confirm) {
+            common_vendor.index.showToast({
+              title: "订单已删除",
+              icon: "success"
+            });
+          }
+        }
       });
     };
     const formatTime = (timeStr) => {
+      if (!timeStr)
+        return "";
       const date = new Date(timeStr);
-      const now = /* @__PURE__ */ new Date();
-      const diff = now - date;
-      if (diff < 6e4) {
-        return "刚刚";
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    };
+    const copyOrderNo = (orderNo) => {
+      if (!orderNo) {
+        common_vendor.index.showToast({
+          title: "订单号为空",
+          icon: "none"
+        });
+        return;
       }
-      if (diff < 36e5) {
-        return `${Math.floor(diff / 6e4)}分钟前`;
+      common_vendor.index.setClipboardData({
+        data: orderNo,
+        success: () => {
+          common_vendor.index.showToast({
+            title: "订单号已复制",
+            icon: "success"
+          });
+        },
+        fail: () => {
+          common_vendor.index.showToast({
+            title: "复制失败",
+            icon: "none"
+          });
+        }
+      });
+    };
+    const formatServiceDateTime = (serviceDate, serviceTime) => {
+      if (!serviceDate && !serviceTime)
+        return "待确认";
+      let result = "";
+      if (serviceDate) {
+        const date = new Date(serviceDate);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const weekday = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"][date.getDay()];
+        result += `${year}-${month}-${day} ${weekday}`;
       }
-      if (diff < 864e5) {
-        return `${Math.floor(diff / 36e5)}小时前`;
+      if (serviceTime) {
+        if (result) {
+          result += " ";
+        }
+        result += serviceTime;
       }
-      return date.toLocaleDateString();
+      return result || "待确认";
     };
     return (_ctx, _cache) => {
+      var _a, _b, _c, _d;
       return common_vendor.e({
-        a: common_vendor.f(statusTabs.value, (tab, index, i0) => {
+        a: common_vendor.t(getStatusText(orderDetail.value.status)),
+        b: common_vendor.n(getStatusClass(orderDetail.value.status)),
+        c: common_vendor.f(progressSteps.value, (step, index, i0) => {
           return common_vendor.e({
-            a: common_vendor.t(tab.label),
-            b: tab.count > 0
-          }, tab.count > 0 ? {
-            c: common_vendor.t(tab.count)
+            a: common_vendor.t(step.icon),
+            b: common_vendor.t(step.title),
+            c: index < progressSteps.value.length - 1
+          }, index < progressSteps.value.length - 1 ? {
+            d: common_vendor.n(getConnectorClass(step.status, progressSteps.value[index + 1].status))
+          } : {}, {
+            e: index,
+            f: common_vendor.n(getStepClass(step.status))
+          });
+        }),
+        d: _ctx.$imgBaseUrl + orderDetail.value.service_image_url,
+        e: common_vendor.t(orderDetail.value.service_name),
+        f: common_vendor.t(orderDetail.value.unit_price),
+        g: common_vendor.t(orderDetail.value.unit),
+        h: common_vendor.t(orderDetail.value.quantity),
+        i: common_vendor.t(orderDetail.value.total_amount),
+        j: (_b = (_a = orderDetail.value) == null ? void 0 : _a.companion) == null ? void 0 : _b.avatar,
+        k: common_vendor.t((_d = (_c = orderDetail.value) == null ? void 0 : _c.companion) == null ? void 0 : _d.nickname),
+        l: common_vendor.t(orderDetail.value.service_address),
+        m: common_vendor.t(formatServiceDateTime(orderDetail.value.service_date, orderDetail.value.service_time)),
+        n: common_vendor.t(orderDetail.value.order_no),
+        o: common_assets._imports_0$6,
+        p: common_vendor.o(($event) => copyOrderNo(orderDetail.value.order_no)),
+        q: orderDetail.value.start_time
+      }, orderDetail.value.start_time ? {
+        r: common_vendor.t(formatTime(orderDetail.value.start_time))
+      } : {}, {
+        s: orderDetail.value.end_time
+      }, orderDetail.value.end_time ? {
+        t: common_vendor.t(formatTime(orderDetail.value.end_time))
+      } : {}, {
+        v: common_vendor.t(formatTime(orderDetail.value.created_at)),
+        w: orderDetail.value.payment_time
+      }, orderDetail.value.payment_time ? {
+        x: common_vendor.t(formatTime(orderDetail.value.payment_time))
+      } : {}, {
+        y: orderDetail.value.remark
+      }, orderDetail.value.remark ? {
+        z: common_vendor.t(orderDetail.value.remark)
+      } : {}, {
+        A: common_vendor.f(getOrderActions(orderDetail.value.status), (action, index, i0) => {
+          return common_vendor.e({
+            a: common_vendor.t(action.text),
+            b: action.text === "联系客服"
+          }, action.text === "联系客服" ? {
+            c: common_vendor.o(() => {
+            }, index)
           } : {}, {
             d: index,
-            e: currentStatus.value === tab.value ? 1 : "",
-            f: common_vendor.o(($event) => switchStatus(tab.value), index)
+            e: common_vendor.n(action.type),
+            f: common_vendor.o(($event) => handleOrderAction(action.action, orderDetail.value), index)
           });
-        }),
-        b: orderList.value.length === 0 && !isLoading.value
-      }, orderList.value.length === 0 && !isLoading.value ? {
-        c: common_assets._imports_0
-      } : common_vendor.e({
-        d: common_vendor.f(orderList.value, (order, k0, i0) => {
-          return common_vendor.e({
-            a: common_vendor.t(order.orderNo),
-            b: common_vendor.t(formatTime(order.createTime)),
-            c: common_vendor.t(getStatusText(order.status)),
-            d: common_vendor.n(getStatusClass(order.status)),
-            e: order.serviceImage,
-            f: common_vendor.t(order.serviceName),
-            g: common_vendor.t(order.serviceDesc),
-            h: common_vendor.t(order.duration),
-            i: common_vendor.t(order.price),
-            j: order.partner
-          }, order.partner ? {
-            k: order.partner.avatar,
-            l: common_vendor.t(order.partner.name),
-            m: common_vendor.t(order.partner.rating),
-            n: common_vendor.t(order.partner.orderCount)
-          } : {}, {
-            o: common_vendor.t(order.totalAmount),
-            p: common_vendor.f(getOrderActions(order.status), (action, actionIndex, i1) => {
-              return {
-                a: common_vendor.t(action.text),
-                b: actionIndex,
-                c: common_vendor.n(action.type),
-                d: common_vendor.o(($event) => handleOrderAction(action.action, order), actionIndex)
-              };
-            }),
-            q: order.id,
-            r: common_vendor.o(($event) => navigateToDetail(order.id), order.id)
-          });
-        }),
-        e: hasMore.value && orderList.value.length > 0
-      }, hasMore.value && orderList.value.length > 0 ? common_vendor.e({
-        f: isLoadingMore.value
-      }, isLoadingMore.value ? {} : {}) : {}), {
-        g: isRefreshing.value,
-        h: common_vendor.o(onRefresh),
-        i: common_vendor.o(onRefreshRestore),
-        j: common_vendor.o(loadMore)
+        })
       });
     };
   }

@@ -1,21 +1,18 @@
 <template>
-    <view class="personal-data-container">
+    <scroll-view class="personal-data-container" scroll-y="true">
       <!-- 优化后的头部信息区 -->
       <view class="profile-header-block">
         <view class="header-row">
-          <view class="left-group">
-            <view class="back-btn-wrap" @click="goBack">
-              <image src="/static/icons/common/arrow-left.png" class="back-btn-icon" mode="aspectFit" />
-            </view>
-            <view class="avatar-wrap">
+                      <view class="left-group">
+              <view class="avatar-wrap">
               <image :src="user.avatar" class="avatar" mode="aspectFill" />
               <view class="online-dot"></view>
             </view>
             <view class="profile-meta">
               <view class="nickname-row">
                 <text class="nickname">{{ user.nickname }}</text>
-                <image v-if="user.verified && currentLevel" :src="currentLevel.icon_url" class="verified-icon" mode="aspectFit" />
-                <text v-if="currentLevel.level_name" class="level-tag">{{ currentLevel.level_name }}</text>
+                <image v-if="user.verified && currentLevel" :src="currentLevel?.icon_url" class="verified-icon" mode="aspectFit" />
+                <text v-if="currentLevel?.level_name" class="level-tag">{{ currentLevel?.level_name }}</text>
               </view>
               <view class="user-tags" v-if="user.tags && user.tags.length > 0">
                 <text v-for="tag in user.tags" :key="tag" class="user-tag">{{ tag }}</text>
@@ -52,7 +49,7 @@
             <text>实名认证</text>
           </view>
           <view class="service-tag-item">
-            <image src="/static/icons/profile/shield.png" class="service-tag-icon" mode="aspectFit" />
+            <image src="/static/icons/profile/lse_icon.png" class="service-tag-icon" mode="aspectFit" />
             <text>绿色服务</text>
           </view>
         </view>
@@ -84,7 +81,7 @@
               </view>
               <view class="service-bottom-row">
                 <text class="service-price">{{ item.price }}元/{{ item.unit || '小时' }}起</text>
-                <view class="order-btn">去下单</view>
+                <view class="order-btn" @click="goToSubmit(item)">去下单</view>
               </view>
             </view>
           </view>
@@ -127,8 +124,9 @@
             <text class="empty-text-profile">~暂无评价~</text>
           </view>
         </view>
-      </view>
-    </view>
+      </view> 
+       <view style="height: 50rpx;"></view>
+    </scroll-view>
   </template>
   
   <script setup>
@@ -164,6 +162,19 @@
 
   ]
 
+  // 跳转到提交订单页面
+  // 传递参数说明：
+  // service_id: 服务项目ID
+  // price_template_id: 价格模板ID
+  // application_id: 友伴师ID
+  // level_order: 友伴师等级序号
+  // nickname: 友伴师昵称
+  const goToSubmit = (item) => {
+    uni.navigateTo({
+      url: `/subPackages/order/submit?service_id=${item.service_id}&price_template_id=${item.price_template_id || ''}&companion_id=${params.value.id}&level_order=${user.value.level_order || ''}&nickname=${user.value.nickname}`
+    })
+  }
+
   // 获取城市服务信息
 const getCityServicesData = async () => {
   try {
@@ -190,10 +201,10 @@ const getCityServicesData = async () => {
         // 更新用户信息
         if (data) {
                   user.value = {
-          avatar: data.photos && data.photos.length > 0 ? data.photos[0] : 'https://images.pexels.com/photos/1391498/pexels-photo-1391498.jpeg?auto=compress&cs=tinysrgb&w=120&h=160&fit=crop',
+          avatar: data.avatar,
           nickname: data.nickname || '未知用户',
           verified: true,
-          levelTag: data.level_name || '',
+       
           age: data.age ,
           weight: data.weight ,
           height: data.height,
@@ -219,10 +230,13 @@ const getCityServicesData = async () => {
               tags: service.service_tags,
               price: service.price,
               service_id: service.service_id,
+              price_template_id: service.price_template_id || '',
               unit: service.unit,
               min_quantity: service.min_quantity
             }))
           }
+       
+
         }
       } else {
         console.error('获取城市服务失败:', response.data?.message || '未知错误')
@@ -232,9 +246,7 @@ const getCityServicesData = async () => {
     }
   }
 
-  function goBack() {
-    uni.navigateBack()
-  }
+
 
   onMounted(async () => {
   // 确保服务等级列表已加载
@@ -261,15 +273,15 @@ const getCityServicesData = async () => {
   <style scoped>
   .personal-data-container {
     background: #fff;
-    min-height: 100vh;
+    height: 100vh;
     font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
   }
   .profile-header-block {
-    margin-top: 50rpx;
-    background: #f8f9fb;
+    margin-top: 0;
+
     border-radius: 0 0 32rpx 32rpx;
     box-shadow: 0 4rpx 24rpx rgba(115,99,255,0.06);
-    padding: 36rpx 32rpx 24rpx 10rpx;
+    padding: 0rpx 0rpx 24rpx 20rpx;
     margin-bottom: 0;
     position: relative;
     z-index: 11;
@@ -286,25 +298,18 @@ const getCityServicesData = async () => {
     min-width: 0;
     padding-right: 20rpx; /* 为胶囊按钮留出空间 */
   }
-  .back-btn-icon {
-    width: 50rpx;
-    height: 50rpx;
-    display: block;
-    margin-right: 12rpx;
-    padding-left: 16rpx;
-    filter: grayscale(1) brightness(1.8);
-  }
+
   .avatar-wrap {
     position: relative;
     margin-right: 18rpx;
   }
   .avatar {
-    width: 80rpx;
-    height: 80rpx;
+    width: 72rpx;
+    height: 72rpx;
     border-radius: 50%;
-    border: 4rpx solid #fff;
+ 
     object-fit: cover;
-    box-shadow: 0 4rpx 16rpx rgba(115,99,255,0.10);
+
   }
   .online-dot {
     position: absolute;
@@ -329,11 +334,11 @@ const getCityServicesData = async () => {
     gap: 10rpx;
   }
   .nickname {
-    font-size: 24rpx;
+    font-size: 26rpx;
     font-weight: 600;
     color: #222;
     margin-right: 4rpx;
-    max-width: 180rpx;
+    max-width: 200rpx;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -358,7 +363,7 @@ const getCityServicesData = async () => {
     margin-top: 8rpx;
     max-width: 100%;
     word-break: break-all;
-    margin-right: 60px;
+    margin-right: 20rpx;
   }
   
   .user-tag {
@@ -379,12 +384,12 @@ const getCityServicesData = async () => {
   }
   .banner-swiper-inner {
     width: 100%;
-    height: 340rpx;
+    height: 420rpx;
     overflow: hidden;
   }
   .banner-img {
     width: 100%;
-    height: 340rpx;
+    height: 420rpx;
     object-fit: cover;
   }
   .profile-meta-topbar {
@@ -557,10 +562,10 @@ const getCityServicesData = async () => {
     align-items: center;
     background: #fff;
     border-radius: 24rpx;
-    margin: 32rpx 24rpx 0 24rpx;
+    margin: 0rpx 24rpx 0 24rpx;
     box-shadow: 0 4rpx 24rpx rgba(115,99,255,0.06);
     padding: 0 8rpx;
-    height: 90rpx;
+ 
   }
   .profile-tab {
     flex: 1;

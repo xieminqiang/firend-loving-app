@@ -2,11 +2,16 @@
 const common_vendor = require("../../../common/vendor.js");
 const common_assets = require("../../../common/assets.js");
 const api_friends = require("../../../api/friends.js");
-const api_order = require("../../../api/order.js");
+require("../../../config/http.js");
 const stores_level = require("../../../stores/level.js");
 const stores_city = require("../../../stores/city.js");
+if (!Array) {
+  const _easycom_uni_popup2 = common_vendor.resolveComponent("uni-popup");
+  _easycom_uni_popup2();
+}
+const _easycom_uni_popup = () => "../../../uni_modules/uni-popup/components/uni-popup/uni-popup.js";
 if (!Math) {
-  (CitySelector + CityPicker)();
+  (CitySelector + CityPicker + _easycom_uni_popup)();
 }
 const CitySelector = () => "../../../components/common/CitySelector.js";
 const CityPicker = () => "../../../components/common/CityPicker.js";
@@ -108,7 +113,7 @@ const _sfc_main = {
           // 动态生成级别选项，使用全局缓存的服务等级列表
           ...levelStore.sortedServiceLevels.map((level) => ({
             value: level.level_order.toString(),
-            label: `${level.level_name}级别`,
+            label: `${level.level_name}`,
             icon: level.icon_url || "/static/icons/friend/star.png"
           }))
         ],
@@ -155,7 +160,7 @@ const _sfc_main = {
       filters[activeModal.value].value = "all";
     };
     const applyFilter = () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:327", "应用筛选:", {
+      common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:367", "应用筛选:", {
         gender: genderFilter.value,
         distance: distanceFilter.value,
         level: levelFilter.value,
@@ -165,86 +170,61 @@ const _sfc_main = {
       searchCompanionsData(true);
     };
     const refreshRecommend = () => {
-      common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:340", "刷新推荐，清除筛选条件");
+      common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:380", "刷新推荐，清除筛选条件");
       genderFilter.value = "all";
       levelFilter.value = "all";
       searchCompanionsData(true);
     };
-    const navigateToBooking = async (item) => {
-      var _a, _b, _c;
+    const servicePopup = common_vendor.ref(null);
+    const currentPartnerServices = common_vendor.ref([]);
+    const currentPartner = common_vendor.ref(null);
+    const scrollTop = common_vendor.ref(0);
+    const openServicePopup = async (partner) => {
+      currentPartner.value = partner;
       try {
-        common_vendor.index.showLoading({
-          title: "创建订单中..."
-        });
-        const orderData = {
-          companion_id: item.id,
-          service_id: 3,
-          // 取第一个服务ID
-          city_code: cityStore.currentCityCode || 110100,
-          // 当前选中的城市代码
-          quantity: 3,
-          // 固定数量
-          service_address: "北京市朝阳区三里屯",
-          // 固定地址
-          service_date: "2025-01-28",
-          // 固定日期
-          service_time: "14:00-16:00",
-          // 固定时间
-          remark: "请准时到达",
-          // 固定备注
-          user_latitude: ((_a = cityStore.userLocation) == null ? void 0 : _a.latitude) || 39.9042,
-          // 用户当前纬度
-          user_longitude: ((_b = cityStore.userLocation) == null ? void 0 : _b.longitude) || 116.4074
-          // 用户当前经度
+        const requestParams = {
+          city_code: cityStore.currentCityCode,
+          application_id: partner.id
         };
-        common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:373", "创建订单参数:", orderData);
-        const response = await api_order.createOrder(orderData);
-        common_vendor.index.hideLoading();
+        if (latitude.value && longitude.value) {
+          requestParams.latitude = parseFloat(latitude.value);
+          requestParams.longitude = parseFloat(longitude.value);
+        }
+        const response = await api_friends.getCityServices(requestParams);
         if (response.data && response.data.code === 0) {
-          common_vendor.index.showToast({
-            title: "邀约成功",
-            icon: "success"
-          });
-          try {
-            const orderParamsData = {
-              order_id: response.data.data.order_id,
-              payment_method: 1
-            };
-            const paramsResponse = await api_order.orderParams(orderParamsData);
-            common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:396", "订单参数接口调用成功:", paramsResponse.data);
-            common_vendor.index.requestPayment({
-              provider: "wxpay",
-              ...paramsResponse.data.data.pay_params,
-              success: (res) => {
-                common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:402", "支付成功", res);
-                common_vendor.index.showToast({
-                  title: "支付成功",
-                  icon: "success"
-                });
-              },
-              fail: (err) => {
-                common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:411", "支付失败", JSON.stringify(err));
-              }
-            });
-          } catch (paramsError) {
-            common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:418", "订单参数接口调用失败:", paramsError);
+          const data = response.data.data;
+          if (data && data.services && data.services.length > 0) {
+            currentPartnerServices.value = data.services.map((service) => ({
+              title: service.service_name,
+              img: "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com" + service.service_image_url || "",
+              tags: service.service_tags || [],
+              price: service.price,
+              service_id: service.service_id,
+              price_template_id: service.price_template_id || "",
+              unit: service.unit,
+              min_quantity: service.min_quantity
+            }));
+          } else {
+            currentPartnerServices.value = [];
           }
-          common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:422", "订单创建成功:", response.data.data);
         } else {
-          const errorMsg = ((_c = response.data) == null ? void 0 : _c.message) || "创建订单失败";
-          common_vendor.index.showToast({
-            title: errorMsg,
-            icon: "none"
-          });
+          currentPartnerServices.value = [];
         }
       } catch (error) {
-        common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:435", "创建订单失败:", error);
-        common_vendor.index.showToast({
-          title: "创建订单失败，请重试",
-          icon: "none"
-        });
+        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:435", "获取服务信息失败:", error);
+        currentPartnerServices.value = [];
       }
+      servicePopup.value.open();
+    };
+    const closeServicePopup = () => {
+      servicePopup.value.close();
+    };
+    const goToSubmit = (item) => {
+      common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:449", "选择服务:", item);
+      closeServicePopup();
+      common_vendor.index.navigateTo({
+        url: `/subPackages/order/submit?service_id=${item.service_id}&price_template_id=${item.price_template_id || ""}&companion_id=${currentPartner.value.id}&level_order=${currentPartner.value.level_order || ""}&nickname=${currentPartner.value.name}`
+      });
     };
     const navigateToDetail = (partnerId) => {
       let url = "/subPackages/friend/detail?id=" + partnerId + "&city_code=" + cityStore.currentCityCode;
@@ -281,9 +261,9 @@ const _sfc_main = {
         if (levelFilter.value !== "all") {
           params.level_order = parseInt(levelFilter.value);
         }
-        common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:542", "搜索参数:", params);
+        common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:558", "搜索参数:", params);
         const response = await api_friends.searchCompanions(params);
-        common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:546", "API完整响应:", response);
+        common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:562", "API完整响应:", response);
         if (response.data && response.data.code === 0) {
           const data = response.data.data;
           if (data && data.list) {
@@ -294,21 +274,21 @@ const _sfc_main = {
               age: item.age,
               height: item.height,
               weight: item.weight,
-              distance: item.distance ? parseFloat(item.distance) : 0,
+              distance: item.distance,
               tags: item.tags || [],
               services: (() => {
                 if (typeof item.services === "string") {
                   try {
                     return JSON.parse(item.services);
                   } catch (e) {
-                    common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:565", "解析services JSON失败:", e);
+                    common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:581", "解析services JSON失败:", e);
                     return [];
                   }
                 }
                 return item.services || [];
               })(),
               // 安全解析JSON字符串数组
-              avatar: item.photos && item.photos.length > 0 ? item.photos[0] : "https://images.pexels.com/photos/1391498/pexels-photo-1391498.jpeg?auto=compress&cs=tinysrgb&w=120&h=160&fit=crop",
+              avatar: item.avatar,
               online: item.is_online === 1,
               bookable: item.can_accept_orders === "Y"
             }));
@@ -321,18 +301,18 @@ const _sfc_main = {
             }
             total.value = data.total || 0;
             hasMore.value = newData.length === pageSize.value;
-            common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:587", "搜索成功，共获取", newData.length, "条数据，总数:", total.value);
+            common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:603", "搜索成功，共获取", newData.length, "条数据，总数:", total.value);
             if (newData.length === 0 && isRefresh) {
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:598", "API返回数据为空");
+            common_vendor.index.__f__("log", "at pages/tabbar/friends/index.vue:614", "API返回数据为空");
             if (isRefresh) {
               partnersList.value = [];
               total.value = 0;
             }
           }
         } else {
-          common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:606", "API返回错误:", response.data);
+          common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:622", "API返回错误:", response.data);
           const errorMsg = ((_a = response.data) == null ? void 0 : _a.message) || "搜索失败";
           common_vendor.index.showToast({
             title: errorMsg,
@@ -345,8 +325,8 @@ const _sfc_main = {
           }
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:620", "搜索伴友师失败:", error);
-        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:621", "错误详情:", error.response || error);
+        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:636", "搜索伴友师失败:", error);
+        common_vendor.index.__f__("error", "at pages/tabbar/friends/index.vue:637", "错误详情:", error.response || error);
         let errorMsg = "搜索失败，请重试";
         if (error.response && error.response.data) {
           errorMsg = error.response.data.message || errorMsg;
@@ -409,17 +389,17 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_vendor.o(($event) => showCityPicker.value = true),
-        b: common_assets._imports_0$1,
+        b: common_assets._imports_1,
         c: common_vendor.o([($event) => search.value = $event.detail.value, onSearchInput]),
         d: search.value,
         e: safeAreaRight.value + "px",
-        f: common_assets._imports_1,
+        f: common_assets._imports_1$1,
         g: common_vendor.o(refreshRecommend),
         h: common_vendor.t(getGenderFilterText.value),
-        i: common_assets._imports_1$1,
+        i: common_assets._imports_1$2,
         j: common_vendor.o(($event) => openFilterModal("gender")),
         k: common_vendor.t(getLevelFilterText.value),
-        l: common_assets._imports_1$1,
+        l: common_assets._imports_1$2,
         m: common_vendor.o(($event) => openFilterModal("level")),
         n: statusBarHeight.value + "px",
         o: loading.value && !dataLoaded.value
@@ -432,47 +412,44 @@ const _sfc_main = {
             c: common_vendor.t(p.name),
             d: p.gender === "女"
           }, p.gender === "女" ? {
-            e: common_assets._imports_1$2
+            e: common_assets._imports_2
           } : {
-            f: common_assets._imports_0$2
+            f: common_assets._imports_3$1
           }, {
             g: common_vendor.t(p.age),
             h: common_vendor.t(p.height),
             i: common_vendor.t(p.weight),
-            j: p.distance > 0
-          }, p.distance > 0 ? {
-            k: common_assets._imports_5$1,
-            l: common_vendor.t(p.distance)
-          } : {}, {
-            m: common_vendor.f(p.visibleTags, (tag, index, i1) => {
+            j: common_vendor.t(p.distance),
+            k: common_vendor.f(p.visibleTags, (tag, index, i1) => {
               return {
                 a: common_vendor.t(tag),
                 b: index
               };
             }),
-            n: p.extraTags > 0
+            l: p.extraTags > 0
           }, p.extraTags > 0 ? {
-            o: common_vendor.t(p.extraTags)
+            m: common_vendor.t(p.extraTags)
           } : {}, {
-            p: common_vendor.o(($event) => navigateToBooking(p), p.id),
-            q: p.id,
-            r: common_vendor.o(($event) => navigateToDetail(p.id), p.id)
+            n: common_vendor.o(($event) => openServicePopup(p), p.id),
+            o: p.id,
+            p: common_vendor.o(($event) => navigateToDetail(p.id), p.id)
           });
-        })
+        }),
+        r: common_assets._imports_4
       } : dataLoaded.value && processedPartnersList.value.length === 0 ? {
-        s: common_assets._imports_0
+        t: common_assets._imports_3
       } : {}, {
         p: processedPartnersList.value.length > 0,
-        r: dataLoaded.value && processedPartnersList.value.length === 0,
-        t: common_vendor.o(loadMore),
-        v: isRefreshing.value,
-        w: common_vendor.o(onRefresh),
-        x: activeModal.value
+        s: dataLoaded.value && processedPartnersList.value.length === 0,
+        v: common_vendor.o(loadMore),
+        w: isRefreshing.value,
+        x: common_vendor.o(onRefresh),
+        y: activeModal.value
       }, activeModal.value ? {
-        y: common_vendor.t(getModalTitle.value),
-        z: common_assets._imports_5,
-        A: common_vendor.o(closeModal),
-        B: common_vendor.f(getFilterOptions.value, (option, k0, i0) => {
+        z: common_vendor.t(getModalTitle.value),
+        A: common_assets._imports_6,
+        B: common_vendor.o(closeModal),
+        C: common_vendor.f(getFilterOptions.value, (option, k0, i0) => {
           return common_vendor.e({
             a: option.icon
           }, option.icon ? {
@@ -490,16 +467,50 @@ const _sfc_main = {
             h: common_vendor.o(($event) => selectOption(option.value), option.value)
           });
         }),
-        C: common_vendor.o(resetFilter),
-        D: common_vendor.o(applyFilter),
-        E: common_vendor.o(() => {
+        D: common_vendor.o(resetFilter),
+        E: common_vendor.o(applyFilter),
+        F: common_vendor.o(() => {
         }),
-        F: common_vendor.o(closeModal)
+        G: common_vendor.o(closeModal)
       } : {}, {
-        G: common_vendor.o(onCitySelected),
-        H: common_vendor.o(($event) => showCityPicker.value = $event),
-        I: common_vendor.p({
+        H: common_vendor.o(onCitySelected),
+        I: common_vendor.o(($event) => showCityPicker.value = $event),
+        J: common_vendor.p({
           visible: showCityPicker.value
+        }),
+        K: common_assets._imports_6,
+        L: common_vendor.o(closeServicePopup),
+        M: currentPartnerServices.value.length > 0
+      }, currentPartnerServices.value.length > 0 ? {
+        N: common_vendor.f(currentPartnerServices.value, (item, k0, i0) => {
+          return {
+            a: item.img,
+            b: common_vendor.t(item.title),
+            c: common_vendor.f(item.tags, (tag, k1, i1) => {
+              return {
+                a: common_vendor.t(tag),
+                b: tag
+              };
+            }),
+            d: common_vendor.t(item.price),
+            e: common_vendor.t(item.unit || "小时"),
+            f: common_vendor.o(($event) => goToSubmit(item), item.title),
+            g: item.title
+          };
+        })
+      } : {
+        O: common_assets._imports_3
+      }, {
+        P: scrollTop.value,
+        Q: common_vendor.sr(servicePopup, "5e09aaad-2", {
+          "k": "servicePopup"
+        }),
+        R: common_vendor.o(closeServicePopup),
+        S: common_vendor.p({
+          type: "bottom",
+          ["mask-click"]: true,
+          round: "20",
+          ["safe-area"]: false
         })
       });
     };

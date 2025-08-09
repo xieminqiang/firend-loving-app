@@ -23,6 +23,11 @@ const _sfc_main = {
       return levelStore.sortedServiceLevels.find((level) => level.level_order === user.value.level_order);
     });
     const comments = [];
+    const goToSubmit = (item) => {
+      common_vendor.index.navigateTo({
+        url: `/subPackages/order/submit?service_id=${item.service_id}&price_template_id=${item.price_template_id || ""}&companion_id=${params.value.id}&level_order=${user.value.level_order || ""}&nickname=${user.value.nickname}`
+      });
+    };
     const getCityServicesData = async () => {
       var _a;
       try {
@@ -35,16 +40,15 @@ const _sfc_main = {
           requestParams.longitude = parseFloat(params.value.longitude);
         }
         const response = await api_friends.getCityServices(requestParams);
-        common_vendor.index.__f__("log", "at subPackages/friend/detail.vue:183", "城市服务信息响应:", response);
+        common_vendor.index.__f__("log", "at subPackages/friend/detail.vue:194", "城市服务信息响应:", response);
         if (response.data && response.data.code === 0) {
           const data = response.data.data;
-          common_vendor.index.__f__("log", "at subPackages/friend/detail.vue:188", "城市服务数据:", data);
+          common_vendor.index.__f__("log", "at subPackages/friend/detail.vue:199", "城市服务数据:", data);
           if (data) {
             user.value = {
-              avatar: data.photos && data.photos.length > 0 ? data.photos[0] : "https://images.pexels.com/photos/1391498/pexels-photo-1391498.jpeg?auto=compress&cs=tinysrgb&w=120&h=160&fit=crop",
+              avatar: data.avatar,
               nickname: data.nickname || "未知用户",
               verified: true,
-              levelTag: data.level_name || "",
               age: data.age,
               weight: data.weight,
               height: data.height,
@@ -70,28 +74,26 @@ const _sfc_main = {
                 tags: service.service_tags,
                 price: service.price,
                 service_id: service.service_id,
+                price_template_id: service.price_template_id || "",
                 unit: service.unit,
                 min_quantity: service.min_quantity
               }));
             }
           }
         } else {
-          common_vendor.index.__f__("error", "at subPackages/friend/detail.vue:228", "获取城市服务失败:", ((_a = response.data) == null ? void 0 : _a.message) || "未知错误");
+          common_vendor.index.__f__("error", "at subPackages/friend/detail.vue:242", "获取城市服务失败:", ((_a = response.data) == null ? void 0 : _a.message) || "未知错误");
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at subPackages/friend/detail.vue:231", "获取城市服务异常:", error);
+        common_vendor.index.__f__("error", "at subPackages/friend/detail.vue:245", "获取城市服务异常:", error);
       }
     };
-    function goBack() {
-      common_vendor.index.navigateBack();
-    }
     common_vendor.onMounted(async () => {
       await levelStore.fetchServiceLevels();
       const pages = getCurrentPages();
       const currentPage = pages[pages.length - 1];
       params.value = currentPage.options || {};
-      common_vendor.index.__f__("log", "at subPackages/friend/detail.vue:248", "页面参数:", params.value);
-      common_vendor.index.__f__("log", "at subPackages/friend/detail.vue:249", "经纬度参数:", {
+      common_vendor.index.__f__("log", "at subPackages/friend/detail.vue:260", "页面参数:", params.value);
+      common_vendor.index.__f__("log", "at subPackages/friend/detail.vue:261", "经纬度参数:", {
         latitude: params.value.latitude,
         longitude: params.value.longitude
       });
@@ -100,47 +102,46 @@ const _sfc_main = {
       }
     });
     return (_ctx, _cache) => {
+      var _a, _b, _c, _d;
       return common_vendor.e({
-        a: common_assets._imports_0$6,
-        b: common_vendor.o(goBack),
-        c: user.value.avatar,
-        d: common_vendor.t(user.value.nickname),
-        e: user.value.verified && currentLevel.value
+        a: user.value.avatar,
+        b: common_vendor.t(user.value.nickname),
+        c: user.value.verified && currentLevel.value
       }, user.value.verified && currentLevel.value ? {
-        f: currentLevel.value.icon_url
+        d: (_a = currentLevel.value) == null ? void 0 : _a.icon_url
       } : {}, {
-        g: currentLevel.value.level_name
-      }, currentLevel.value.level_name ? {
-        h: common_vendor.t(currentLevel.value.level_name)
+        e: (_b = currentLevel.value) == null ? void 0 : _b.level_name
+      }, ((_c = currentLevel.value) == null ? void 0 : _c.level_name) ? {
+        f: common_vendor.t((_d = currentLevel.value) == null ? void 0 : _d.level_name)
       } : {}, {
-        i: user.value.tags && user.value.tags.length > 0
+        g: user.value.tags && user.value.tags.length > 0
       }, user.value.tags && user.value.tags.length > 0 ? {
-        j: common_vendor.f(user.value.tags, (tag, k0, i0) => {
+        h: common_vendor.f(user.value.tags, (tag, k0, i0) => {
           return {
             a: common_vendor.t(tag),
             b: tag
           };
         })
       } : {}, {
-        k: user.value.gender === "女" ? "/static/icons/friend/white_nv.png" : "/static/icons/friend/white_nan.png",
-        l: common_vendor.t(user.value.age),
-        m: common_vendor.t(user.value.weight),
-        n: common_vendor.t(user.value.height),
-        o: user.value.distance !== ""
+        i: user.value.gender === "女" ? "/static/icons/friend/white_nv.png" : "/static/icons/friend/white_nan.png",
+        j: common_vendor.t(user.value.age),
+        k: common_vendor.t(user.value.weight),
+        l: common_vendor.t(user.value.height),
+        m: user.value.distance !== ""
       }, user.value.distance !== "" ? {
-        p: common_assets._imports_1$7,
-        q: common_vendor.t(user.value.distance)
+        n: common_assets._imports_0$5,
+        o: common_vendor.t(user.value.distance)
       } : {}, {
-        r: common_vendor.f(banners.value, (item, idx, i0) => {
+        p: common_vendor.f(banners.value, (item, idx, i0) => {
           return {
             a: item.img,
             b: idx
           };
         }),
-        s: common_assets._imports_2$1,
-        t: common_assets._imports_3$2,
-        v: common_assets._imports_4$1,
-        w: common_vendor.f(tabs, (tab, idx, i0) => {
+        q: common_assets._imports_1$8,
+        r: common_assets._imports_2$4,
+        s: common_assets._imports_3$3,
+        t: common_vendor.f(tabs, (tab, idx, i0) => {
           return common_vendor.e({
             a: common_vendor.t(tab),
             b: activeTab.value === idx
@@ -152,9 +153,9 @@ const _sfc_main = {
             e: common_vendor.o(($event) => switchTab(idx), tab)
           });
         }),
-        x: services.value.length > 0
+        v: services.value.length > 0
       }, services.value.length > 0 ? {
-        y: common_vendor.f(services.value, (item, k0, i0) => {
+        w: common_vendor.f(services.value, (item, k0, i0) => {
           return {
             a: item.img,
             b: common_vendor.t(item.title),
@@ -166,18 +167,19 @@ const _sfc_main = {
             }),
             d: common_vendor.t(item.price),
             e: common_vendor.t(item.unit || "小时"),
-            f: item.title
+            f: common_vendor.o(($event) => goToSubmit(item), item.title),
+            g: item.title
           };
         })
       } : {
-        z: common_assets._imports_0
+        x: common_assets._imports_3
       }, {
-        A: activeTab.value === 0,
-        B: common_assets._imports_0,
-        C: activeTab.value === 1,
-        D: comments.length > 0
+        y: activeTab.value === 0,
+        z: common_assets._imports_3,
+        A: activeTab.value === 1,
+        B: comments.length > 0
       }, comments.length > 0 ? {
-        E: common_vendor.f(comments, (comment, idx, i0) => {
+        C: common_vendor.f(comments, (comment, idx, i0) => {
           return {
             a: comment.avatar,
             b: common_vendor.t(comment.name),
@@ -202,9 +204,9 @@ const _sfc_main = {
           };
         })
       } : {
-        F: common_assets._imports_0
+        D: common_assets._imports_3
       }, {
-        G: activeTab.value === 2
+        E: activeTab.value === 2
       });
     };
   }

@@ -411,27 +411,6 @@ to {
   display: flex;
   gap: 16rpx;
 }
-.contact-btn.data-v-5b390ea8 {
-  flex: 0 0 auto;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(247, 248, 250, 0.8) 100%);
-  border: 2rpx solid rgba(0, 0, 0, 0.1);
-  color: #1A1A1A;
-  padding: 16rpx 24rpx;
-  border-radius: 32rpx;
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-}
-.contact-btn.data-v-5b390ea8:active {
-  transform: scale(0.98);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(247, 248, 250, 0.9) 100%);
-}
-.btn-icon.data-v-5b390ea8 {
-  width: 32rpx;
-  height: 32rpx;
-}
 .book-btn.data-v-5b390ea8 {
   flex: 1;
   background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);

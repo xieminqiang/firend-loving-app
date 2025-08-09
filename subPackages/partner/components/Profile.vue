@@ -4,8 +4,8 @@
       <view class="profile-header" @click="goToDataEdit">
         <view class="avatar-container">
           <image 
-            v-if="applicationInfo && applicationInfo.photos && applicationInfo.photos.length > 0"
-            :src="applicationInfo.photos[0]" 
+            v-if="applicationInfo && applicationInfo.avatar"
+            :src="applicationInfo.avatar" 
             class="avatar-img" 
             mode="aspectFill" 
           />
@@ -56,29 +56,14 @@
       
       <!-- 功能列表 -->
       <view class="function-list">
-        <view class="function-item" @click="handleFunctionClick('service')">
-          <view class="function-icon">📋</view>
-          <text class="function-text">我的服务</text>
-          <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
-        </view>
-        <view class="function-item" @click="handleFunctionClick('review')">
-          <view class="function-icon">⭐</view>
-          <text class="function-text">我的评价</text>
-          <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
-        </view>
-        <view class="function-item" @click="handleFunctionClick('statistics')">
-          <view class="function-icon">📊</view>
-          <text class="function-text">数据统计</text>
+        <view class="function-item" @click="handleFunctionClick('orders')">
+          <image src="@/static/icons/profile/dingdan.png" class="function-icon-img" mode="aspectFit" />
+          <text class="function-text">我的订单</text>
           <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
         </view>
         <view class="function-item" @click="handleFunctionClick('level')">
-          <view class="function-icon">🏆</view>
+          <image src="@/static/icons/profile/dengji.png" class="function-icon-img" mode="aspectFit" />
           <text class="function-text">友伴等级说明</text>
-          <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
-        </view>
-        <view class="function-item" @click="handleFunctionClick('settings')">
-          <view class="function-icon">⚙️</view>
-          <text class="function-text">设置</text>
           <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
         </view>
       </view>
@@ -160,33 +145,14 @@ const handleBalanceAction = (action) => {
 // 处理功能点击
 const handleFunctionClick = (functionName) => {
   switch (functionName) {
-    case 'service':
-      uni.showToast({
-        title: '我的服务功能开发中',
-        icon: 'none'
-      })
-      break
-    case 'review':
-      uni.showToast({
-        title: '我的评价功能开发中',
-        icon: 'none'
-      })
-      break
-    case 'statistics':
-      uni.showToast({
-        title: '数据统计功能开发中',
-        icon: 'none'
+    case 'orders':
+      uni.navigateTo({
+        url: `/subPackages/partner/order/index?companion_id=${props.applicationInfo?.id || ''}`
       })
       break
     case 'level':
       uni.navigateTo({
         url: '/subPackages/partner/level/index'
-      })
-      break
-    case 'settings':
-      uni.showToast({
-        title: '设置功能开发中',
-        icon: 'none'
       })
       break
   }
@@ -243,29 +209,28 @@ const handleApplicationStatusChanged = (data) => {
 
 <style lang="scss" scoped>
 .profile-content {
-  padding: 32rpx;
+  padding: 20rpx;
 }
 
 .profile-header {
   background: #FFFFFF;
   border-radius: 20rpx;
-  padding: 32rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
-  border: 1rpx solid #f0f0f0;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+
   display: flex;
   align-items: center;
 }
 
 .avatar-container {
-  margin-right: 24rpx;
+  margin-right: 20rpx;
 }
 
 .avatar-img {
   width: 120rpx;
   height: 120rpx;
   border-radius: 50%;
-  border: 2rpx solid #e9ecef;
+
 }
 
 .avatar-placeholder {
@@ -404,13 +369,13 @@ const handleApplicationStatusChanged = (data) => {
 }
 
 .account-info {
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
 }
 
 .balance-card {
   background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
   border-radius: 20rpx;
-  padding: 32rpx;
+  padding: 28rpx;
   color: white;
   text-align: center;
 }
@@ -453,15 +418,13 @@ const handleApplicationStatusChanged = (data) => {
 .function-list {
   background: #FFFFFF;
   border-radius: 20rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
-  border: 1rpx solid #f0f0f0;
+
 }
 
 .function-item {
   display: flex;
   align-items: center;
-  padding: 32rpx;
+  padding: 28rpx;
   border-bottom: 1rpx solid #f0f0f0;
   transition: all 0.2s;
 }
@@ -476,6 +439,12 @@ const handleApplicationStatusChanged = (data) => {
 
 .function-icon {
   font-size: 40rpx;
+  margin-right: 24rpx;
+}
+
+.function-icon-img {
+  width: 40rpx;
+  height: 40rpx;
   margin-right: 24rpx;
 }
 

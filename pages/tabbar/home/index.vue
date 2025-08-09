@@ -464,7 +464,7 @@ const onRefresh = async (tab) => {
     
     // 下拉刷新时强制重新加载数据
     console.log(`下拉刷新${tab}选项卡数据`)
-    await loadSingleTabData(tab, true)
+    await loadSingleTabData(tab, false)
     // 模拟加载时间，确保用户能看到刷新动画
     await new Promise(resolve => setTimeout(resolve, 800))
   } catch (error) {

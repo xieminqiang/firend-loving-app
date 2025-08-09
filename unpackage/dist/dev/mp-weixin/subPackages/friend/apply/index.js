@@ -553,10 +553,10 @@ const _sfc_main = {
       return common_vendor.e({
         a: formData.nickname,
         b: common_vendor.o(($event) => formData.nickname = $event.detail.value),
-        c: common_assets._imports_0$2,
+        c: common_assets._imports_3$1,
         d: formData.gender === "male" ? 1 : "",
         e: common_vendor.o(($event) => selectGender("male")),
-        f: common_assets._imports_1$2,
+        f: common_assets._imports_2,
         g: formData.gender === "female" ? 1 : "",
         h: common_vendor.o(($event) => selectGender("female")),
         i: formData.age,

@@ -93,10 +93,6 @@
     <!-- 底部预约按钮 -->
     <view class="bottom-section" v-if="!loading && !error">
       <view class="action-buttons">
-        <view class="contact-btn" @click="contactService">
-          <image src="@/static/icons/friend/message.png" class="btn-icon" mode="aspectFit" />
-          <text>咨询</text>
-        </view>
         <view class="book-btn" @click="bookService">
           <text>立即预约</text>
         </view>
@@ -230,40 +226,11 @@ const previewImage = () => {
     })
   }
 }
-
-// 咨询服务
-const contactService = () => {
-  uni.showModal({
-    title: '咨询服务',
-    content: '是否要联系客服咨询此服务？',
-    success: (res) => {
-      if (res.confirm) {
-        uni.showToast({
-          title: '正在为您转接客服...',
-          icon: 'none'
-        })
-      }
-    }
-  })
-}
-
 // 预约服务
 const bookService = () => {
-  uni.showModal({
-    title: '确认预约',
-    content: `确认预约${serviceDetail.value.name}？`,
-    success: (res) => {
-      if (res.confirm) {
-        uni.showToast({
-          title: '预约成功！',
-          icon: 'success'
-        })
-        
-        setTimeout(() => {
-          uni.navigateBack()
-        }, 2000)
-      }
-    }
+  // 跳转到友伴选择页面，传递服务ID
+  uni.navigateTo({
+    url: `/subPackages/friend/friend-select?service_id=${serviceDetail.value.id}`
   })
 }
 </script>
@@ -719,30 +686,6 @@ const bookService = () => {
 .action-buttons {
   display: flex;
   gap: 16rpx;
-}
-
-.contact-btn {
-  flex: 0 0 auto;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(247, 248, 250, 0.8) 100%);
-  border: 2rpx solid rgba(0, 0, 0, 0.1);
-  color: $text-color-primary;
-  padding: 16rpx 24rpx;
-  border-radius: 32rpx;
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-  
-  &:active {
-    transform: scale(0.98);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(247, 248, 250, 0.9) 100%);
-  }
-}
-
-.btn-icon {
-  width: 32rpx;
-  height: 32rpx;
 }
 
 .book-btn {

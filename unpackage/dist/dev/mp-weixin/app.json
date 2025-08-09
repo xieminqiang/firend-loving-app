@@ -32,21 +32,26 @@
       "pages": [
         "index",
         "DataEdetion/index",
-        "level/index"
+        "level/index",
+        "order/index",
+        "components/DataSelect",
+        "order/detail"
       ]
     },
     {
       "root": "subPackages/friend",
       "pages": [
         "apply/index",
-        "detail"
+        "detail",
+        "friend-select"
       ]
     },
     {
       "root": "subPackages/order",
       "pages": [
         "index",
-        "detail"
+        "detail",
+        "submit"
       ]
     }
   ],
@@ -57,7 +62,7 @@
     "backgroundColor": "#F5F5F5"
   },
   "tabBar": {
-    "color": "#BFBFBF",
+    "color": "#1A1A1A",
     "selectedColor": "#7363FF",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
