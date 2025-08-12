@@ -1,0 +1,1 @@
+"use strict";const e=require("../../../../common/vendor.js"),o={__name:"index",setup:o=>(e.ref({}),e.onMounted((()=>{console.log("账户设置页面加载完成")})),(e,o)=>({}))},n=e._export_sfc(o,[["__scopeId","data-v-36f0092b"]]);wx.createPage(n);

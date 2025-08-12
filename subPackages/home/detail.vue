@@ -197,7 +197,7 @@ const onImageError = () => {
 const previewImage = () => {
   if (serviceDetail.value && serviceDetail.value.image_url) {
     // 直接使用配置的图片基础URL
-    const imgBaseUrl = 'https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com'
+    const imgBaseUrl = 'https://sbx-server.oss-cn-shenzhen.aliyuncs.com'
     
     const imageUrl = serviceDetail.value.image_url.startsWith('http') 
       ? serviceDetail.value.image_url 

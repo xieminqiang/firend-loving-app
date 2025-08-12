@@ -6,12 +6,12 @@
     >
       <!-- 订单状态进度条 -->
       <view class="status-progress">
-        <view class="progress-header">
+       <view class="progress-header">
           <text class="progress-title">订单进度</text>
           <text class="current-status" :class="getStatusClass(orderDetail.status)">{{ getStatusText(orderDetail.status) }}</text>
         </view>
-        
-        <view class="progress-steps">
+       
+   <!--    <view class="progress-steps">
           <view 
             v-for="(step, index) in progressSteps" 
             :key="index"
@@ -30,7 +30,7 @@
               :class="getConnectorClass(step.status, progressSteps[index + 1].status)"
             ></view>
           </view>
-        </view>
+        </view> -->
       </view>
 
 
@@ -63,7 +63,7 @@
           <!-- 服务地址和时间 -->
           <view class="service-details-info">
             <view class="detail-item">
-              <text class="detail-label">友伴信息：</text>
+              <text class="detail-label">服务信息：</text>
               <view class="companion-info">
                 <image 
                   :src="orderDetail?.companion?.avatar" 
@@ -74,7 +74,7 @@
               </view>
             </view>
             <view class="detail-item">
-              <text class="detail-label">服务地址：</text>
+              <text class="detail-label">预约地址：</text>
               <text class="detail-value">{{ orderDetail.service_address }}</text>
             </view>
             <view class="detail-item">

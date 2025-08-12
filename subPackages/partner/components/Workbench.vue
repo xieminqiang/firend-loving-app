@@ -141,18 +141,25 @@
             </view>
             
             <!-- 服务地址和时间 -->
-            <view v-if="[2, 3, 4, 5].includes(order.status)" class="service-location-time">
-              <view class="location-info" v-if="order.status != 2 && order.user">
+            <view v-if="[2, 3, 4, 5, 11].includes(order.status)" class="service-location-time">
+              <view class="location-info" v-if="order.user">
                 <text class="location-label">服务信息：</text>
                 <text class="location-value">{{ order?.user?.nick_name }} {{ order?.user?.phone }}</text>
               </view>
               <view class="location-info">
                 <text class="location-label">服务地址：</text>
-                <text class="location-value">{{ order.service_address }}</text>
+                <view class="location-value-container">
+                  <text class="location-value">{{ order.service_address }}</text>
+                  <view class="location-actions">
+                    <view class="nav-btn" @click.stop="openLocation(order)">
+                      <text class="nav-text">导航</text>
+                    </view>
+                  </view>
+                </view>
               </view>
-              <view class="time-info">
-                <text class="time-label">预约时间：</text>
-                <text class="time-value">{{ formatServiceDateTime(order.service_date, order.service_time) }}</text>
+              <view class="location-info">
+                <text class="location-label">预约时间：</text>
+                <text class="location-value">{{ formatServiceDateTime(order.service_date, order.service_time) }}</text>
               </view>
             </view>
             
@@ -188,16 +195,17 @@
 
 <script setup>
 import { ref, onMounted, computed, watch, nextTick } from 'vue'
-import { getCurrentLocationAddress, getCacheStatus } from '@/utils/location.js'
+import { getCurrentLocationAddress, getCacheStatus } from '../utils/location.js'
 import { updateCompanionOnlineStatus, getCompanionSchedule } from '@/api/user.js'
 import { 
   getCompanionActiveOrders,
   acceptCompanionOrder,
   rejectCompanionOrder,
   arrivedCompanionOrder,
+  departCompanionOrder,
   endCompanionService
 } from '@/api/order.js'
-import { processAddress, analyzeAddress } from '@/utils/address.js'
+import { processAddress, analyzeAddress } from '../utils/address.js'
 import VideoUploadModal from './VideoUploadModal.vue'
 
 // 定义props
@@ -641,8 +649,24 @@ const viewAllOrders = () => {
 // 跳转到订单详情
 const navigateToOrderDetail = (orderId) => {
   uni.navigateTo({
-    url: `/subPackages/partner/order/detail?orderId=${orderId}`
+    url: `/subPackages/partner/order/detail?orderId=${orderId}&companion_id=${props.applicationInfo.id}`
   })
+}
+
+// 打开导航
+const openLocation = (order) => {
+  if (order.user_latitude && order.user_longitude) {
+    uni.openLocation({ 
+      latitude: Number(order.user_latitude), //要去的纬度
+      longitude: Number(order.user_longitude), //要去的经度 
+      address: order.service_address, //要去的具体地址 
+    })
+  } else {
+    uni.showToast({
+      title: '暂无位置信息',
+      icon: 'none'
+    })
+  }
 }
 
 // 获取订单操作按钮
@@ -662,6 +686,10 @@ const getOrderActions = (status) => {
     5: [ // 服务中
       { text: '电话联系', action: 'contact', type: 'secondary' },
       { text: '结束服务', action: 'end', type: 'primary' }
+    ],
+    11: [ // 已确认待开始出发
+      { text: '电话联系', action: 'contact', type: 'secondary' },
+      { text: '我已出发', action: 'depart', type: 'depart' }
     ]
   }
   return actionMap[status] || []
@@ -681,6 +709,9 @@ const handleOrderAction = (action, order) => {
       break
     case 'arrived':
       handleArrived(order)
+      break
+    case 'depart':
+      handleDepart(order)
       break
     case 'call':
       handleCallCustomer(order)
@@ -861,6 +892,50 @@ const handleCallCustomer = (order) => {
   }
 }
 
+// 我已出发
+const handleDepart = (order) => {
+  uni.showModal({
+    title: '确认出发',
+    content: '确认您已开始出发前往服务地点？',
+    confirmText: '确认',
+    cancelText: '取消',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          uni.showLoading({
+            title: '更新中...'
+          })
+          
+          const response = await departCompanionOrder({ 
+            order_id: order.id,
+            companion_id: Number(props.applicationInfo.id)
+          })
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '已确认出发',
+              icon: 'success'
+            })
+            
+            // 刷新最近订单数据
+            await fetchRecentOrders()
+          } else {
+            throw new Error(response.data.msg || '确认出发失败')
+          }
+        } catch (error) {
+          console.error('确认出发失败:', error)
+          uni.showToast({
+            title: error.message || '操作失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
+      }
+    }
+  })
+}
+
 // 结束服务
 const handleEndService = (order) => {
   uni.showModal({
@@ -1032,7 +1107,8 @@ const getOrderStatusText = (status) => {
     2: '等待接单',
     3: '我已出发',
     4: '已到达，等待开始服务',
-    5: '服务中'
+    5: '服务中',
+  	11: '待服务'
   }
   return statusMap[status] || '未知状态'
 }
@@ -1043,7 +1119,8 @@ const getOrderStatusClass = (status) => {
     2: 'status-pending',
     3: 'status-departing',
     4: 'status-arrived',
-    5: 'status-serving'
+    5: 'status-serving',
+    11: 'status-departing'
   }
   return statusMap[status] || 'status-default'
 }
@@ -1631,8 +1708,8 @@ onMounted(() => {
 .location-info,
 .time-info {
   display: flex;
-  align-items: flex-start;
-  margin-bottom: 12rpx;
+  align-items: center;
+  margin-bottom: 16rpx;
 }
 
 .location-info:last-child,
@@ -1648,14 +1725,58 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.location-value,
-.time-value {
-  font-size: 26rpx;
-  color: #1a1a1a;
-  flex: 1;
-  word-break: break-all;
-  line-height: 1.4;
-}
+  .location-value,
+  .time-value {
+    font-size: 26rpx;
+    color: #1a1a1a;
+    flex: 1;
+    word-break: break-all;
+    line-height: 1.4;
+  }
+  
+  .location-value-container {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 16rpx;
+  }
+  
+  .location-value-container .location-value {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .location-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8rpx 16rpx;
+    background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
+    border-radius: 20rpx;
+    transition: all 0.3s ease;
+    
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+  
+  .nav-icon {
+    width: 24rpx;
+    height: 24rpx;
+    margin-right: 6rpx;
+  }
+  
+  .nav-text {
+    font-size: 22rpx;
+    color: #FFFFFF;
+    font-weight: 500;
+  }
 
 /* 操作按钮 */
 .order-actions {
@@ -1697,6 +1818,17 @@ onMounted(() => {
 
 .action-btn.secondary:active {
   background: #f8f9fa;
+  transform: scale(0.96);
+}
+
+.action-btn.depart {
+  background: #4CAF50;
+  color: #FFFFFF;
+  border-color: #4CAF50;
+}
+
+.action-btn.depart:active {
+  background: #45a049;
   transform: scale(0.96);
 }
 
@@ -1783,8 +1915,8 @@ onMounted(() => {
 }
 
 .schedule-icon {
-  width: 32rpx;
-  height: 32rpx;
+  width: 36rpx;
+  height:36rpx;
   margin-right: 8rpx;
 }
 

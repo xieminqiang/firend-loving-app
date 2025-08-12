@@ -32,12 +32,12 @@
       <!-- Logo和标题区域 -->
       <view class="header-section">
         <view class="logo-container">
-          <image src="@/static/logo.png" class="logo" mode="aspectFill"></image>
+          <image :src="$imgBaseUrl +'/img/20250812/fa380b9964f9fabea946752d163ad1a1/c2bde904-004a-414d-84eb-a95da538b9f7.png'" class="logo" mode="aspectFill"></image>
           <view class="logo-glow"></view>
         </view>
         <view class="title-container">
           <view class="main-title">欢迎来到随伴行</view>
-          <view class="subtitle">兴趣陪伴 · 情绪连接 · 温暖相遇</view>
+         <!-- <view class="subtitle">兴趣陪伴 · 情绪连接 · 温暖相遇</view> -->
         </view>
       </view>
 
@@ -51,15 +51,7 @@
         </button>
       </view>
 
-      <!-- 底部协议说明 -->
-      <view class="agreement-section">
-        <text class="agreement-text">
-          登录即表示您同意
-          <text class="link-text" @click="showUserAgreement">《用户协议》</text>
-          和
-          <text class="link-text" @click="showPrivacyPolicy">《隐私政策》</text>
-        </text>
-      </view>
+
     </view>
   </view>
 
@@ -71,7 +63,7 @@
       </view>
       <view class="popup-content">
         <text class="popup-text">
-          请您认真阅读<text class="highlight-text">《用户协议》</text>、<text class="highlight-text">《隐私政策》</text>的全部条款，接受后可开始使用我们的服务
+          请您认真阅读<text class="highlight-text" @click="showUserAgreement">《平台服务协议》</text>、<text class="highlight-text" @click="showPrivacyPolicy">《隐私政策》</text>的全部条款，接受后可开始使用我们的服务
         </text>
       </view>
       <view class="popup-buttons flex-between">
@@ -127,11 +119,7 @@ const handleCancel = () => {
 const handleConfirm = () => {
   hasAgreed.value = true
   popup.value.close()
-  uni.showToast({
-    title: '感谢您的信任',
-    icon: 'none',
-    duration: 1500
-  })
+ 
 }
 
 const onPopupChange = (e) => {
@@ -140,17 +128,15 @@ const onPopupChange = (e) => {
 
 // 显示用户协议
 const showUserAgreement = () => {
-  uni.showToast({
-    title: '用户协议页面开发中',
-    icon: 'none'
+  uni.navigateTo({
+    url: '/subPackages/login/agreement'
   })
 }
 
 // 显示隐私政策
 const showPrivacyPolicy = () => {
-  uni.showToast({
-    title: '隐私政策页面开发中',
-    icon: 'none'
+  uni.navigateTo({
+    url: '/subPackages/login/policy'
   })
 }
 
@@ -588,25 +574,7 @@ const getPhoneNumber = async (e) => {
   text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
 }
 
-.agreement-section {
-  text-align: center;
-  padding: 0 20rpx;
-  position: relative;
-  z-index: 20;
-}
 
-.agreement-text {
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.8;
-  text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.1);
-}
-
-.link-text {
-  color: #FFEAA7;
-
-  font-weight: 500;
-}
 
 // 弹窗样式
 .popup-container {

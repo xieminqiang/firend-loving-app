@@ -6,12 +6,12 @@
         <CitySelector @click="showCityPicker = true" />
         <view class="search-container" :style="{ paddingRight: safeAreaRight + 'px' }">
           <image src="@/static/icons/friend/search.png" class="search-icon" mode="aspectFit" />
-          <input v-model="search" class="search-input" placeholder="搜索友伴" @input="onSearchInput" />
+          <input v-model="search" class="search-input" placeholder="搜索关键词" @input="onSearchInput" />
         </view>
       </view>
       
-      <!-- 重新设计的筛选栏 -->
-      <view class="filter-bar">
+      <!-- 的筛选栏 -->
+    <!--  <view class="filter-bar">
         <view class="filter-item" @click="refreshRecommend">
           <text>推荐</text>
           <image src="@/static/icons/friend/tuijian.png" class="recommend-icon" mode="aspectFit" />
@@ -24,7 +24,7 @@
           <text>{{ getLevelFilterText }}</text>
           <image src="@/static/icons/friend/chevron-down.png" class="filter-arrow" mode="aspectFit" />
         </view>
-      </view>
+      </view> -->
       
 
     </view>
@@ -59,11 +59,11 @@
                 </view>
               <view class="flex-between">
                 <view class="flex">
-                  <view>
+                 <!-- <view>
                   <image src="@/static/icons/friend/female.png" mode="aspectFit" class="gender-icon" v-if="p.gender === '女'" />
                   <image src="@/static/icons/friend/male.png" class="gender-icon" mode="aspectFit" v-else/>
-                  </view>
-                   <view class="partner-meta">{{ p.age }}  ·  {{p.height }}cm  ·  {{ p.weight  }}kg</view>
+                  </view> -->
+         <!--          <view class="partner-meta">{{ p.age }}  ·  {{p.height }}cm  ·  {{ p.weight  }}kg</view> -->
 
                 </view>
                 <view class="partner-meta-distance" >
@@ -73,10 +73,10 @@
 
               </view>
           
-              <view class="partner-tags">
+            <!--  <view class="partner-tags">
                 <text v-for="(tag, index) in p.visibleTags" :key="index" class="tag">{{ tag }}</text>
                 <text v-if="p.extraTags > 0" class="more-tags">+{{ p.extraTags }}</text>
-              </view>
+              </view> -->
               <view class="partner-actions flex-between">
                 <view ></view>
                 <view class="schedule-btn" @click.stop="openServicePopup(p)">
@@ -156,11 +156,11 @@
           >
             <view v-if="currentPartnerServices.length > 0" class="service-list">
               <view class="service-item" v-for="item in currentPartnerServices" :key="item.title">
-                <image :src="item.img" class="service-img" mode="aspectFill" />
+                <image  :src="$imgBaseUrl + item.service_image_url"  class="service-img" mode="aspectFill" />
                 <view class="service-info">
-                  <text class="service-title">{{ item.title }}</text>
+                  <text class="service-title">{{ item.service_name}}</text>
                   <view class="service-tags">
-                    <text v-for="tag in item.tags" :key="tag" class="service-tag">{{ tag }}</text>
+                    <text v-for="tag in item.service_tags" :key="tag" class="service-tag">{{ tag }}</text>
                   </view>
                   <view class="service-bottom-row">
                     <text class="service-price">{{ item.price }}元/{{ item.unit || '小时' }}起</text>
@@ -217,7 +217,7 @@ const genderFilter = ref('all')
 const distanceFilter = ref('all')
 const levelFilter = ref('all')
 const sortFilter = ref('recommend')
-
+const level_order = ref(1)
 // 友伴数据
 const partnersList = ref([])
 const total = ref(0)
@@ -308,12 +308,6 @@ const getFilterOptions = computed(function() {
         label: `${level.level_name}`,
         icon: level.icon_url || '/static/icons/friend/star.png'
       }))
-    ],
-    sort: [
-      { value: 'recommend', label: '推荐排序', icon: '/static/icons/friend/thumbs-up.png' },
-      { value: 'distance', label: '距离最近', icon: '/static/icons/friend/location.png' },
-      { value: 'rating', label: '评分最高', icon: '/static/icons/friend/star.png' },
-      { value: 'new', label: '最新加入', icon: '/static/icons/friend/bolt.png' }
     ]
   }
   return options[activeModal.value] || []
@@ -413,18 +407,8 @@ const openServicePopup = async (partner) => {
     if (response.data && response.data.code === 0) {
       const data = response.data.data
       if (data && data.services && data.services.length > 0) {
-        currentPartnerServices.value = data.services.map(service => ({
-          title: service.service_name,
-          img: "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com" + service.service_image_url || '',
-          tags: service.service_tags || [],
-          price: service.price,
-          service_id: service.service_id,
-          price_template_id: service.price_template_id || '',
-          unit: service.unit,
-          min_quantity: service.min_quantity
-		
-        })) 
-	
+        currentPartnerServices.value = data.services
+        level_order.value = data.level_order
       } else {
         currentPartnerServices.value = []
       }
@@ -451,7 +435,7 @@ const goToSubmit = (item) => {
   
   // 跳转到订单提交页面
   uni.navigateTo({
-    url: `/subPackages/order/submit?service_id=${item.service_id}&price_template_id=${item.price_template_id || ''}&companion_id=${currentPartner.value.id}&level_order=${currentPartner.value.level_order || ''}&nickname=${currentPartner.value.name}`
+    url: `/subPackages/order/submit?service_id=${item.service_id}&price_template_id=${item.price_template_id || ''}&companion_id=${currentPartner.value.id}&level_order=${level_order.value || ''}&nickname=${currentPartner.value.name}`
   })
 }
 

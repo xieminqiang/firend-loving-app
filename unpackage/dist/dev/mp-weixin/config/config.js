@@ -1,12 +1,2 @@
-"use strict";
-const config = {
-  development: {
-    //https://dev.anzhuhui.com/fresh/v1  http://192.168.1.15:9901/love/v1
-    baseUrl: "http://172.20.10.7:9901/love/v1"
-  },
-  production: {
-    baseUrl: "https://api.xieminqiang168.cn/love/v1"
-  }
-};
-exports.config = config;
+"use strict";const i={development:{baseUrl:"https://api.xieminqiang168.cn/love/v1"},production:{baseUrl:"https://api.xieminqiang168.cn/love/v1"}};exports.config=i;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/config/config.js.map

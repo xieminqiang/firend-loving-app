@@ -1,0 +1,1 @@
+"use strict";const e=require("../common/vendor.js");require("./user.js"),require("./level.js"),require("./city.js");const t=e.createPinia();t.use(e.createPersistedState({storage:{getItem:t=>e.index.getStorageSync(t),setItem(t,r){e.index.setStorageSync(t,r)}}})),exports.pinia=t;

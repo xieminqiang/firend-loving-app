@@ -94,7 +94,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { uploadCompanionVideo } from '@/api/user.js'
-import { uploadFile, getUploadResult } from '@/api/file.js'
+import { uploadFile, getUploadResult } from '../api/file.js'
 
 // 定义props
 const props = defineProps({
@@ -197,7 +197,7 @@ const selectVideo = () => {
         }
         
         // 设置视频URL
-        videoUrl.value = "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com" + fileData.url
+        videoUrl.value = "https://sbx-server.oss-cn-shenzhen.aliyuncs.com" + fileData.url
         uni.hideLoading()
       } catch (error) {
         uni.hideLoading()

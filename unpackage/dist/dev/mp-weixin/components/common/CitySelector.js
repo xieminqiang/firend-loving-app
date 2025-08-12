@@ -1,27 +1,2 @@
-"use strict";
-const common_vendor = require("../../common/vendor.js");
-const common_assets = require("../../common/assets.js");
-const stores_city = require("../../stores/city.js");
-const _sfc_main = {
-  __name: "CitySelector",
-  emits: ["click"],
-  setup(__props, { emit: __emit }) {
-    const emit = __emit;
-    const cityStore = stores_city.useCityStore();
-    const currentCity = common_vendor.computed(() => cityStore.currentCity);
-    const handleClick = () => {
-      emit("click");
-    };
-    return (_ctx, _cache) => {
-      return {
-        a: common_assets._imports_0$8,
-        b: common_vendor.t(currentCity.value),
-        c: common_assets._imports_1$2,
-        d: common_vendor.o(handleClick)
-      };
-    };
-  }
-};
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-e1a05edf"]]);
-wx.createComponent(Component);
+"use strict";const t=require("../../common/vendor.js"),e=require("../../common/assets.js"),i=require("../../stores/city.js"),_={__name:"CitySelector",emits:["click"],setup(u,{emit:c}){const o=c,r=i.useCityStore(),s=t.computed(()=>r.currentCity),n=()=>{o("click")};return(a,p)=>({a:e._imports_0$8,b:t.t(s.value),c:e._imports_1$5,d:t.o(n)})}},m=t._export_sfc(_,[["__scopeId","data-v-e1a05edf"]]);wx.createComponent(m);
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/components/common/CitySelector.js.map

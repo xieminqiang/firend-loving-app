@@ -115,7 +115,10 @@
                 <!-- <text v-else class="load-more-text">上拉加载更多</text> -->
               </view>
             </view>
-          </scroll-view>
+             <view style="height: 50rpx;"></view>
+		  
+		  
+		  </scroll-view>
         </swiper-item>
       </swiper>
     </view>
@@ -1043,8 +1046,7 @@ const formatTime = (timeStr) => {
   background: #FFFFFF;
   border-radius: 16rpx;
   padding: 20rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
-  border: 1rpx solid #f0f0f0;
+
 }
 
 /* 订单头部 */

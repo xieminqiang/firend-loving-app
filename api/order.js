@@ -95,6 +95,23 @@ export const getCompanionOrderList = (params) => {
   })
 }
 
+// 获取友伴订单详情
+export const getCompanionOrderDetail = (params) => {
+  // 确保order_id和companion_id存在
+  if (!params.order_id) {
+    console.warn('getCompanionOrderDetail: order_id is required')
+  }
+  if (!params.companion_id) {
+    console.warn('getCompanionOrderDetail: companion_id is required')
+  }
+  
+  return http({
+    url: '/front/companion/order/detail',
+    method: 'POST',
+    data: params
+  })
+}
+
 // 友伴接单
 export const acceptCompanionOrder = (data) => {
   return http({

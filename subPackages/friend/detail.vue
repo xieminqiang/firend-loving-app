@@ -14,16 +14,16 @@
                 <image v-if="user.verified && currentLevel" :src="currentLevel?.icon_url" class="verified-icon" mode="aspectFit" />
                 <text v-if="currentLevel?.level_name" class="level-tag">{{ currentLevel?.level_name }}</text>
               </view>
-              <view class="user-tags" v-if="user.tags && user.tags.length > 0">
+            <!--  <view class="user-tags" v-if="user.tags && user.tags.length > 0">
                 <text v-for="tag in user.tags" :key="tag" class="user-tag">{{ tag }}</text>
-              </view>
+              </view> -->
             </view>
           </view>
         </view>
       </view>
       <!-- 轮播图及服务标签 -->
       <view class="carousel-header-wrap">
-        <view class="profile-meta-topbar">
+     <!--   <view class="profile-meta-topbar">
           <view class="meta-left">
             <image :src="user.gender === '女' ? '/static/icons/friend/white_nv.png' : '/static/icons/friend/white_nan.png'" class="meta-topbar-icon" mode="aspectFit" />
             <text>{{ user.age }}岁 | {{ user.weight }}kg | {{ user.height }}cm</text>
@@ -32,14 +32,14 @@
             <image src="/static/icons/friend/white_dingwei.png" class="meta-topbar-icon" mode="aspectFit" />
             <text>{{ user.distance }}</text>
           </view>
-        </view>
+        </view> -->
         <swiper class="banner-swiper-inner" :indicator-dots="true" :autoplay="true" :interval="4000" :duration="500">
           <swiper-item v-for="(item, idx) in banners" :key="idx">
             <image :src="item.img" class="banner-img" mode="aspectFill" />
           </swiper-item>
         </swiper>
         <!-- 轮播图下方服务标签 -->
-        <view class="service-tags-bar">
+     <!--   <view class="service-tags-bar">
           <view class="service-tag-item">
             <image src="/static/icons/profile/handshake.png" class="service-tag-icon" mode="aspectFit" />
             <text>真人面试</text>
@@ -52,10 +52,10 @@
             <image src="/static/icons/profile/lse_icon.png" class="service-tag-icon" mode="aspectFit" />
             <text>绿色服务</text>
           </view>
-        </view>
+        </view> -->
       </view>
       <!-- 顶部tab栏和内容区 -->
-      <view class="profile-tabs">
+   <!--   <view class="profile-tabs">
         <view
           v-for="(tab, idx) in tabs"
           :key="tab"
@@ -65,19 +65,19 @@
           <text>{{ tab }}</text>
           <view v-if="activeTab === idx" class="tab-underline"></view>
         </view>
-      </view>
+      </view> -->
       <view class="profile-tab-content">
         <!-- 提供项目 -->
         <view v-show="activeTab === 0">
           <view v-if="services.length > 0" class="service-list">
           <view class="service-item" v-for="item in services" :key="item.title">
-            <image :src="item.img" class="service-img" mode="aspectFill" />
+            <image  :src="$imgBaseUrl + item.service_image_url"  class="service-img" mode="aspectFill" />
             <view class="service-info">
               <view class="service-title-row">
-                <text class="service-title">{{ item.title }}</text>
+                <text class="service-title">{{ item.service_name}}</text>
               </view>
               <view class="service-tags">
-                <text v-for="tag in item.tags" :key="tag" class="service-tag">{{ tag }}</text>
+                <text v-for="tag in item.service_tags" :key="tag" class="service-tag">{{ tag }}</text>
               </view>
               <view class="service-bottom-row">
                 <text class="service-price">{{ item.price }}元/{{ item.unit || '小时' }}起</text>
@@ -224,16 +224,7 @@ const getCityServicesData = async () => {
           
           // 更新服务列表数据
           if (data.services && data.services.length > 0) {
-            services.value = data.services.map(service => ({
-              title: service.service_name,
-              img: "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com" + service.service_image_url || '',
-              tags: service.service_tags,
-              price: service.price,
-              service_id: service.service_id,
-              price_template_id: service.price_template_id || '',
-              unit: service.unit,
-              min_quantity: service.min_quantity
-            }))
+            services.value = data.services
           }
        
 

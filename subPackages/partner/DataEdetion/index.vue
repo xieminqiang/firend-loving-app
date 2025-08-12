@@ -416,7 +416,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { getApplicatioInfo, updateCompanionApplication, getServicesByCities, getPersonalityTags } from '@/api/user.js'
 import { getCityList } from '@/api/home.js'
-import { uploadFile, getUploadResult } from '@/api/file.js'
+import { uploadFile, getUploadResult } from '../api/file.js'
 import { useUserStore } from '@/stores/user.js'
 
 // 用户store
@@ -800,7 +800,7 @@ const addPhoto = () => {
             }
 
             // 返回上传后的URL
-            return "https://sygx-server-bucket-admin.oss-cn-shanghai.aliyuncs.com" + fileData.url
+            return "https://sbx-server.oss-cn-shenzhen.aliyuncs.com" + fileData.url
           } catch (error) {
             console.error(`第${index + 1}张照片上传失败:`, error)
             throw error

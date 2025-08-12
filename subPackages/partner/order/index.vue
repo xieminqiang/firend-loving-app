@@ -91,7 +91,14 @@
                     </view>
                     <view class="location-info">
                       <text class="location-label">服务地址：</text>
-                      <text class="location-value">{{ order.service_address }}</text>
+                      <view class="location-value-container">
+                        <text class="location-value">{{ order.service_address }}</text>
+                        <view class="location-actions">
+                          <view class="nav-btn" @click.stop="openLocation(order)">
+                            <text class="nav-text">导航</text>
+                          </view>
+                        </view>
+                      </view>
                     </view>
                     <view class="time-info">
                       <text class="time-label">预约时间：</text>
@@ -126,6 +133,7 @@
                   <text v-if="isLoadingMore" class="loading-text">加载中...</text>
                 </view>
               </view>
+			         <view style="height: 50rpx;"></view>
             </scroll-view>
           </swiper-item>
         </swiper>
@@ -894,9 +902,25 @@
   
   // 跳转到订单详情
   const navigateToDetail = (orderId) => {
-    // uni.navigateTo({
-    //   url: `/subPackages/partner/order/detail?orderId=${orderId}`
-    // })
+    uni.navigateTo({
+      url: `/subPackages/partner/order/detail?orderId=${orderId}&companion_id=${companionId.value}`
+    })
+  }
+  
+  // 打开导航
+  const openLocation = (order) => {
+    if (order.user_latitude && order.user_longitude) {
+      uni.openLocation({ 
+        latitude: Number(order.user_latitude), //要去的纬度
+        longitude: Number(order.user_longitude), //要去的经度 
+        address: order.service_address, //要去的具体地址 
+      })
+    } else {
+      uni.showToast({
+        title: '暂无位置信息',
+        icon: 'none'
+      })
+    }
   }
   
   // 格式化时间
@@ -1074,8 +1098,7 @@
     background: #FFFFFF;
     border-radius: 16rpx;
     padding: 24rpx;
-    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
-    border: 1rpx solid #f0f0f0;
+
   }
   
   /* 订单头部 */
@@ -1237,8 +1260,8 @@
   .location-info,
   .time-info {
     display: flex;
-    align-items: flex-start;
-    margin-bottom: 12rpx;
+    align-items: center;
+    margin-bottom: 16rpx;
   }
   
   .location-info:last-child,
@@ -1261,6 +1284,44 @@
     flex: 1;
     word-break: break-all;
     line-height: 1.4;
+  }
+  
+  .location-value-container {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 16rpx;
+  }
+  
+  .location-value-container .location-value {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .location-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8rpx 16rpx;
+    background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
+    border-radius: 20rpx;
+    transition: all 0.3s ease;
+    
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+  
+  .nav-text {
+    font-size: 22rpx;
+    color: #FFFFFF;
+    font-weight: 500;
   }
   
   /* 操作按钮 */

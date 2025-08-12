@@ -1,0 +1,1 @@
+{"version":3,"file":"agreement.js","sources":["subPackages/login/agreement.vue?type=page"],"sourcesContent":["import MiniProgramPage from '/Users/xiaoqiang/Documents/friemd/firend-loving-app/subPackages/login/agreement.vue'\nwx.createPage(MiniProgramPage)"],"names":["MiniProgramPage"],"mappings":"+JACA,GAAG,WAAWA,CAAe"}

@@ -1,0 +1,1 @@
+"use strict";const e=require("../../../../common/vendor.js"),o={__name:"index",setup:o=>(e.ref({}),e.onMounted((()=>{console.log("关于我们页面加载完成")})),(e,o)=>({}))},n=e._export_sfc(o,[["__scopeId","data-v-298415d3"]]);wx.createPage(n);

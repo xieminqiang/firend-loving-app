@@ -1,0 +1,1 @@
+{"version":3,"file":"policy.js","sources":["subPackages/login/policy.vue?type=page"],"sourcesContent":["import MiniProgramPage from '/Users/xiaoqiang/Documents/friemd/firend-loving-app/subPackages/login/policy.vue'\nwx.createPage(MiniProgramPage)"],"names":["MiniProgramPage"],"mappings":"4JACA,GAAG,WAAWA,CAAe"}

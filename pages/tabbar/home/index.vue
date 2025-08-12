@@ -20,36 +20,7 @@
 
      
     >
-      <!-- 轮播banner -->
-      <view class="banner-container">
-        <view class="banner-swiper" @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
-          <view class="banner-track" :style="{ transform: `translateX(-${currentBanner * 100}%)` }">
-            <view v-for="(b, idx) in banners" :key="idx" class="banner-slide-img">
-              <image :src="b.img" class="banner-img-full" mode="aspectFill" />
-              <view class="banner-img-content">
-                <view class="banner-content-wrapper">
-                  <text class="banner-title-img">{{ b.title }}</text>
-                  <text class="banner-subtitle-img">{{ b.subtitle }}</text>
-                  <view class="banner-action-hint">
-                    <text class="action-text">了解更多</text>
-                    <text class="action-arrow">→</text>
-                  </view>
-                </view>
-              </view>
-            </view>
-          </view>
-          <view class="banner-controls">
-            <view class="banner-dots">
-              <text 
-                v-for="(_, index) in banners" 
-                :key="index" 
-                :class="['dot', { active: currentBanner === index }]" 
-                @click="currentBanner = index"
-              ></text>
-            </view>
-          </view>
-        </view>
-      </view>
+
 
       <!-- 服务选项卡 -->
       <view class="category-tabs">
@@ -171,10 +142,7 @@ onMounted(async () => {
   navBarHeight.value = 0 // H5不需要导航栏高度
   // #endif
   
-  // 自动轮播
-  bannerTimer = setInterval(() => {
-    nextBanner()
-  }, 5000)
+
 
   // 初始化城市数据（获取位置和加载城市列表）
   await cityStore.initCityData()
@@ -192,61 +160,25 @@ const currentCityCode = computed(() => cityStore.currentCityCode)
 const cityList = computed(() => cityStore.cityList)
 const cityIndex = computed(() => cityStore.cityIndex)
 
-// 轮播相关数据
-const currentBanner = ref(0)
-const serviceTab = ref('服务')
-const serviceTabs = ['服务', '娱乐', '运动']
 
+const serviceTab = ref('服务')
+//const serviceTabs = ['服务', '娱乐', '运动']
+const serviceTabs = ['服务']
 // 页面卸载时清除定时器
-let bannerTimer = null
 onUnmounted(() => {
-  if (bannerTimer) {
-    clearInterval(bannerTimer)
-  }
   if (swiperChangeTimer) {
     clearTimeout(swiperChangeTimer)
   }
 })
 
-function nextBanner() {
-  if (currentBanner.value < banners.length - 1) {
-    currentBanner.value++
-  } else {
-    currentBanner.value = 0
-  }
-}
 
-function prevBanner() {
-  if (currentBanner.value > 0) {
-    currentBanner.value--
-  } else {
-    currentBanner.value = banners.length - 1
-  }
-}
 
 // 城市选择 - 使用全局store
 function onCityChange(e) {
   cityStore.selectCity(e.detail.value)
 }
 
-// Banner data
-const banners = [
-  {
-    title: '友伴招募',
-    subtitle: '挑战高薪 | 男女不限',
-    img: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    title: '监督举报',
-    subtitle: '平台禁止私下交易',
-    img: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    title: '全国热招',
-    subtitle: '城市独家运营商',
-    img: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80',
-  }
-]
+
 
 // 为每个选项卡存储数据
 const allServiceItems = ref({
@@ -389,28 +321,7 @@ const getTabServiceItems = (tab) => {
   return allServiceItems.value[tab] || []
 }
 
-// 触摸事件处理
-let touchStartX = 0
-let touchEndX = 0
 
-function onTouchStart(e) {
-  touchStartX = e.touches[0].clientX
-}
-
-function onTouchMove(e) {
-  touchEndX = e.touches[0].clientX
-}
-
-function onTouchEnd() {
-  if (touchEndX === 0) return
-  if (touchEndX - touchStartX > 50 && currentBanner.value > 0) {
-    currentBanner.value--
-  } else if (touchStartX - touchEndX > 50 && currentBanner.value < banners.length - 1) {
-    currentBanner.value++
-  }
-  touchStartX = 0
-  touchEndX = 0
-}
 
 // 跳转到服务详情页功能
 function navigateToServiceDetail(serviceId) {
@@ -627,175 +538,7 @@ function onCitySelected(index) {
 
 
 
-/* Banner 容器 - 现在在scroll-view内部 */
-.banner-container {
-  margin: 20rpx 24rpx;
-  position: relative;
-  z-index: 2;
-}
 
-/* Banner 轮播 */
-.banner-swiper {
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 24rpx;
-  border-radius: 24rpx;
-  box-shadow: 0 8rpx 32rpx rgba(130, 160, 216, 0.1);
-  background: linear-gradient(135deg, rgba(130, 160, 216, 0.02) 0%, rgba(255, 111, 97, 0.01) 100%);
-  padding: 3rpx;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(130, 160, 216, 0.06) 0%, rgba(255, 111, 97, 0.03) 100%);
-    border-radius: 24rpx;
-    z-index: 0;
-  }
-}
-
-.banner-track {
-  display: flex;
-  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  position: relative;
-  z-index: 1;
-  gap: 20rpx;
-}
-
-.banner-slide-img {
-  width: 100%;
-  flex-shrink: 0;
-  position: relative;
-  border-radius: 28rpx;
-  overflow: hidden;
-}
-
-.banner-img-full {
-  width: 100%;
-  height: 300rpx;
-  border-radius: 21rpx;
-}
-
-.banner-img-content {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 0;
-  z-index: 2;
-  border-radius: 0 0 28rpx 28rpx;
-}
-
-.banner-content-wrapper {
-  padding: 48rpx 40rpx 40rpx;
-  background: linear-gradient(to top, 
-    rgba(0,0,0,0.6) 0%, 
-    rgba(0,0,0,0.3) 40%,
-    transparent 70%);
-  border-radius: 0 0 28rpx 28rpx;
-  backdrop-filter: blur(8rpx);
-  -webkit-backdrop-filter: blur(8rpx);
-  box-sizing: border-box;
-}
-
-.banner-title-img {
-  display: block;
-  font-size: 48rpx;
-  font-weight: 700;
-  color: white;
-  text-shadow: 0 2rpx 12rpx rgba(0,0,0,0.4);
-  margin-bottom: 12rpx;
-  letter-spacing: 1rpx;
-}
-
-.banner-subtitle-img {
-  display: block;
-  font-size: 28rpx;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1rpx 6rpx rgba(0,0,0,0.3);
-  margin-bottom: 24rpx;
-  line-height: 1.4;
-}
-
-.banner-action-hint {
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10rpx);
-  -webkit-backdrop-filter: blur(10rpx);
-  border: 1rpx solid rgba(255, 255, 255, 0.2);
-  border-radius: 24rpx;
-  padding: 12rpx 20rpx;
-  width: fit-content;
-  transition: all 0.3s;
-  
-  &:active {
-    background: rgba(255, 255, 255, 0.25);
-    transform: scale(0.98);
-  }
-}
-
-.action-text {
-  font-size: 24rpx;
-  color: white;
-  font-weight: 500;
-  margin-right: 8rpx;
-}
-
-.action-arrow {
-  font-size: 24rpx;
-  color: white;
-  font-weight: 600;
-  transition: transform 0.3s;
-}
-
-.banner-action-hint:active .action-arrow {
-  transform: translateX(4rpx);
-}
-
-.banner-controls {
-  position: absolute;
-  bottom: 20rpx;
-  left: 0;
-  width: 100%;
-  z-index: 10;
-}
-
-.banner-dots {
-  display: flex;
-  justify-content: center;
-  position: relative;
-  z-index: 5;
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(16rpx) saturate(1.2);
-  -webkit-backdrop-filter: blur(16rpx) saturate(1.2);
-  border-radius: 20rpx;
-  padding: 8rpx 16rpx;
-  width: fit-content;
-  margin: 0 auto;
-  border: 1rpx solid rgba(255, 255, 255, 0.1);
-}
-
-.dot {
-  width: 8rpx;
-  height: 8rpx;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  margin: 0 6rpx;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  cursor: pointer;
-}
-
-.dot.active {
-  width: 32rpx;
-  height: 8rpx;
-  border-radius: 4rpx;
-  background: linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0.8) 100%);
-  box-shadow: 0 2rpx 8rpx rgba(255, 255, 255, 0.3);
-}
 
 /* 服务标签区域 - 现在在scroll-view内部 */
 .category-tabs {

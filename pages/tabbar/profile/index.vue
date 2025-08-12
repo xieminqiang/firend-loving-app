@@ -24,7 +24,7 @@
             </view>
             <view class="user-details">
               <view class="name-row">
-                <view class="user-name">{{ userInfo.nickname || '' }}</view>
+                <view class="user-name">{{ userInfo.nick_name|| '' }}</view>
             
               </view>
               <view class="user-phone">{{ formatPhone(userInfo.phone) || '未绑定手机号' }}</view>
@@ -128,14 +128,14 @@
         
         <!-- 设置列表 -->
         <view class="settings-list">
-          <view class="setting-item" @click="navigateToPartnerRegistration">
+       <!--   <view class="setting-item" @click="navigateToPartnerRegistration">
             <view class="setting-icon">
               <image src="@/static/icons/profile/friendship.png" class="setting-icon-img" mode="aspectFit" />
             </view>
             <text class="setting-text" v-if="applicationInfo && applicationInfo.status && applicationInfo.status === 'approved'">友伴端</text>
             <text class="setting-text" v-else>友伴入驻</text>
             <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
-          </view>
+          </view> -->
           <view class="setting-item" @click="navigateToCustomerService">
             <view class="setting-icon">
               <image src="@/static/icons/profile/kefu.png" class="setting-icon-img" mode="aspectFit" />
@@ -291,10 +291,17 @@ const loadUserData = async () => {
         const userData = response.data.data
         console.log('解析用户数据:', userData)
         
+   const userInfo = {
+     ...userData,
+     access_token: userStore.userInfo.access_token || '',
+     refresh_token: userStore.userInfo.refresh_token || '',
+    
+   }
    
+   // 更新用户状态
+    userStore.setUserInfo(userInfo)
         
-        // 更新用户状态
-         userStore.setUserInfo(userData)
+     
      
      
       } else {

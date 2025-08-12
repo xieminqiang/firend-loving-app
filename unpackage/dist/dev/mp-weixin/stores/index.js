@@ -1,18 +1,2 @@
-"use strict";
-const common_vendor = require("../common/vendor.js");
-require("./user.js");
-require("./level.js");
-require("./city.js");
-const pinia = common_vendor.createPinia();
-pinia.use(common_vendor.createPersistedState({
-  storage: {
-    getItem(key) {
-      return common_vendor.index.getStorageSync(key);
-    },
-    setItem(key, value) {
-      common_vendor.index.setStorageSync(key, value);
-    }
-  }
-}));
-exports.pinia = pinia;
+"use strict";const e=require("../common/vendor.js");require("./user.js");require("./level.js");require("./city.js");const r=e.createPinia();r.use(e.createPersistedState({storage:{getItem(t){return e.index.getStorageSync(t)},setItem(t,i){e.index.setStorageSync(t,i)}}}));exports.pinia=r;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/stores/index.js.map

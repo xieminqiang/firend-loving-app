@@ -1,0 +1,1 @@
+"use strict";const e=require("../common/vendor.js").defineStore("user",{state:()=>({userInfo:{}}),getters:{},actions:{setUserInfo(e){this.userInfo=e,console.log("userInfo",this.userInfo)},clearUserInfo(){this.userInfo={}}},persist:{key:"user-store",paths:["userInfo"]}});exports.useUserStore=e;

@@ -1,0 +1,1 @@
+<view class="city-selector data-v-1998caae" bindtap="{{d}}"><image src="{{a}}" class="location-icon data-v-1998caae" mode="aspectFit"/><view class="city-select data-v-1998caae"><text class="data-v-1998caae">{{b}}</text><image src="{{c}}" class="select-arrow data-v-1998caae" mode="aspectFit"/></view></view>
