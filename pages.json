@@ -1,5 +1,14 @@
 {
 	"pages": [
+		{"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
+				
+			}
+		
+		}, 
 		{
 			"path": "pages/tabbar/home/index",
 			"style": {
@@ -13,13 +22,13 @@
 				"navigationStyle": "custom"
 			}
 		},
-		// {
-		// 	"path": "pages/tabbar/discover/index",
-		// 	"style": {
-		// 		"navigationBarTitleText": "发现",
-		// 	"navigationStyle": "custom"
-		// 	}
-		// },
+		{
+			"path": "pages/tabbar/discover/index",
+			"style": {
+				"navigationBarTitleText": "发现",
+			"navigationStyle": "custom"
+			}
+		},
 		{
 			"path": "pages/tabbar/profile/index",
 			"style": {
@@ -210,10 +219,7 @@
 	
 	],
 	"tabBar": {
-		"color": "#1A1A1A",
-		"selectedColor": "#7363FF",
-		"backgroundColor": "#FFFFFF",
-		"borderStyle": "white",
+		"custom": true,
 		"list": [
 			{
 				"pagePath": "pages/tabbar/home/index",
@@ -221,18 +227,18 @@
 				"iconPath": "static/icons/tabbar/home.png",
 				"selectedIconPath": "static/icons/tabbar/home-fill.png"
 			},
-			// {
-			// 	"pagePath": "pages/tabbar/friends/index",
-			// 	"text": "服务",
-			// 	"iconPath": "static/icons/tabbar/friends.png",
-			// 	"selectedIconPath": "static/icons/tabbar/friends-fill.png"
-			// },
-			// {
-			// 	"pagePath": "pages/tabbar/discover/index",
-			// 	"text": "发现",
-			// 	"iconPath": "static/icons/tabbar/discover.png",
-			// 	"selectedIconPath": "static/icons/tabbar/discover-fill.png"
-			// },
+			{
+				"pagePath": "pages/tabbar/friends/index",
+				"text": "服务",
+				"iconPath": "static/icons/tabbar/friends.png",
+				"selectedIconPath": "static/icons/tabbar/friends-fill.png"
+			},
+			{
+				"pagePath": "pages/tabbar/discover/index",
+				"text": "发现",
+				"iconPath": "static/icons/tabbar/discover.png",
+				"selectedIconPath": "static/icons/tabbar/discover-fill.png"
+			},
 			{
 				"pagePath": "pages/tabbar/profile/index",
 				"text": "我的",

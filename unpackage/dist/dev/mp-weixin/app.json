@@ -1,7 +1,9 @@
 {
   "pages": [
+    "pages/index/index",
     "pages/tabbar/home/index",
     "pages/tabbar/friends/index",
+    "pages/tabbar/discover/index",
     "pages/tabbar/profile/index"
   ],
   "subPackages": [
@@ -63,16 +65,25 @@
     "backgroundColor": "#F5F5F5"
   },
   "tabBar": {
-    "color": "#1A1A1A",
-    "selectedColor": "#7363FF",
-    "backgroundColor": "#FFFFFF",
-    "borderStyle": "white",
+    "custom": true,
     "list": [
       {
         "pagePath": "pages/tabbar/home/index",
         "text": "首页",
         "iconPath": "static/icons/tabbar/home.png",
         "selectedIconPath": "static/icons/tabbar/home-fill.png"
+      },
+      {
+        "pagePath": "pages/tabbar/friends/index",
+        "text": "服务",
+        "iconPath": "static/icons/tabbar/friends.png",
+        "selectedIconPath": "static/icons/tabbar/friends-fill.png"
+      },
+      {
+        "pagePath": "pages/tabbar/discover/index",
+        "text": "发现",
+        "iconPath": "static/icons/tabbar/discover.png",
+        "selectedIconPath": "static/icons/tabbar/discover-fill.png"
       },
       {
         "pagePath": "pages/tabbar/profile/index",

@@ -5,7 +5,6 @@ import { useUserStore } from '@/stores/user.js'
 export default {
 	onLaunch: function() {
 		console.log('App Launch')
-		// uni.hideTabBar()
 		// 应用启动时清除等级列表缓存，确保获取最新数据
 		this.clearServiceLevels()
 		// 初始化时获取服务等级列表
@@ -14,7 +13,7 @@ export default {
 	onShow: function() {
 		console.log('App Show')
 		// 应用从后台恢复时，检查是否需要更新等级列表
-		this.checkAndUpdateServiceLevels()
+		this.checkAndUpdateServiceLevels() 
 	},
 	onHide: function() {
 		console.log('App Hide')
@@ -38,7 +37,7 @@ export default {
 				// 如果数据过期或为空，重新获取
 				if (levelStore.needUpdate || levelStore.serviceLevels.length === 0) {
 					console.log('检测到等级列表需要更新，重新获取...')
-					await levelStore.fetchServiceLevels()
+					levelStore.fetchServiceLevels()
 				}
 			} catch (error) {
 				console.error('检查更新服务等级列表失败:', error)
@@ -46,13 +45,13 @@ export default {
 		},
 		
 		async initServiceLevels() {
-			try {
-				const levelStore = useLevelStore()
-				await levelStore.fetchServiceLevels()
-				console.log('服务等级列表初始化完成')
-			} catch (error) {
-				console.error('初始化服务等级列表失败:', error)
-			}
+			// try {
+			// 	const levelStore = useLevelStore()
+			// 	levelStore.fetchServiceLevels()
+			// 	console.log('服务等级列表初始化完成')
+			// } catch (error) {
+			// 	console.error('初始化服务等级列表失败:', error)
+			// }
 		}
 	}
 }
@@ -61,7 +60,7 @@ export default {
 <style lang="scss">
 	@import "@/styles/variables.scss";
 	@import "@/styles/common.scss";
-      
+ 
 	
 	
 	/* 每个页面公共css */

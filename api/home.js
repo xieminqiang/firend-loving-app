@@ -67,3 +67,14 @@ export const getCityList = () => {
   })
 }
 
+/**
+ * 获取首页开关配置
+ * @returns Promise
+ */
+export const getFirstSwitch = () => {
+  return http({
+    url: '/front/switch/first',
+    method: 'GET'
+  })
+}
+

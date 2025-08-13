@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "发现",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "hm-tabbar": "../../../components/hm-tabbar/hm-tabbar"
+  }
+}

@@ -1,7 +1,7 @@
 // config.js
 const config = {
     development: {//https://dev.anzhuhui.com/fresh/v1  http://192.168.1.15:9901/love/v1
-         baseUrl: 'https://api.xieminqiang168.cn/love/v1',
+         baseUrl: 'http://172.20.10.7:9901/love/v1',
    
     },
     production: {

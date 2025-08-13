@@ -23,7 +23,7 @@
       </view>
       <!-- 轮播图及服务标签 -->
       <view class="carousel-header-wrap">
-     <!--   <view class="profile-meta-topbar">
+       <view class="profile-meta-topbar">
           <view class="meta-left">
             <image :src="user.gender === '女' ? '/static/icons/friend/white_nv.png' : '/static/icons/friend/white_nan.png'" class="meta-topbar-icon" mode="aspectFit" />
             <text>{{ user.age }}岁 | {{ user.weight }}kg | {{ user.height }}cm</text>
@@ -32,14 +32,14 @@
             <image src="/static/icons/friend/white_dingwei.png" class="meta-topbar-icon" mode="aspectFit" />
             <text>{{ user.distance }}</text>
           </view>
-        </view> -->
+        </view>
         <swiper class="banner-swiper-inner" :indicator-dots="true" :autoplay="true" :interval="4000" :duration="500">
           <swiper-item v-for="(item, idx) in banners" :key="idx">
             <image :src="item.img" class="banner-img" mode="aspectFill" />
           </swiper-item>
         </swiper>
         <!-- 轮播图下方服务标签 -->
-     <!--   <view class="service-tags-bar">
+       <view class="service-tags-bar">
           <view class="service-tag-item">
             <image src="/static/icons/profile/handshake.png" class="service-tag-icon" mode="aspectFit" />
             <text>真人面试</text>
@@ -52,10 +52,10 @@
             <image src="/static/icons/profile/lse_icon.png" class="service-tag-icon" mode="aspectFit" />
             <text>绿色服务</text>
           </view>
-        </view> -->
+        </view>
       </view>
       <!-- 顶部tab栏和内容区 -->
-   <!--   <view class="profile-tabs">
+     <view class="profile-tabs">
         <view
           v-for="(tab, idx) in tabs"
           :key="tab"
@@ -65,7 +65,7 @@
           <text>{{ tab }}</text>
           <view v-if="activeTab === idx" class="tab-underline"></view>
         </view>
-      </view> -->
+      </view>
       <view class="profile-tab-content">
         <!-- 提供项目 -->
         <view v-show="activeTab === 0">
@@ -171,7 +171,7 @@
   // nickname: 友伴师昵称
   const goToSubmit = (item) => {
     uni.navigateTo({
-      url: `/subPackages/order/submit?service_id=${item.service_id}&price_template_id=${item.price_template_id || ''}&companion_id=${params.value.id}&level_order=${user.value.level_order || ''}&nickname=${user.value.nickname}`
+      url: `/subPackages/order/submit?service_id=${item.service_id}&price_template_id=${item.price_template_id || ''}&companion_id=${user.value.application_id}&level_order=${user.value.level_order || ''}&nickname=${user.value.nickname}`
     })
   }
 

@@ -111,7 +111,7 @@
         </view>
         
         <!-- 推广中心 -->
-        <!-- <view class="promotion-banner" @click="navigateToPromotion">
+ <!--       <view class="promotion-banner" @click="navigateToPromotion">
           <view class="promotion-content">
             <view class="promotion-info">
               <text class="promotion-title">邀请好友 得奖励</text>
@@ -128,14 +128,14 @@
         
         <!-- 设置列表 -->
         <view class="settings-list">
-       <!--   <view class="setting-item" @click="navigateToPartnerRegistration">
+         <view class="setting-item" @click="navigateToPartnerRegistration" v-if="userStore.switch === 1">
             <view class="setting-icon">
               <image src="@/static/icons/profile/friendship.png" class="setting-icon-img" mode="aspectFit" />
             </view>
             <text class="setting-text" v-if="applicationInfo && applicationInfo.status && applicationInfo.status === 'approved'">友伴端</text>
             <text class="setting-text" v-else>友伴入驻</text>
             <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
-          </view> -->
+          </view>
           <view class="setting-item" @click="navigateToCustomerService">
             <view class="setting-icon">
               <image src="@/static/icons/profile/kefu.png" class="setting-icon-img" mode="aspectFit" />
@@ -159,7 +159,15 @@
           随伴行
         </view>
       </view>
-    </scroll-view>
+    </scroll-view>  
+    <template v-if="userStore.switch === 1">
+     
+      <hm-tabbar currentTab="profile"></hm-tabbar>
+    </template>
+ 
+   <template v-else>
+      <mq-tabbar currentTab="profile"></mq-tabbar> 
+  </template>
   </view>
 </template>
 

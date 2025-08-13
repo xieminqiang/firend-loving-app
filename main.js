@@ -4,6 +4,7 @@ import App from './App'
 import Vue from 'vue'
 import './uni.promisify.adaptor'
 Vue.config.productionTip = false
+
 App.mpType = 'app'
 const app = new Vue({
   ...App
@@ -19,6 +20,7 @@ export function createApp() {
   const app = createSSRApp(App)
     app.config.globalProperties.$imgBaseUrl = 'https://sbx-server.oss-cn-shenzhen.aliyuncs.com';
   app.use(pinia)
+ 
   return {
     app
   }

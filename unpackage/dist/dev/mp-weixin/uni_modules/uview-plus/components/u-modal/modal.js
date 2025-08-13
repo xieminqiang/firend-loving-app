@@ -1,0 +1,2 @@
+"use strict";const e={modal:{show:!1,title:"",content:"",confirmText:"确认",cancelText:"取消",showConfirmButton:!0,showCancelButton:!1,confirmColor:"#2979ff",cancelColor:"#606266",buttonReverse:!1,zoom:!0,asyncClose:!1,closeOnClickOverlay:!1,negativeTop:0,width:"650rpx",confirmButtonShape:"",duration:400,contentTextAlign:"left",asyncCloseTip:"操作中...",asyncCancelClose:!1,contentStyle:{}}};exports.Modal=e;
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-plus/components/u-modal/modal.js.map

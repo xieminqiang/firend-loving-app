@@ -1,4 +1,7 @@
 {
   "navigationStyle": "custom",
-  "usingComponents": {}
+  "usingComponents": {
+    "hm-tabbar": "../../../components/hm-tabbar/hm-tabbar",
+    "mq-tabbar": "../../../components/mq-tabbar/mq-tabbar"
+  }
 }

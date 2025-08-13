@@ -241,6 +241,7 @@
     <view class="like-toast" v-if="showLikeToast">
       <image src="@/static/icons/friend/heart.png" class="toast-icon" mode="aspectFit" />
     </view>
+		<hm-tabbar currentTab="discover"></hm-tabbar>
   </view>
 </template>
 

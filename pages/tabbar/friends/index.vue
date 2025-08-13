@@ -6,7 +6,7 @@
         <CitySelector @click="showCityPicker = true" />
         <view class="search-container" :style="{ paddingRight: safeAreaRight + 'px' }">
           <image src="@/static/icons/friend/search.png" class="search-icon" mode="aspectFit" />
-          <input v-model="search" class="search-input" placeholder="搜索关键词" @input="onSearchInput" />
+          <input v-model="search" class="search-input" placeholder="搜索友伴" @input="onSearchInput" />
         </view>
       </view>
       
@@ -59,11 +59,11 @@
                 </view>
               <view class="flex-between">
                 <view class="flex">
-                 <!-- <view>
+                 <view>
                   <image src="@/static/icons/friend/female.png" mode="aspectFit" class="gender-icon" v-if="p.gender === '女'" />
                   <image src="@/static/icons/friend/male.png" class="gender-icon" mode="aspectFit" v-else/>
-                  </view> -->
-         <!--          <view class="partner-meta">{{ p.age }}  ·  {{p.height }}cm  ·  {{ p.weight  }}kg</view> -->
+                  </view>
+                  <view class="partner-meta">{{ p.age }}  ·  {{p.height }}cm  ·  {{ p.weight  }}kg</view>
 
                 </view>
                 <view class="partner-meta-distance" >
@@ -73,10 +73,10 @@
 
               </view>
           
-            <!--  <view class="partner-tags">
+             <view class="partner-tags">
                 <text v-for="(tag, index) in p.visibleTags" :key="index" class="tag">{{ tag }}</text>
                 <text v-if="p.extraTags > 0" class="more-tags">+{{ p.extraTags }}</text>
-              </view> -->
+              </view>
               <view class="partner-actions flex-between">
                 <view ></view>
                 <view class="schedule-btn" @click.stop="openServicePopup(p)">
@@ -176,7 +176,8 @@
           </scroll-view>
         </view>
       </view>
-    </uni-popup>
+    </uni-popup> 
+  	<hm-tabbar currentTab="friends"></hm-tabbar>
   </view>
 </template>
 

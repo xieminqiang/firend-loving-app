@@ -6,6 +6,7 @@ export const useUserStore = defineStore('user',{
   state: () => ({
     userInfo: {
 	},
+    switch: null, // 添加开关字段
 
   }),
   // 定义 getters
@@ -20,6 +21,11 @@ export const useUserStore = defineStore('user',{
       console.log('userInfo', this.userInfo);
     },
 	
+    //设置开关状态
+    setSwitch(switchData) {
+      this.switch = switchData
+      console.log('switch', this.switch);
+    },
 
     //清除用户信息
     clearUserInfo() {
@@ -29,7 +35,7 @@ export const useUserStore = defineStore('user',{
   // 持久化配置
   persist: {
     key: 'user-store',
-    paths: ['userInfo'] // 只持久化 userInfo 字段
+    paths: ['userInfo', 'switch'] // 持久化 userInfo 和 switch 字段
   }
 })
 
