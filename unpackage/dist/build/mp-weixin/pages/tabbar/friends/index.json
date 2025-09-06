@@ -1,8 +1,0 @@
-{
-  "navigationStyle": "custom",
-  "usingComponents": {
-    "uni-popup": "../../../uni_modules/uni-popup/components/uni-popup/uni-popup",
-    "city-selector": "../../../components/common/CitySelector",
-    "city-picker": "../../../components/common/CityPicker"
-  }
-}

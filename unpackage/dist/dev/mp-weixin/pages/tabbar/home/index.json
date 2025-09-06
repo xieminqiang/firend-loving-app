@@ -1,8 +1,11 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
+    "u-popup": "../../../uni_modules/uview-plus/components/u-popup/u-popup",
     "hm-tabbar": "../../../components/hm-tabbar/hm-tabbar",
-    "city-selector": "../../../components/common/CitySelector",
-    "city-picker": "../../../components/common/CityPicker"
+    "home-component": "./components/home",
+    "friends-component": "./components/friends",
+    "discover-component": "./components/discover",
+    "profile-component": "./components/profile"
   }
 }

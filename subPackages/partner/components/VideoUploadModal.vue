@@ -31,7 +31,7 @@
           <!-- 已有视频时显示预览 -->
           <view v-if="videoUrl && videoUrl != ''" class="video-preview">
             <video 
-              :src="videoUrl" 
+              :src="$imgBaseUrl + videoUrl" 
               class="preview-video"
               controls
               show-center-play-btn
@@ -94,7 +94,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { uploadCompanionVideo } from '@/api/user.js'
-import { uploadFile, getUploadResult } from '../api/file.js'
+import { uploadFile, getUploadResult } from '@/api/file.js'
 
 // 定义props
 const props = defineProps({
@@ -196,8 +196,8 @@ const selectVideo = () => {
           throw new Error('上传结果解析失败')
         }
         
-        // 设置视频URL
-        videoUrl.value = "https://sbx-server.oss-cn-shenzhen.aliyuncs.com" + fileData.url
+        // 设置视频URL（保存完整URL用于预览，提交时去掉域名前缀）
+        videoUrl.value = fileData.url
         uni.hideLoading()
       } catch (error) {
         uni.hideLoading()
@@ -237,8 +237,12 @@ const submitVideo = async () => {
   try {
     uni.showLoading({ title: '提交审核中...' })
     
+    // 提交时去掉域名前缀，只保留相对路径
+    let videoUrlToSubmit = videoUrl.value
+
+    
     const response = await uploadCompanionVideo({
-      intro_video_url: videoUrl.value
+      intro_video_url: videoUrlToSubmit
     })
     
     // 如果执行到这里，说明请求成功且没有业务错误

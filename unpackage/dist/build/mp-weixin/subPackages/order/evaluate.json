@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "评价",
+  "usingComponents": {
+    "u-rate": "../../uni_modules/uview-plus/components/u-rate/u-rate"
+  }
+}

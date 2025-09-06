@@ -1,32 +1,14 @@
 <template>
 	<view class="hm_tabbar">
-		<u-tabbar 
-			:value="currentTab" 
-			activeColor="#7363FF" 
-			inactiveColor="#8A8A8A" 
-			:border="false" 
-			:fixed="true"
-			:placeholder="true" 
-			:safeAreaInsetBottom="true"
-			class="custom-tabbar"
-		>
-			<u-tabbar-item 
-				v-for="item in tabList" 
-				:key="item.name" 
-				:text="item.text" 
-				:name="item.name"
-				@click="handTab(item)"
-				class="tab-item"
-			>
+		<u-tabbar :value="currentTab" activeColor="#7363FF" inactiveColor="#1A1A1A" :border="false" :fixed="true"
+			:placeholder="true" :safeAreaInsetBottom="true">
+			<u-tabbar-item v-for="(item,i) in tabList" :key="item.name" :text="item.text" :name="item.name"
+			 @click="handTab(item)">
 				<template #active-icon>
-					<view class="icon-wrapper active">
-						<image class="tab-icon" :src="item.selectedIconPath"></image>
-					</view>
+					<image class="u-page__item__slot-icon" :src="item.selectedIconPath"></image>
 				</template>
 				<template #inactive-icon>
-					<view class="icon-wrapper">
-						<image class="tab-icon" :src="item.iconPath"></image>
-					</view>
+					<image class="u-page__item__slot-icon" :src="item.iconPath"></image>
 				</template>
 			</u-tabbar-item>
 		</u-tabbar>
@@ -34,7 +16,7 @@
 </template>
 
 <script setup>
-
+import { defineEmits } from 'vue'
 
 	const tabList = [
 			{
@@ -74,89 +56,35 @@
 		}
 	})
 
-
+	// 定义emit事件，用于通知父组件tab切换
+	const emit = defineEmits(['tabChange'])
 
 	const handTab = (row) => {
-		uni.switchTab({
-			url: '/' + row.pagePath
-		})
+		// 不再跳转页面，而是发送事件通知父组件
+		emit('tabChange', row.name)
 	}
 </script>
 
-<style lang="scss" scoped>
-	.hm_tabbar {
-		.custom-tabbar {
-			background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-			box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.08);
-			border-radius: 24rpx 24rpx 0 0;
-			backdrop-filter: blur(20rpx);
-		}
-	}
 
-	.icon-wrapper {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 80rpx;
-		height: 80rpx;
-		border-radius: 20rpx;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-		position: relative;
-		
+	<style lang="scss" scoped>
+		.hm_tabbar {
+		}
 	
-	}
-
-	.tab-icon {
-		width: 48rpx;
-		height: 48rpx;
-		
-	}
-
-	:deep(.u-tabbar) {
-		height: 120rpx;
-		padding: 0 20rpx;
-	}
-
-	:deep(.u-tabbar-item) {
-		height: 120rpx;
-		transition: all 0.3s ease;
-		
-		&:hover {
-			transform: translateY(-4rpx);
+		.u-page__item__slot-icon {
+			width: 40rpx;
+			height: 40rpx;
 		}
-	}
-
-	:deep(.u-tabbar__content) {
-		padding: 16rpx 0;
-	}
-
-	:deep(.u-tabbar-item__text) {
-		font-size: 24rpx;
-		font-weight: 500;
-		margin-top: 8rpx;
-		transition: all 0.3s ease;
-	}
-
-	:deep(.u-tabbar-item--active .u-tabbar-item__text) {
-		font-weight: 600;
-		color: #7363FF;
-		transform: scale(1.05);
-	}
-
-	// 添加响应式设计
-	@media (max-width: 750rpx) {
-		.icon-wrapper {
-			width: 70rpx;
-			height: 70rpx;
+	
+		:deep(.u-tabbar) {
+			height: 100rpx;
+			// height: 88px !important;
 		}
-		
-		.tab-icon {
-			width: 42rpx;
-			height: 42rpx;
+	
+		:deep(.u-tabbar-item) {
+			// height: 88px;
 		}
-		
-		:deep(.u-tabbar-item__text) {
-			font-size: 22rpx;
+	
+		:deep(.u-tabbar__content) {
+			padding: 10rpx 0 34rpx;;
 		}
-	}
 </style>

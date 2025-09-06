@@ -111,7 +111,7 @@
   <style scoped>
   .policy-container {
     height: 100vh;
-    background-color: #f5f5f5;
+    background-color: #F8F8F8;
     display: flex;
     flex-direction: column;
   }

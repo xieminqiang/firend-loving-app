@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "city-selector": "../../../../components/common/CitySelector",
+    "city-picker": "../../../../components/common/CityPicker"
+  }
+}

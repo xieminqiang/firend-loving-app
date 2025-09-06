@@ -94,6 +94,20 @@ export function getCompanionOnlineStatus() {
 }
 
 /**
+ * 更新用户基本信息
+ * @param {Object} data - 用户基本信息数据
+ * @param {string} data.head_img - 头像图片路径
+ * @returns {Promise} 返回更新结果
+ */
+export const updateUserBasicInfo = (data) => {
+  return http({
+    url: '/front/user/basic-info',
+    method: 'PUT',
+    data
+  })
+}
+
+/**
  * 更新用户信息
  * @param {Object} data - 用户信息数据
  * @returns {Promise} 返回更新结果
@@ -228,5 +242,60 @@ export const saveCompanionSchedule = (data) => {
     url: '/front/companion/schedule',
     method: 'PUT',
     data
+  })
+}
+
+/**
+ * 友伴师提现
+ * @param {Object} data - 提现数据
+ * @param {number} data.withdraw_amount - 提现金额（分）
+ * @returns {Promise} 返回提现结果
+ */
+export const companionWithdraw = (data) => {
+  return http({
+    url: '/front/companion/withdraw/direct',
+    method: 'POST',
+    data
+  })
+}
+
+/**
+ * 获取友伴师待确认提现列表
+ * @returns {Promise} 返回待确认提现列表
+ */
+export const getPendingWithdrawList = () => {
+  return http({
+    url: '/front/companion/withdraw/pending-confirm',
+    method: 'POST'
+  })
+}
+
+/**
+ * 获取友伴师提现记录
+ * @param {Object} params - 查询参数
+ * @param {number} params.page - 页码
+ * @param {number} params.page_size - 每页数量
+ * @returns {Promise} 返回提现记录列表
+ */
+export const getWithdrawRecords = (params) => {
+  return http({
+    url: '/front/companion/withdraw/records',
+    method: 'POST',
+    data: params
+  })
+}
+
+/**
+ * 获取友伴师余额明细
+ * @param {Object} params - 查询参数
+ * @param {number} params.page - 页码
+ * @param {number} params.page_size - 每页数量
+ * @returns {Promise} 返回余额明细列表
+ */
+export const getBalanceLogs = (params) => {
+  return http({
+    url: '/front/companion/balance/logs',
+    method: 'POST',
+    data: params
   })
 }

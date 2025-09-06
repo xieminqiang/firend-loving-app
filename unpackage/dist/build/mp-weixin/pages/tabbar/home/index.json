@@ -1,7 +1,10 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
-    "city-selector": "../../../components/common/CitySelector",
-    "city-picker": "../../../components/common/CityPicker"
+    "hm-tabbar": "../../../components/hm-tabbar/hm-tabbar",
+    "home-component": "./components/home",
+    "friends-component": "./components/friends",
+    "discover-component": "./components/discover",
+    "profile-component": "./components/profile"
   }
 }

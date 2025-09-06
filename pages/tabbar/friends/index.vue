@@ -1,5 +1,5 @@
 <template>
-  <view class="friends-container">
+  <view class="friends-container" v-if="userStore.switch === 1">
     <!-- 顶部区域 -->
     <view class="header" :style="{ paddingTop: statusBarHeight + 'px' }">
       <view class="header-top">
@@ -11,7 +11,7 @@
       </view>
       
       <!-- 的筛选栏 -->
-    <!--  <view class="filter-bar">
+     <view class="filter-bar">
         <view class="filter-item" @click="refreshRecommend">
           <text>推荐</text>
           <image src="@/static/icons/friend/tuijian.png" class="recommend-icon" mode="aspectFit" />
@@ -24,7 +24,7 @@
           <text>{{ getLevelFilterText }}</text>
           <image src="@/static/icons/friend/chevron-down.png" class="filter-arrow" mode="aspectFit" />
         </view>
-      </view> -->
+      </view>
       
 
     </view>
@@ -49,7 +49,7 @@
         <view v-else-if="processedPartnersList.length > 0">
           <view v-for="p in processedPartnersList" :key="p.id" class="partner-card" @click="navigateToDetail(p.id)">
             <view class="avatar-wrapper">
-              <image :src="p.avatar" class="avatar" mode="aspectFill" />
+              <image :src="$imgBaseUrl + p.avatar" class="avatar" mode="aspectFill" />
               <view v-if="p.online" class="status-dot"></view>
             </view>
             <view class="partner-info">
@@ -189,7 +189,9 @@ import { useLevelStore } from '@/stores/level.js'
 import { useCityStore } from '@/stores/city.js'
 import CitySelector from '@/components/common/CitySelector.vue'
 import CityPicker from '@/components/common/CityPicker.vue'
-
+import { useUserStore } from '@/stores/user.js'
+// 用户状态管理
+const userStore = useUserStore()
 // 状态栏高度和胶囊按钮信息
 const statusBarHeight = ref(0)
 const menuButtonInfo = ref(null)

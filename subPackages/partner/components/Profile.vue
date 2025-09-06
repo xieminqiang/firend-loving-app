@@ -5,7 +5,7 @@
         <view class="avatar-container">
           <image 
             v-if="applicationInfo && applicationInfo.avatar"
-            :src="applicationInfo.avatar" 
+            :src="$imgBaseUrl + applicationInfo.avatar" 
             class="avatar-img" 
             mode="aspectFill" 
           />
@@ -42,20 +42,16 @@
         <image src="@/static/icons/common/arrow-right.png" class="profile-arrow" mode="aspectFit" />
       </view>
       
-      <!-- 账户信息 -->
-      <view class="account-info">
-        <view class="balance-card">
-          <text class="balance-label">账户余额</text>
-          <text class="balance-amount">¥0.00</text>
-          <view class="balance-actions">
-            <text class="action-btn" @click="handleBalanceAction('withdraw')">提现</text>
-            <text class="action-btn" @click="handleBalanceAction('detail')">明细</text>
-          </view>
-        </view>
-      </view>
+
       
       <!-- 功能列表 -->
-      <view class="function-list">
+              <view class="function-list">
+                  <view class="function-item" @click="handleFunctionClick('balance')">
+          <image src="@/static/icons/profile/zhanghuyue.png" class="function-icon-img" mode="aspectFit" />
+          <text class="function-text">我的余额</text>
+          <text class="balance-display">¥{{ formatBalance(applicationInfo?.available_balance || 0) }}</text>
+          <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
+        </view>
         <view class="function-item" @click="handleFunctionClick('orders')">
           <image src="@/static/icons/profile/dingdan.png" class="function-icon-img" mode="aspectFit" />
           <text class="function-text">我的订单</text>
@@ -68,6 +64,14 @@
         </view>
       </view>
     </view>
+    
+    <!-- 发动态入口 -->
+   
+      <view class="release-content" @click="toRelease">
+        <image src="@/static/icons/partner/add_dt.png" class="release-icon" mode="aspectFit" />
+        <text class="release-text">分享你的动态</text>
+      </view>
+   
   
   <!-- 视频上传弹框 -->
   <VideoUploadModal 
@@ -76,12 +80,15 @@
     @close="hideVideoUploadModal"
     @success="handleVideoUploadSuccess"
   />
+
+
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import VideoUploadModal from './VideoUploadModal.vue'
 import { useLevelStore } from '@/stores/level.js'
+
 
 // 定义props
 const props = defineProps({
@@ -97,6 +104,8 @@ const levelStore = useLevelStore()
 // 视频上传弹框状态
 const showVideoUploadModal = ref(false)
 
+
+
 // 计算当前等级信息
 const currentLevel = computed(() => {
   if (!props.applicationInfo?.level_order || !levelStore.sortedServiceLevels.length) {
@@ -108,6 +117,22 @@ const currentLevel = computed(() => {
 // 获取接单状态样式类
 const getOrderStatusClass = (canAcceptOrders) => {
   return canAcceptOrders === 'Y' ? 'status-success' : 'status-warning'
+}
+
+// 格式化余额显示（分转元，保持精度）
+const formatBalance = (balanceInCents) => {
+  if (!balanceInCents && balanceInCents !== 0) return '0.00'
+  // 使用数学运算避免浮点数精度问题
+  const yuan = Math.floor(balanceInCents / 100)
+  const fen = balanceInCents % 100
+  
+  if (fen === 0) {
+    return yuan + '.00'
+  } else if (fen < 10) {
+    return yuan + '.0' + fen
+  } else {
+    return yuan + '.' + fen
+  }
 }
 
 // 跳转到资料编辑页面
@@ -124,27 +149,26 @@ const goToLevelPage = () => {
   })
 }
 
-// 处理余额操作
-const handleBalanceAction = (action) => {
-  switch (action) {
-    case 'withdraw':
-      uni.showToast({
-        title: '提现功能开发中',
-        icon: 'none'
-      })
-      break
-    case 'detail':
-      uni.showToast({
-        title: '明细功能开发中',
-        icon: 'none'
-      })
-      break
-  }
+
+
+
+
+
+
+// 取消提现
+const cancelWithdraw = () => {
+  showWithdrawModal.value = false
+  withdrawAmount.value = ''
 }
 
 // 处理功能点击
 const handleFunctionClick = (functionName) => {
   switch (functionName) {
+    case 'balance':
+      uni.navigateTo({
+        url: '/subPackages/balance/index'
+      })
+      break
     case 'orders':
       uni.navigateTo({
         url: `/subPackages/partner/order/index?companion_id=${props.applicationInfo?.id || ''}`
@@ -173,6 +197,13 @@ const handleVideoUploadSuccess = (data) => {
   console.log('视频上传成功:', data)
   // 发送事件通知父组件刷新数据
   uni.$emit('applicationStatusChanged', data)
+}
+
+// 跳转到发动态页面
+const toRelease = async () => {
+  uni.navigateTo({
+    url: '/subPackages/release/index'
+  })
 }
 
 // 生命周期
@@ -368,52 +399,7 @@ const handleApplicationStatusChanged = (data) => {
   color: #FFFFFF;
 }
 
-.account-info {
-  margin-bottom: 20rpx;
-}
 
-.balance-card {
-  background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
-  border-radius: 20rpx;
-  padding: 28rpx;
-  color: white;
-  text-align: center;
-}
-
-.balance-label {
-  font-size: 28rpx;
-  opacity: 0.9;
-  display: block;
-  margin-bottom: 16rpx;
-}
-
-.balance-amount {
-  font-size: 48rpx;
-  font-weight: 700;
-  display: block;
-  margin-bottom: 24rpx;
-}
-
-.balance-actions {
-  display: flex;
-  justify-content: center;
-  gap: 32rpx;
-}
-
-.action-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 24rpx;
-  padding: 12rpx 24rpx;
-  font-size: 24rpx;
-  font-weight: 500;
-  border: 1rpx solid rgba(255, 255, 255, 0.3);
-  transition: all 0.2s;
-}
-
-.action-btn:active {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(0.96);
-}
 
 .function-list {
   background: #FFFFFF;
@@ -460,8 +446,46 @@ const handleApplicationStatusChanged = (data) => {
   height: 32rpx;
 }
 
+.balance-display {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #07c160;
+  margin-right: 10rpx;
+
+}
+
 .profile-arrow {
   width: 32rpx;
   height: 32rpx;
 }
+
+
+
+.release-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx;
+  margin-left: 20rpx;
+  margin-right: 20rpx;
+
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  box-sizing: border-box;
+}
+
+
+.release-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12rpx;
+}
+
+.release-text {
+  font-size: 28rpx;
+  color: #7363FF;
+  font-weight: 500;
+}
+
+
 </style> 

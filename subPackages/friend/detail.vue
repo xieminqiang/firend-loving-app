@@ -5,7 +5,7 @@
         <view class="header-row">
                       <view class="left-group">
               <view class="avatar-wrap">
-              <image :src="user.avatar" class="avatar" mode="aspectFill" />
+              <image :src="proxy.$imgBaseUrl + user.avatar" class="avatar" mode="aspectFill" />
               <view class="online-dot"></view>
             </view>
             <view class="profile-meta">
@@ -14,9 +14,9 @@
                 <image v-if="user.verified && currentLevel" :src="currentLevel?.icon_url" class="verified-icon" mode="aspectFit" />
                 <text v-if="currentLevel?.level_name" class="level-tag">{{ currentLevel?.level_name }}</text>
               </view>
-            <!--  <view class="user-tags" v-if="user.tags && user.tags.length > 0">
+             <view class="user-tags" v-if="user.tags && user.tags.length > 0">
                 <text v-for="tag in user.tags" :key="tag" class="user-tag">{{ tag }}</text>
-              </view> -->
+              </view>
             </view>
           </view>
         </view>
@@ -35,7 +35,12 @@
         </view>
         <swiper class="banner-swiper-inner" :indicator-dots="true" :autoplay="true" :interval="4000" :duration="500">
           <swiper-item v-for="(item, idx) in banners" :key="idx">
-            <image :src="item.img" class="banner-img" mode="aspectFill" />
+            <image 
+              :src="proxy.$imgBaseUrl + item.img" 
+              class="banner-img" 
+              mode="aspectFill"
+              @click="previewImage(idx)"
+            />
           </swiper-item>
         </swiper>
         <!-- 轮播图下方服务标签 -->
@@ -71,7 +76,7 @@
         <view v-show="activeTab === 0">
           <view v-if="services.length > 0" class="service-list">
           <view class="service-item" v-for="item in services" :key="item.title">
-            <image  :src="$imgBaseUrl + item.service_image_url"  class="service-img" mode="aspectFill" />
+            <image  :src="proxy.$imgBaseUrl + item.service_image_url"  class="service-img" mode="aspectFill" />
             <view class="service-info">
               <view class="service-title-row">
                 <text class="service-title">{{ item.service_name}}</text>
@@ -93,7 +98,55 @@
         </view>
         <!-- TA的动态 -->
         <view v-show="activeTab === 1">
-          <view class="empty-state-profile">
+          <view v-if="momentsLoading" class="loading-state">
+            <text class="loading-text">加载中...</text>
+          </view>
+          <view v-else-if="momentsList.length > 0" class="moments-list">
+            <view v-for="(item, index) in momentsList" :key="index" class="moment-item">
+              <view class="moment-left">
+                <view class="moment-day">{{ item.moments_info?.time_date }}</view>
+                <view class="moment-time">{{ item.moments_info?.time_time }}</view>
+              </view>
+              <view class="moment-right">
+                <!-- 文案 -->
+                <view class="copywriting">
+                  <view>{{ item.moments_info?.content }}</view>
+                  
+                  <!-- 照片 -->
+                  <view>
+                    <PictureDisplay v-if="item.moments_info?.file_list" :list="item.moments_info?.file_list"
+                      :topicList="item.moments_info?.topic_list" @playVideo="handlePlayVideo"></PictureDisplay>
+                  </view>
+                </view>
+                
+                <!-- 底部 -->
+                <view class="foot">
+                  <view class="foot-set" @tap="setTrends(item)">
+                    <image src="@/static/my/more@3x.png" mode="widthFix" class="foot-image"></image>
+                    <view class="foot-status">{{ item.moments_info?.moments_status?.title }}</view>
+                  </view>
+                  <view class="foot-right">
+                    <!-- 点赞 -->
+                    <view class="icon-item">
+                      <image v-if="!item.moments_info?.is_praised" src="@/static/square/love.png" mode=""
+                        class="foot-image" @tap="handlePraise(item)">
+                      </image>
+                      <image v-if="item.moments_info?.is_praised" src="@/static/square/active-love.png" mode=""
+                        class="foot-image" @tap="handlePraise(item)">
+                      </image>
+                      <view class="icon-title">{{ item.moments_info?.praise_num || 0 }}</view>
+                    </view>
+                    <!-- 评论 -->
+                    <view class="icon-item icon-item-center" @tap="toRecord(item)">
+                      <image src="@/static/square/message.png" mode="" class="foot-image"></image>
+                      <view class="icon-title">{{ item.moments_info?.comments_num || 0 }}</view>
+                    </view>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+          <view v-else class="empty-state-profile">
             <image src="/static/images/empty.png" class="empty-icon" mode="aspectFit" />
             <text class="empty-text-profile">~暂无动态~</text>
           </view>
@@ -130,15 +183,43 @@
   </template>
   
   <script setup>
-  import { ref, computed, onMounted } from 'vue'
-  import { getCityServices } from '@/api/friends.js'
-  import { useLevelStore } from '@/stores/level.js'
+import { ref, computed, onMounted, getCurrentInstance } from 'vue'
+import { getCityServices } from '@/api/friends.js'
+import { getMomentsByCompanion, praiseMoment } from '@/api/discover.js'
+import { useLevelStore } from '@/stores/level.js'
+import { useUserStore } from '@/stores/user.js'
+import PictureDisplay from '@/components/common/PictureDisplay.vue'
 
   // 获取页面参数
   const params = ref({})
 
+  // 获取当前实例以访问全局属性
+  const { proxy } = getCurrentInstance()
+
   // 获取level store
   const levelStore = useLevelStore()
+  
+  // 用户状态管理
+  const userStore = useUserStore()
+  
+  // 登录状态判断
+  const isLoggedIn = computed(() => {
+    return userStore.userInfo && Object.keys(userStore.userInfo).length > 0
+  })
+  
+  // 用户信息
+  const userInfo = computed(() => {
+    if (isLoggedIn.value) {
+      return userStore.userInfo
+    }
+  })
+  
+  // 导航到登录页面
+  const navigateToLogin = () => {
+    uni.navigateTo({
+      url: '/subPackages/login/index'
+    })
+  }
 
   const tabs = ['提供项目', 'TA的动态', '客户评价']
   const activeTab = ref(0)
@@ -146,9 +227,11 @@
     activeTab.value = idx
   }
 
-  const user = ref({})
-  const banners = ref([])
-  const services = ref([])
+const user = ref({})
+const banners = ref([])
+const services = ref([])
+const momentsList = ref([])
+const momentsLoading = ref(false)
 
   // 计算当前等级信息
   const currentLevel = computed(() => {
@@ -170,8 +253,19 @@
   // level_order: 友伴师等级序号
   // nickname: 友伴师昵称
   const goToSubmit = (item) => {
+    // 检查登录状态
+    if (!isLoggedIn.value) {
+      uni.showToast({
+        title: '请先登录',
+        icon: 'none',
+        duration: 2000
+      })
+      navigateToLogin()
+      return
+    }
+    
     uni.navigateTo({
-      url: `/subPackages/order/submit?service_id=${item.service_id}&price_template_id=${item.price_template_id || ''}&companion_id=${user.value.application_id}&level_order=${user.value.level_order || ''}&nickname=${user.value.nickname}`
+      url: `/subPackages/order/submit?service_id=${item.service_id}&price_template_id=${item.price_template_id || ''}&companion_id=${params.value.id}&level_order=${user.value.level_order || ''}&nickname=${user.value.nickname}`
     })
   }
 
@@ -237,6 +331,154 @@ const getCityServicesData = async () => {
     }
   }
 
+  // 获取友伴师动态列表
+  const getMomentsData = async () => {
+    if (!params.value.id) return
+    
+    try {
+      momentsLoading.value = true
+      const requestParams = {
+        companion_id: parseInt(params.value.id),
+        page: 1,
+        page_size: 10
+      }
+      
+      const response = await getMomentsByCompanion(requestParams)
+      console.log('动态列表响应:', response)
+      
+      if (response.data && response.data.code === 0) {
+        const data = response.data.data
+        if (data && data.moments_list) {
+          momentsList.value = data.moments_list
+          console.log('动态列表数据:', momentsList.value)
+        }
+      } else {
+        console.error('获取动态列表失败:', response.data?.message || '未知错误')
+      }
+    } catch (error) {
+      console.error('获取动态列表异常:', error)
+    } finally {
+      momentsLoading.value = false
+    }
+  }
+
+  // 预览图片
+  const previewImage = (index) => {
+    uni.previewImage({
+      urls: banners.value.map(item => proxy.$imgBaseUrl + item.img),
+      current: proxy.$imgBaseUrl + banners.value[index].img,
+      indicator: 'number',
+      loop: true,
+      show: true,
+      success: function(res) {
+        console.log('图片预览成功', res);
+      },
+      fail: function(err) {
+        console.error('图片预览失败', err);
+      }
+    });
+  };
+
+  // 预览动态图片
+  const previewMomentImage = (index, fileList) => {
+    const imageUrls = fileList
+      .filter(file => !file.is_video)
+      .map(file => file.path);
+    
+    if (imageUrls.length > 0) {
+      uni.previewImage({
+        urls: imageUrls,
+        current: imageUrls[index],
+        indicator: 'number',
+        loop: true,
+        show: true,
+        success: function(res) {
+          console.log('动态图片预览成功', res);
+        },
+        fail: function(err) {
+          console.error('动态图片预览失败', err);
+        }
+      });
+    }
+  };
+
+  // 处理视频播放
+  const handlePlayVideo = (videoPath) => { 
+    console.log('播放视频:', videoPath)
+    // 可以在这里添加视频播放逻辑
+  }
+
+  // 点赞处理
+  const handlePraise = async (val) => {
+    try {
+      // 先更新本地状态，提供即时反馈
+      const wasPraised = val.moments_info.is_praised
+      val.moments_info.is_praised = !wasPraised
+      
+      if (val.moments_info.is_praised) {
+        val.moments_info.praise_num = parseInt(val.moments_info.praise_num) + 1
+      } else {
+        val.moments_info.praise_num = Math.max(0, parseInt(val.moments_info.praise_num) - 1)
+      }
+      
+      // 调用API接口
+      const response = await praiseMoment({
+        target_id: val.moments_info.moments_id
+      })
+      
+      if (response.data && response.data.code === 0) {
+        // API调用成功，本地状态已经更新
+        console.log('点赞成功')
+      } else {
+        // API调用失败，回滚本地状态
+        val.moments_info.is_praised = wasPraised
+        if (wasPraised) {
+          val.moments_info.praise_num = parseInt(val.moments_info.praise_num) + 1
+        } else {
+          val.moments_info.praise_num = Math.max(0, parseInt(val.moments_info.praise_num) - 1)
+        }
+        
+        uni.showToast({
+          title: '点赞失败，请重试',
+          icon: 'none'
+        })
+      }
+    } catch (error) {
+      console.error('点赞失败:', error)
+      // 发生错误，回滚本地状态
+      const wasPraised = val.moments_info.is_praised
+      val.moments_info.is_praised = !wasPraised
+      if (wasPraised) {
+        val.moments_info.praise_num = parseInt(val.moments_info.praise_num) + 1
+      } else {
+        val.moments_info.praise_num = Math.max(0, parseInt(val.moments_info.praise_num) - 1)
+      }
+      
+      uni.showToast({
+        title: '网络错误，请重试',
+        icon: 'none'
+      })
+    }
+  }
+
+  // 去评论
+  const toRecord = (item) => {
+    uni.navigateTo({
+      url: '/subPackages/record/comment',
+      success(res) {
+        // 通过eventChannel向被打开页面传送数据
+        res.eventChannel.emit('getRecord', {
+          data: item
+        })
+      }
+    })
+  }
+
+  // 设置动态
+  const setTrends = (item) => {
+    // 可以在这里添加设置动态的逻辑
+    console.log('设置动态:', item)
+  }
 
 
   onMounted(async () => {
@@ -257,6 +499,11 @@ const getCityServicesData = async () => {
   // 调用城市服务接口
   if (params.value.id && params.value.city_code) {
     getCityServicesData()
+  }
+  
+  // 调用动态列表接口
+  if (params.value.id) {
+    getMomentsData()
   }
 })
   </script>
@@ -382,6 +629,12 @@ const getCityServicesData = async () => {
     width: 100%;
     height: 420rpx;
     object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .banner-img:active {
+    transform: scale(0.98);
   }
   .profile-meta-topbar {
     position: absolute;
@@ -694,5 +947,96 @@ const getCityServicesData = async () => {
     justify-content: center;
     align-items: center;
     padding: 24rpx 0 env(safe-area-inset-bottom, 24rpx) 0;
+  }
+
+  /* 动态列表样式 */
+  .loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60rpx 0;
+  }
+  .loading-text {
+    font-size: 28rpx;
+    color: #999;
+  }
+  .moments-list {
+    padding: 0 24rpx;
+  }
+  .moment-item {
+    display: flex;
+    padding: 40rpx 0 20rpx;
+    border-bottom: 1rpx solid #f0f0f0;
+  }
+  .moment-item:last-child {
+    border-bottom: none;
+  }
+  .moment-left {
+    display: flex;
+    flex-direction: column;
+    margin-right: 24rpx;
+    min-width: 120rpx;
+  }
+  .moment-day {
+    font-size: 32rpx;
+    font-weight: 400;
+    color: #b3b3b3;
+    margin-bottom: 4rpx;
+  }
+  .moment-time {
+    font-size: 20rpx;
+    font-weight: 300;
+    color: #b3b3b3;
+  }
+  .moment-right {
+    flex: 1;
+    min-width: 0;
+  }
+  .copywriting {
+    padding-left: 0;
+    padding-top: 20rpx;
+    padding-right: 20rpx;
+    font-size: 24rpx;
+    color: rgba(26, 26, 26, 1);
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .foot {
+    margin-top: 38rpx;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 0;
+  }
+  .foot-image {
+    width: 44rpx;
+    height: 44rpx;
+  }
+  .foot-set {
+    display: flex;
+    align-items: center;
+  }
+  .foot-status {
+    margin-left: 14rpx;
+    font-size: 20rpx;
+    color: #ccc;
+  }
+  .foot-right {
+    display: flex;
+  }
+  .icon-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .icon-title {
+    margin-left: 12rpx;
+    font-size: 20rpx;
+    font-weight: 500;
+    color: rgba(153, 153, 153, 1);
+  }
+  .icon-item-center {
+    margin-left: 50rpx;
+    margin-right: 20rpx;
   }
   </style> 

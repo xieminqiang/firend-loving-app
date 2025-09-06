@@ -227,3 +227,30 @@ export const getCompanionActiveOrders = (data) => {
     data
   })
 }
+
+// 获取友伴余额详情
+export const getCompanionBalanceDetail = (data) => {
+  return http({
+    url: '/front/companion/balance/detail',
+    method: 'POST',
+    data
+  })
+}
+
+// 创建订单评价
+export const createOrderComment = (data) => {
+  return http({
+    url: '/front/order/comment/create',
+    method: 'POST',
+    data
+  })
+}
+
+// 获取订单评价列表
+export const getOrderCommentList = (params) => {
+  return http({
+    url: '/front/order/comment/order-list',
+    method: 'POST',
+    data: params
+  })
+}

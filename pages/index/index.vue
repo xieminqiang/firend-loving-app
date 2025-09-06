@@ -13,31 +13,35 @@ import { useUserStore } from '@/stores/user.js'
 const userStore = useUserStore()
 
 // 调用接口
-const callFirstSwitch = async () => {
+const callFirstSwitch = async () => {  
+
 	try {
 		const response = await getFirstSwitch() 
       
 		console.log('首页开关配置:', response.data)
 		
+		
+	
 		// 保存开关数据到store
 		if (response.data && response.data.code === 0 && response.data.data) {
-			userStore.setSwitch(response.data.data.value)
+				// userStore.setSwitch(1)
+			userStore.setSwitch(response.data.data.value) 
 			console.log('开关数据已保存到store:', response.data.data.value)
 		}
 		
-		// 如果 value = 1，则跳转到首页
+	
 		if (response.data && response.data.code === 0 ) {
 
-            console.log('跳转到首页')
-          if(response.data.data.value === 1){
+            
+          if(response.data.data.value === 1 ){
           
-            uni.switchTab({
+            uni.reLaunch({
 				url: '/pages/tabbar/home/index'
 			})
         
-        }else{
-            uni.switchTab({
-				url: '/pages/tabbar/home/index-page'
+        }  else{ 
+			uni.reLaunch({
+				url: '/pages/tabbar/page/page'
 			}) 
             }
 		}
@@ -45,10 +49,53 @@ const callFirstSwitch = async () => {
 		console.error('获取首页开关配置失败:', error)
 	}
 }
+import {
+	onShow,
+	onLoad
+} from '@dcloudio/uni-app'; 
+onShow(() => { 
+	// userStore.setSwitch(1)
+	// uni.reLaunch({
+	// 				url: '/pages/tabbar/home/index'
+	// 			})
+  // 页面显示时，如果已登录则获取订单数量 
 
+	userStore.setSwitch(2)
+	const accountInfo = uni.getAccountInfoSync();  
+
+	
+	const currentVersion = accountInfo.miniProgram.envVersion 
+		console.log('当前小程序版本号:', currentVersion)
+	 if (currentVersion == "release" || currentVersion == "develop") {
+		 callFirstSwitch()
+	 } else { 
+		  userStore.setSwitch(2) 
+		 uni.reLaunch({
+		 	url: '/pages/tabbar/page/page'
+		 })
+		
+	 }
+})
 // 页面加载时调用
-onMounted(() => {
-	callFirstSwitch()
+onMounted(() => {  
+
+	// userStore.setSwitch(2)
+	// const accountInfo = uni.getAccountInfoSync();
+	// const currentVersion = accountInfo.miniProgram.envVersion 
+	// console.log('当前小程序版本号:', currentVersion)
+	//  if (currentVersion == "release" || currentVersion == "develop") {
+	// 	 callFirstSwitch()
+	//  } else { 
+	// 	  userStore.setSwitch(2) 
+	// 	 uni.reLaunch({
+	// 	 	url: '/pages/tabbar/page/page'
+	// 	 })
+		
+	//  }
+	 
+	// console.log('当前小程序版本号:', currentVersion)
+	// console.log('当前小程序版本号111:', accountInfo.miniProgram.envVersion) 
+	
 })
 </script>
 

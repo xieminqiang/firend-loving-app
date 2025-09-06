@@ -23,7 +23,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .about-container {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #F8F8F8;
   
   .header {
     padding: 20rpx;

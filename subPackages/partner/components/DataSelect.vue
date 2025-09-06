@@ -374,6 +374,13 @@ const saveSchedule = async () => {
         icon: 'success'
       })
       console.log('保存成功:', response.data)
+      
+      // 发送事件通知Workbench组件刷新日期安排数据
+      uni.$emit('scheduleDataUpdated', {
+        companion_id: companion_id.value,
+        day_of_week: dayOfWeek,
+        schedule: dayData.schedule
+      })
     } else {
       uni.showToast({
         title: response.data?.msg || '保存失败',

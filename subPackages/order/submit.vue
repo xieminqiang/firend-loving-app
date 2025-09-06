@@ -53,7 +53,7 @@
               <text class="service-price">¥{{ serviceInfo?.price_info?.unit_price }}</text>
               <text class="service-duration">/ {{ serviceInfo?.price_info?.unit}}</text>
             </view>
-            <text class="service-provider">友伴达人: {{ params.nickname}}</text>
+            <text class="service-provider">{{ params.nickname}}</text>
           </view>
           <view class="quantity-selector">
             <view 
@@ -606,7 +606,7 @@ onMounted(() => {
 <style scoped>
 .submit-order-container {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #F8F8F8;
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
 }
 

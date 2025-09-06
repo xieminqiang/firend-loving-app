@@ -9,9 +9,9 @@
     <!-- 详情内容 -->
     <scroll-view v-else-if="!error" class="detail-content" scroll-y="true">
       <!-- 返回按钮 -->
-      <view class="back-button" @click="goBack">
+ <!--     <view class="back-button" @click="goBack">
         <image src="@/static/icons/common/arrow-left.png" class="back-icon" mode="aspectFit" />
-      </view>
+      </view> -->
 
       <!-- 服务头图 -->
       <view class="hero-section" @click="previewImage">
@@ -352,7 +352,7 @@ const bookService = () => {
 // 头图区域
 .hero-section {
   position: relative;
-  height: 500rpx;
+  height: 100vw;
   overflow: hidden;
  
   

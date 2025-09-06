@@ -156,7 +156,7 @@
                 :key="index"
                 @click="previewPhoto(index)"
               >
-                <image :src="photo" class="photo-img" mode="aspectFill" />
+                <image :src="$imgBaseUrl + photo" class="photo-img" mode="aspectFill" />
                 <view class="photo-overlay">
                   <view class="photo-remove" @click.stop="deletePhoto(index)">
                     <text class="remove-text">×</text>
@@ -416,7 +416,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { getApplicatioInfo, updateCompanionApplication, getServicesByCities, getPersonalityTags } from '@/api/user.js'
 import { getCityList } from '@/api/home.js'
-import { uploadFile, getUploadResult } from '../api/file.js'
+import { uploadFile, getUploadResult } from '@/api/file.js'
 import { useUserStore } from '@/stores/user.js'
 
 // 用户store
@@ -800,7 +800,7 @@ const addPhoto = () => {
             }
 
             // 返回上传后的URL
-            return "https://sbx-server.oss-cn-shenzhen.aliyuncs.com" + fileData.url
+            return fileData.url
           } catch (error) {
             console.error(`第${index + 1}张照片上传失败:`, error)
             throw error
@@ -908,11 +908,7 @@ const onRefresh = async () => {
   isRefreshing.value = true
   try {
     await loadInitialData()
-    uni.showToast({
-      title: '刷新成功',
-      icon: 'success',
-      duration: 1500
-    })
+
   } catch (error) {
     uni.showToast({
       title: '刷新失败',

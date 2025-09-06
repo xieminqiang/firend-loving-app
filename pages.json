@@ -1,38 +1,27 @@
 {
 	"pages": [
-		{"path": "pages/index/index",
+		{
+			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,
 				"navigationStyle": "custom"
-				
 			}
-		
 		}, 
 		{
 			"path": "pages/tabbar/home/index",
 			"style": {
 				"navigationStyle": "custom"
 			}
-		},
-		{
-			"path": "pages/tabbar/friends/index",
-			"style": {
+		}, 
+	
 		
-				"navigationStyle": "custom"
-			}
-		},
 		{
-			"path": "pages/tabbar/discover/index",
+			"path": "pages/tabbar/page/page",
 			"style": {
-				"navigationBarTitleText": "发现",
-			"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/tabbar/profile/index",
-			"style": {
-			   "navigationStyle": "custom"
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true,
+				"backgroundTextStyle": "dark"
 			}
 		}
 	],
@@ -40,7 +29,7 @@
 		{
 			"root": "subPackages/login",
 			"pages": [
-								{
+				{
 					"path": "index",
 					"style": {
 						"navigationStyle": "custom"
@@ -50,21 +39,15 @@
 					"path": "policy",
 					"style": {
 						"navigationBarTitleText": ""
-					
 					}
-				
-				} , 
+				}, 
 				{
 					"path": "agreement",
 					"style": {
 						"navigationBarTitleText": ""
-						
 					}
-				
 				} 
 			]
-		
-		
 		},
 		{
 			"root": "subPackages/home",
@@ -72,15 +55,11 @@
 				{
 					"path": "detail",
 					"style": {
-					
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "详情"
 					}
 				}
 			]
-		
-		
 		},
-		
 		{
 			"root": "subPackages/settings",
 			"pages": [
@@ -91,16 +70,9 @@
 					}
 				},
 				{
-					"path": "pages/account/index",
+					"path": "pages/index/edit",
 					"style": {
-						"navigationBarTitleText": "账户设置"
-					}
-				},
-				
-				{
-					"path": "pages/privacy/index",
-					"style": {
-						"navigationBarTitleText": "隐私设置"
+						"navigationBarTitleText": "个人信息"
 					}
 				},
 				{
@@ -110,9 +82,31 @@
 					}
 				}
 			]
-		}
-	,
-	{
+		},
+		{
+			"root": "subPackages/release",
+			"pages": [
+				{
+					"path": "index",
+					"style": {
+							"navigationStyle": "custom"
+					}
+				}
+				
+			]
+		}, 
+		{
+			"root": "subPackages/record",
+			"pages": [
+				{
+					"path": "comment",
+					"style": {
+						"navigationBarTitleText": "评论"
+					}
+				}
+			]
+		},
+		{
 			"root": "subPackages/partner",
 			"pages": [
 				{
@@ -125,136 +119,155 @@
 					"path": "DataEdetion/index",
 					"style": {
 						"navigationBarTitleText": "资料编辑"
-					
 					}
 				},
 				{
 					"path": "level/index",
 					"style": {
 						"navigationBarTitleText": "等级中心"
-						
 					}
 				},
 				{
 					"path": "order/index",
 					"style": {
 						"navigationBarTitleText": "订单中心"
-						
 					}
-				},
+				}, 
+				{
+					"path": "order/partner-evaluate",
+					"style": {
+						"navigationBarTitleText": "评价"
+					}
+				}, 
+				
 				{
 					"path": "components/DataSelect",
 					"style": {
 						"navigationBarTitleText": "日期安排"
-						
 					}
-				},
-				
+				}, 
 				{
 					"path": "order/detail",
 					"style": {
 						"navigationBarTitleText": "订单详情"
-						
 					}
 				}
 			]
 		},
-	{
-		"root": "subPackages/friend",
-		"pages": [
-			{
-				"path": "apply/index",
-				"style": {
-				
-					 		"navigationBarTitleText": "友伴入驻"
+		{
+			"root": "subPackages/friend",
+			"pages": [
+				{
+					"path": "apply/index",
+					"style": {
+						"navigationBarTitleText": "友伴入驻"
+					}
+				},
+				{
+					"path": "detail",
+					"style": {
+						"navigationBarTitleText": ""
+					}
+				},
+				{
+					"path": "fr_detail",
+					"style": {
+						"navigationBarTitleText": ""
+					}
+				},
+				{
+					"path": "friend-select",
+					"style": {
+						"navigationStyle": "custom"
+					}
 				}
-			},
-			{
-				"path": "detail",
-				"style": {
+			]
+		},
+		{
+			"root": "subPackages/balance",
+			"pages": [
+				{
+					"path": "index",
+					"style": {
+						"navigationBarTitleText": "余额"
+					}
+				},
+				{
+					"path": "detail",
+					"style": {
+						"navigationBarTitleText": "明细"
+					}
+				},
+				{
+					"path": "detaril-re",
+					"style": {
+						"navigationBarTitleText": "明细详情"
+					}
+				},
+				{
+					"path": "record-detail",
+					"style": {
+						"navigationBarTitleText": "提现详情"
+					}
+				} ,
 				
-					"navigationBarTitleText": ""
-				}
-			}
-			,
-			{
-				"path": "friend-select",
-				"style": {
+				{
+					"path": "Withdraw",
+					"style": {
+						"navigationBarTitleText": "提现"
+					}
+				} ,
 				
-					"navigationStyle": "custom"
+				{
+					"path": "record",
+					"style": {
+						"navigationBarTitleText": "提现记录"
+					}
 				}
-			}
-		]
-	},
-	{
-		"root": "subPackages/order",
-		"pages": [
-			{
-				"path": "index",
-				"style": {
+			]
+		},
+		{
+			"root": "subPackages/order",
+			"pages": [
+				{
+					"path": "index",
+					"style": {
+						"navigationBarTitleText": "我的订单"
+					}
+				},
+				{
+					"path": "detail",
+					"style": {
+						"navigationBarTitleText": "订单详情"
+					}
+				}, 
+				{
+					"path": "evaluate",
+					"style": {
+						"navigationBarTitleText": "评价"
+					}
+				}, 
+				{
+					"path": "evaluate-detail",
+					"style": {
+						"navigationBarTitleText": "评价"
+					}
+				}, 
 				
-					"navigationBarTitleText": "我的订单"
+				{
+					"path": "submit",
+					"style": {
+						"navigationBarTitleText": ""
+					}
 				}
-			},
-			{
-				"path": "detail",
-				"style": {
-				
-					"navigationBarTitleText": "订单详情"
-				}
-			},
-			{
-				"path": "submit",
-				"style": {
-				
-					"navigationBarTitleText": ""
-				}
-			}
-			
-			
-			
-		]
-	}
-		
-	
+			]
+		}
 	],
-	"tabBar": {
-		"custom": true,
-		"list": [
-			{
-				"pagePath": "pages/tabbar/home/index",
-				"text": "首页",
-				"iconPath": "static/icons/tabbar/home.png",
-				"selectedIconPath": "static/icons/tabbar/home-fill.png"
-			},
-			{
-				"pagePath": "pages/tabbar/friends/index",
-				"text": "服务",
-				"iconPath": "static/icons/tabbar/friends.png",
-				"selectedIconPath": "static/icons/tabbar/friends-fill.png"
-			},
-			{
-				"pagePath": "pages/tabbar/discover/index",
-				"text": "发现",
-				"iconPath": "static/icons/tabbar/discover.png",
-				"selectedIconPath": "static/icons/tabbar/discover-fill.png"
-			},
-			{
-				"pagePath": "pages/tabbar/profile/index",
-				"text": "我的",
-				"iconPath": "static/icons/tabbar/profile.png",
-				"selectedIconPath": "static/icons/tabbar/profile-fill.png"
-			}
-		]
-	},
-	
-	
-	
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "随伴行",
 		"navigationBarBackgroundColor": "#FFFFFF",
-		"backgroundColor": "#F5F5F5"
+		"backgroundColor": "#F8F8F8"
 	},
 	"uniIdRouter": {}
 }

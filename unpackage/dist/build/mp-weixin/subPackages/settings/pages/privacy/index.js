@@ -1,1 +1,0 @@
-"use strict";const e=require("../../../../common/vendor.js"),o={__name:"index",setup:o=>(e.ref({}),e.onMounted((()=>{console.log("隐私设置页面加载完成")})),(e,o)=>({}))},n=e._export_sfc(o,[["__scopeId","data-v-af26f151"]]);wx.createPage(n);

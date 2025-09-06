@@ -20,8 +20,11 @@ export function createApp() {
   const app = createSSRApp(App)
     app.config.globalProperties.$imgBaseUrl = 'https://sbx-server.oss-cn-shenzhen.aliyuncs.com';
   app.use(pinia)
- 
+
+
+
   return {
+ 
     app
   }
 }

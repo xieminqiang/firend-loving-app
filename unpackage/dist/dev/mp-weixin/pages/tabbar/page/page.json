@@ -1,0 +1,10 @@
+{
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "mq-tabbar": "../../../components/mq-tabbar/mq-tabbar",
+    "home-component": "./components/home",
+    "profile-component": "./components/profile"
+  }
+}

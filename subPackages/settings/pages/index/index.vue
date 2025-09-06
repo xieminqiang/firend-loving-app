@@ -7,8 +7,8 @@
 					<text class="setting-text">头像设置</text>
 					<view class="setting-right flex">
 						<view class="user-avatar-container">
-							<image v-if="userInfo.avatar" 
-								:src="userInfo.avatar" 
+							<image v-if="userInfo.head_img" 
+							    :src="$imgBaseUrl + userInfo.head_img"
 								class="user-avatar-display" 
 								mode="aspectFill" />
 							<view v-else class="user-avatar-placeholder">
@@ -20,18 +20,22 @@
 				</view>
 				<view class="divider"></view>
 			</view>
+
+
+			
 			
 			<!-- 用户昵称 - 仅登录时显示 -->
-			<view v-if="isLogin" class="setting-item" @click="handleNicknameSetting">
+			<view v-if="isLogin" class="setting-item" @click="handleAvatarSetting">
 				<view class="setting-content flex-between">
-					<text class="setting-text">用户昵称</text>
+					<text class="setting-text">昵称</text>
 					<view class="setting-right flex">
-						<text class="user-nickname">{{ userInfo.nickname || '未设置昵称' }}</text>
+						<text class="user-nickname">{{ userInfo.nick_name || '未设置昵称' }}</text>
 						<image class="arrow-icon" src="@/static/icons/profile/me_right.png" mode="aspectFit"></image>
 					</view>
 				</view>
 				<view class="divider"></view>
-			</view>
+			</view> 
+			
 			
 			<!-- 隐私政策 -->
 			<view class="setting-item" @click="handlePrivacyPolicy">
@@ -45,19 +49,19 @@
 			<!-- 用户协议 -->
 			<view class="setting-item" @click="handleUserAgreement">
 				<view class="setting-content flex-between">
-					<text class="setting-text">用户协议</text>
+					<text class="setting-text">平台服务协议</text>
 					<image class="arrow-icon" src="@/static/icons/profile/me_right.png" mode="aspectFit"></image>
 				</view>
 				<view class="divider"></view>
 			</view>
 			
 			<!-- 关于我们 -->
-			<view class="setting-item" @click="handleAboutUs">
+			<!-- <view class="setting-item" @click="handleAboutUs">
 				<view class="setting-content flex-between">
 					<text class="setting-text">关于我们</text>
 					<image class="arrow-icon" src="@/static/icons/profile/me_right.png" mode="aspectFit"></image>
 				</view>
-			</view>
+			</view> -->
 		</view>
 		
 		<!-- 退出登录按钮 -->
@@ -81,8 +85,9 @@ import {
 	onShow,
 	onLoad
 } from '@dcloudio/uni-app';
-import { useUserStore } from '@/stores/user.js'
+	import { useUserStore } from '@/stores/user.js'
 import { useLevelStore } from '@/stores/level.js'
+import { updateUserBasicInfo } from '@/api/user.js'
 
 const userStore = useUserStore()
 const levelStore = useLevelStore()   
@@ -119,7 +124,70 @@ const levelStore = useLevelStore()
 		console.log('用户头像:', userInfo.value?.avatar)
 	});
 	
-	// 设置项点击处理
+	// 头像选择处理
+	const onChooseAvatar = async (e) => {
+		console.log('头像选择事件触发:', e)
+		console.log('事件详情:', e.detail)
+		
+		if (!isLogin.value) {
+			uni.showModal({
+				title: '提示',
+				content: '请先登录后再设置头像',
+				confirmText: '去登录',
+				cancelText: '取消',
+				success: (res) => {
+					if (res.confirm) {
+						uni.navigateTo({
+							url: '/subPackages/login/index'
+						})
+					}
+				}
+			})
+			return
+		}
+		
+		try {
+			const { avatarUrl } = e.detail
+			console.log('选择的头像:', avatarUrl)
+			
+			// 显示加载提示
+			uni.showLoading({
+				title: '上传中...'
+			})
+			
+			// 调用接口更新头像
+			const result = await updateUserBasicInfo({
+				head_img: avatarUrl
+			})
+			
+			if (result.code === 200) {
+				// 更新本地用户信息
+				userStore.updateUserInfo({
+					...userStore.userInfo,
+					head_img: avatarUrl
+				})
+				
+				uni.showToast({
+					title: '头像更新成功',
+					icon: 'success'
+				})
+			} else {
+				uni.showToast({
+					title: result.message || '头像更新失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('头像更新失败:', error)
+			uni.showToast({
+				title: '头像更新失败',
+				icon: 'none'
+			})
+		} finally {
+			uni.hideLoading()
+		}
+	}
+	
 	const handleAvatarSetting = () => {
 		if (!isLogin.value) {
 			uni.showModal({
@@ -138,9 +206,8 @@ const levelStore = useLevelStore()
 			return
 		}
 		
-		uni.showToast({
-			title: '头像设置功能开发中',
-			icon: 'none'
+		uni.navigateTo({
+			url: '/subPackages/settings/pages/index/edit'
 		})
 	}
 	
@@ -162,23 +229,20 @@ const levelStore = useLevelStore()
 			return
 		}
 		
-		uni.showToast({
-			title: '昵称设置功能开发中',
-			icon: 'none'
+		uni.navigateTo({
+			url: '/subPackages/settings/pages/index/edit'
 		})
 	}
 	
 	const handlePrivacyPolicy = () => {
-		uni.showToast({
-			title: '隐私政策页面开发中',
-			icon: 'none'
+		uni.navigateTo({
+			url: '/subPackages/login/policy'
 		})
 	}
 	
 	const handleUserAgreement = () => {
-		uni.showToast({
-			title: '用户协议页面开发中',
-			icon: 'none'
+		uni.navigateTo({
+			url: '/subPackages/login/agreement'
 		})
 	}
 	
@@ -275,7 +339,7 @@ const levelStore = useLevelStore()
 	
 	.setting-right {
 		align-items: center;
-		gap: $spacing-base;
+		gap: 10rpx;
 	}
 	
 	.user-avatar-container {
@@ -332,8 +396,24 @@ const levelStore = useLevelStore()
 	.arrow-icon {
 		width: 28rpx;
 		height: 28rpx;
-
-
+	}
+	
+	.avatar-choose-btn {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: none;
+		border: none;
+		padding: 0;
+		margin: 0;
+		line-height: 1;
+		z-index: 10;
+		
+		&::after {
+			border: none;
+		}
 	}
 	
 	.divider {

@@ -1,0 +1,2 @@
+"use strict";const o=require("../../libs/vue.js"),e=require("../../libs/config/props.js"),r=o.defineMixin({props:{show:{type:Boolean,default:()=>e.props.overlay.show},zIndex:{type:[String,Number],default:()=>e.props.overlay.zIndex},duration:{type:[String,Number],default:()=>e.props.overlay.duration},opacity:{type:[String,Number],default:()=>e.props.overlay.opacity}}});exports.props=r;
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-plus/components/u-overlay/props.js.map

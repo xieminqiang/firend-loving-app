@@ -33,9 +33,9 @@ export const getPriceTemplateDetail = (id) => {
  */
 export const getHotRecommendServices = (params = {}) => {
   return getPlatformServicesList({
-    page: 1,
-    page_size: params.page_size || 6,
-    category: params.category || 0,
+    page: params.page,
+    page_size: params.page_size || 10,
+    category: params.category ,
     city_code: params.city_code
   })
 }

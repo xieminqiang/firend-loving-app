@@ -1,0 +1,2 @@
+"use strict";const t=require("../../libs/vue.js"),i=require("../../libs/config/props.js"),n=t.defineMixin({props:{show:{type:Boolean,default:()=>i.props.transition.show},mode:{type:String,default:()=>i.props.transition.mode},duration:{type:[String,Number],default:()=>i.props.transition.duration},timingFunction:{type:String,default:()=>i.props.transition.timingFunction}}});exports.props=n;
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-plus/components/u-transition/props.js.map

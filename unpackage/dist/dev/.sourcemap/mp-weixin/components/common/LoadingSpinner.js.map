@@ -1,0 +1,1 @@
+{"version":3,"file":"LoadingSpinner.js","sources":["/Users/xiaoqiang/Documents/friemd/firend-loving-app/components/common/LoadingSpinner.vue?type=component"],"sourcesContent":["import Component from '/Users/xiaoqiang/Documents/friemd/firend-loving-app/components/common/LoadingSpinner.vue'\nwx.createComponent(Component)"],"names":["Component"],"mappings":"ybACA,GAAG,gBAAgBA,CAAS"}

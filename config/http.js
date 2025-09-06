@@ -34,7 +34,7 @@ const httpInterceptor = {
     }
     // 4. 添加 token 请求头标识
     const userStore = useUserStore()
-    const token = userStore.userInfo?.access_token
+    const token = userStore.userInfo?.access_token || userStore?.token
     if (token) {
       options.header.Authorization = 'Bearer ' + token
     }

@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "square-nav": "./cpns/square-nav",
+    "square-trends-item": "./cpns/square-trends-item"
+  }
+}

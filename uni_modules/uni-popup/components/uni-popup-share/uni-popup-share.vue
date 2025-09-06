@@ -153,7 +153,7 @@
 	}
 
 	.uni-share-content-item:active {
-		background-color: #f5f5f5;
+		background-color: #F8F8F8;
 	}
 
 	.uni-share-image {

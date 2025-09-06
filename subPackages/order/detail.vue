@@ -11,7 +11,7 @@
           <text class="current-status" :class="getStatusClass(orderDetail.status)">{{ getStatusText(orderDetail.status) }}</text>
         </view>
        
-   <!--    <view class="progress-steps">
+      <view class="progress-steps" v-if="userStore.switch == 1">
           <view 
             v-for="(step, index) in progressSteps" 
             :key="index"
@@ -30,7 +30,7 @@
               :class="getConnectorClass(step.status, progressSteps[index + 1].status)"
             ></view>
           </view>
-        </view> -->
+        </view>
       </view>
 
 
@@ -66,7 +66,7 @@
               <text class="detail-label">服务信息：</text>
               <view class="companion-info">
                 <image 
-                  :src="orderDetail?.companion?.avatar" 
+                  :src="$imgBaseUrl +  orderDetail?.companion?.avatar" 
                   class="companion-avatar" 
                   mode="aspectFill"
                 />
@@ -151,9 +151,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { getOrderDetail, orderParams } from '@/api/order.js'
+import { getOrderDetail, orderParams, cancelOrder, deleteOrder } from '@/api/order.js'
 import { useCityStore } from '@/stores/city.js'
-
+import { useUserStore } from '@/stores/user.js'
+// 用户状态管理
+const userStore = useUserStore()
 // 订单详情数据
 const orderDetail = ref({})
 const orderId = ref(null)
@@ -314,11 +316,12 @@ const getOrderActions = (status) => {
       { text: '开始服务', action: 'start', type: 'start' }
     ],
     5: [ // 服务中
-      { text: '续钟', action: 'extend', type: 'primary' },
+      // { text: '续钟', action: 'extend', type: 'primary' },
       { text: '联系友伴', action: 'contact', type: 'secondary' }
     ],
     6: [ // 已完成
-      { text: '再次预约', action: 'rebook', type: 'primary' }
+      { text: orderDetail.value.is_comment === 1 ? '查看评价' : '去评价', action: orderDetail.value.is_comment === 1 ? 'viewComment' : 'evaluate', type: 'primary' },
+      { text: '再次预约', action: 'rebook', type: 'secondary' }
     ],
     7: [ // 已取消
       { text: '删除订单', action: 'delete', type: 'secondary' }
@@ -371,6 +374,12 @@ const handleOrderAction = (action, order) => {
     case 'start':
       handleStartService(order)
       break
+    case 'evaluate':
+      handleEvaluateOrder(order)
+      break
+    case 'viewComment':
+      handleViewComment(order)
+      break
   }
 }
 
@@ -383,13 +392,51 @@ const handleCancelOrder = (order) => {
     content: '确定要取消这个订单吗？',
     confirmText: '确定取消',
     cancelText: '再想想',
-    success: (res) => {
+    success: async (res) => {
       if (res.confirm) {
-        // 这里调用取消订单API
-        uni.showToast({
-          title: '订单已取消',
-          icon: 'success'
-        })
+        try {
+          // 显示加载提示
+          uni.showLoading({
+            title: '取消中...'
+          })
+          
+          // 调用取消订单API
+          const cancelData = {
+            order_id: order.id,
+            cancel_reason: '用户取消'
+          }
+          
+          const response = await cancelOrder(cancelData)
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '订单已取消',
+              icon: 'success'
+            })
+            
+            // 通知订单列表页面更新数据
+            uni.$emit('orderStatusChanged', {
+              type: 'cancel',
+              orderId: order.id,
+              status: 7 // 已取消状态
+            })
+            
+            // 刷新订单详情
+            setTimeout(() => {
+              loadOrderDetail()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '取消订单失败')
+          }
+        } catch (error) {
+          console.error('取消订单失败:', error)
+          uni.showToast({
+            title: error.message || '取消订单失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
       }
     }
   })
@@ -510,6 +557,22 @@ const handleRebookOrder = (order) => {
   }
 }
 
+// 评价订单
+const handleEvaluateOrder = (order) => {
+  // 跳转到评价页面，传递必要参数
+  uni.navigateTo({
+    url: `/subPackages/order/evaluate?orderId=${order.id}&serviceName=${encodeURIComponent(order.service_name)}&serviceImage=${encodeURIComponent(order.service_image_url)}`
+  })
+}
+
+// 查看评价
+const handleViewComment = (order) => {
+  // 跳转到评价详情页面
+  uni.navigateTo({
+    url: `/subPackages/order/evaluate-detail?orderId=${order.id}`
+  })
+}
+
 // 删除订单
 const handleDeleteOrder = (order) => {
   uni.showModal({
@@ -517,13 +580,48 @@ const handleDeleteOrder = (order) => {
     content: '确定要删除这个订单吗？删除后不可恢复。',
     confirmText: '删除',
     cancelText: '取消',
-    success: (res) => {
+    success: async (res) => {
       if (res.confirm) {
-        // 这里调用删除订单API
-        uni.showToast({
-          title: '订单已删除',
-          icon: 'success'
-        })
+        try {
+          uni.showLoading({
+            title: '删除中...'
+          })
+          
+          // 调用删除订单API
+          const deleteData = {
+            order_id: order.id
+          }
+          
+          const response = await deleteOrder(deleteData)
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '订单已删除',
+              icon: 'success'
+            })
+            
+            // 通知订单列表页面更新数据
+            uni.$emit('orderOrderDeleted', {
+              orderId: order.id,
+              status: order.status
+            })
+            
+            // 删除成功后返回上一页
+            setTimeout(() => {
+              uni.navigateBack()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '删除订单失败')
+          }
+        } catch (error) {
+          console.error('删除订单失败:', error)
+          uni.showToast({
+            title: error.message || '删除订单失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
       }
     }
   })

@@ -17,7 +17,7 @@
             <view class="avatar-container">
               <view class="avatar-circle">
                 <image v-if="userInfo.head_img" :src="$imgBaseUrl + userInfo.head_img" class="avatar-img" mode="aspectFill" />
-                <text v-else class="avatar-placeholder">{{ userInfo.nickname?.charAt(0) || '用' }}</text>
+                <text v-else class="avatar-placeholder">{{ userInfo.nickname || '' }}</text>
                 <view class="avatar-border"></view>
               </view>
               <view class="online-indicator"></view>
@@ -131,10 +131,12 @@
          <view class="setting-item" @click="navigateToPartnerRegistration" v-if="userStore.switch === 1">
             <view class="setting-icon">
               <image src="@/static/icons/profile/friendship.png" class="setting-icon-img" mode="aspectFit" />
-            </view>
-            <text class="setting-text" v-if="applicationInfo && applicationInfo.status && applicationInfo.status === 'approved'">友伴端</text>
+            </view> 
+            <template v-if="applicationInfo && applicationInfo.status">
+            <text class="setting-text" v-if="applicationInfo && applicationInfo.status === 'approved'">友伴端</text>
             <text class="setting-text" v-else>友伴入驻</text>
             <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
+          </template>
           </view>
           <view class="setting-item" @click="navigateToCustomerService">
             <view class="setting-icon">
@@ -156,18 +158,11 @@
         </view>
         
         <view class="app-version">
-          随伴行
+          随伴行 {{currVersion}}
         </view>
       </view>
     </scroll-view>  
-    <template v-if="userStore.switch === 1">
-     
-      <hm-tabbar currentTab="profile"></hm-tabbar>
-    </template>
- 
-   <template v-else>
-      <mq-tabbar currentTab="profile"></mq-tabbar> 
-  </template>
+   <mq-tabbar currentTab="profile"></mq-tabbar> 
   </view>
 </template>
 
@@ -178,13 +173,14 @@ import {
 	onShow,
 	onLoad
 } from '@dcloudio/uni-app';
-import { useUserStore } from '@/stores/user.js'
+
 import { getUserInfo, getApplicatioInfo } from '@/api/user.js'
 import { getOrderCount } from '@/api/order.js'
-
+import { useUserStore } from '@/stores/user.js'
 // 用户状态管理
 const userStore = useUserStore()
-
+	
+	
 // 状态栏高度适配
 const statusBarHeight = ref(0)
 
@@ -194,7 +190,7 @@ const isRefreshing = ref(false)
 // 申请信息状态
 const applicationInfo = ref(null)
 const applicationStatus = ref('')
-
+const currVersion = ref('')
 // 登录状态判断
 const isLoggedIn = computed(() => {
   return userStore.userInfo && Object.keys(userStore.userInfo).length > 0
@@ -206,7 +202,7 @@ const userInfo = computed(() => {
     return userStore.userInfo
   }
 
-})
+}) 
 
 // 数据状态
 const orderCounts = ref({
@@ -253,8 +249,9 @@ const handleApplicationStatusChanged = (data) => {
 onMounted(() => {
   // 获取系统信息
   const systemInfo = uni.getSystemInfoSync()
-  statusBarHeight.value = systemInfo.statusBarHeight || 0
-  
+  statusBarHeight.value = systemInfo.statusBarHeight || 0 
+  const accountInfo = uni.getAccountInfoSync();  
+  currVersion.value = accountInfo.miniProgram.version
   // 初始化用户数据
   loadUserData()
   
@@ -379,13 +376,34 @@ const navigateToLogin = () => {
 
 
 // 导航方法
-const navigateToUserDetail = () => {
-  uni.navigateTo({
-    url: '/subPackages/login/index'
-  })
-}
+// const navigateToUserDetail = () => {
+//   uni.navigateTo({
+//     url: '/subPackages/login/index'
+//   })
+// }
 
-
+	const navigateToUserDetail = () => {
+		if (!isLoggedIn.value) {
+			uni.showModal({
+				title: '提示',
+				content: '请先登录后再设置头像',
+				confirmText: '去登录',
+				cancelText: '取消',
+				success: (res) => {
+					if (res.confirm) {
+						uni.navigateTo({
+							url: '/subPackages/login/index'
+						})
+					}
+				}
+			})
+			return
+		}
+		
+		uni.navigateTo({
+			url: '/subPackages/settings/pages/index/edit'
+		})
+	}
 
 const navigateToOrders = (status) => {
   console.log('跳转到订单页面，状态:', status)

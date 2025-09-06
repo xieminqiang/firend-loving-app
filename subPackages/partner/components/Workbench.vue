@@ -8,7 +8,7 @@
           <view class="status-left">
             <!-- 头像显示 -->
             <view class="avatar-container" v-if="applicationInfo && applicationInfo.avatar">
-              <image :src="applicationInfo.avatar" class="avatar-img" mode="aspectFill" />
+              <image :src="$imgBaseUrl + applicationInfo.avatar" class="avatar-img" mode="aspectFill" />
             </view>
             
             <view class="status-info">
@@ -78,9 +78,6 @@
           <view class="schedule-content">
             <text class="schedule-desc">{{ todaySchedule }}</text>
             <view class="schedule-actions">
-              <view class="action-btn schedule-btn" @click.stop="refreshScheduleData">
-                <text class="btn-text">{{ scheduleLoading ? '刷新中...' : '刷新' }}</text>
-              </view>
               <view class="action-btn schedule-btn">设置时间</view>
             </view>
           </view>
@@ -194,7 +191,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, nextTick } from 'vue'
+import { ref, onMounted, computed, watch, nextTick, onUnmounted } from 'vue'
 import { getCurrentLocationAddress, getCacheStatus } from '../utils/location.js'
 import { updateCompanionOnlineStatus, getCompanionSchedule } from '@/api/user.js'
 import { 
@@ -1182,7 +1179,26 @@ onMounted(() => {
   } else {
     console.log('applicationInfo还未准备好，等待watch触发初始化')
   }
+  
+  // 监听日期安排数据更新事件
+  uni.$on('scheduleDataUpdated', handleScheduleDataUpdated)
 })
+
+// 组件卸载时移除事件监听
+onUnmounted(() => {
+  uni.$off('scheduleDataUpdated', handleScheduleDataUpdated)
+})
+
+// 处理日期安排数据更新事件
+const handleScheduleDataUpdated = async (data) => {
+  console.log('收到日期安排数据更新事件:', data)
+  
+  // 检查是否是当前用户的数据
+  if (data.companion_id === props.applicationInfo?.id) {
+    console.log('刷新日期安排数据')
+    await fetchScheduleData()
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1790,8 +1806,8 @@ onMounted(() => {
   border-radius: 99999rpx;
   font-size: 26rpx;
   font-weight: 500;
-  transition: all 0.3s ease;
-  border: 1rpx solid transparent;
+
+
   box-sizing: border-box;
   height: 72rpx;
   display: flex;
@@ -1799,38 +1815,13 @@ onMounted(() => {
   justify-content: center;
 }
 
-.action-btn.primary {
-  background: #7363FF;
-  color: #FFFFFF;
-  border-color: #7363FF;
-}
 
-.action-btn.primary:active {
-  background: #6354e6;
-  transform: scale(0.96);
-}
 
-.action-btn.secondary {
-  background: #FFFFFF;
-  color: #666666;
-  border-color: #e9ecef;
-}
 
-.action-btn.secondary:active {
-  background: #f8f9fa;
-  transform: scale(0.96);
-}
 
-.action-btn.depart {
-  background: #4CAF50;
-  color: #FFFFFF;
-  border-color: #4CAF50;
-}
 
-.action-btn.depart:active {
-  background: #45a049;
-  transform: scale(0.96);
-}
+
+
 
 .action-text {
   color: inherit;
@@ -1967,11 +1958,9 @@ onMounted(() => {
   border-radius: 12rpx;
   font-size: 24rpx;
   font-weight: 500;
-  transition: all 0.3s ease;
+ 
   
-  &:active {
-    transform: scale(0.95);
-  }
+
 }
 
 .quick-btn {

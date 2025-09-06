@@ -1,0 +1,2 @@
+"use strict";const t=require("../vue.js"),i=t.defineMixin({props:{openType:String},methods:{onGetUserInfo(e){this.$emit("getuserinfo",e.detail)},onContact(e){this.$emit("contact",e.detail)},onGetPhoneNumber(e){this.$emit("getphonenumber",e.detail)},onError(e){this.$emit("error",e.detail)},onLaunchApp(e){this.$emit("launchapp",e.detail)},onOpenSetting(e){this.$emit("opensetting",e.detail)}}});exports.openType=i;
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-plus/libs/mixin/openType.js.map

@@ -1,0 +1,2 @@
+"use strict";const r=require("../../libs/vue.js"),p=require("../../libs/config/props.js"),e=r.defineMixin({props:{bgColor:{type:String,default:()=>p.props.gap.bgColor},height:{type:[String,Number],default:()=>p.props.gap.height},marginTop:{type:[String,Number],default:()=>p.props.gap.marginTop},marginBottom:{type:[String,Number],default:()=>p.props.gap.marginBottom}}});exports.props=e;
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-plus/components/u-gap/props.js.map

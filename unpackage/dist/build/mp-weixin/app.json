@@ -1,8 +1,8 @@
 {
   "pages": [
+    "pages/index/index",
     "pages/tabbar/home/index",
-    "pages/tabbar/friends/index",
-    "pages/tabbar/profile/index"
+    "pages/tabbar/page/page"
   ],
   "subPackages": [
     {
@@ -23,8 +23,7 @@
       "root": "subPackages/settings",
       "pages": [
         "pages/index/index",
-        "pages/account/index",
-        "pages/privacy/index",
+        "pages/index/edit",
         "pages/about/index"
       ]
     },
@@ -35,6 +34,7 @@
         "DataEdetion/index",
         "level/index",
         "order/index",
+        "order/partner-evaluate",
         "components/DataSelect",
         "order/detail"
       ]
@@ -44,7 +44,19 @@
       "pages": [
         "apply/index",
         "detail",
+        "fr_detail",
         "friend-select"
+      ]
+    },
+    {
+      "root": "subPackages/balance",
+      "pages": [
+        "index",
+        "detail",
+        "detaril-re",
+        "record-detail",
+        "Withdraw",
+        "record"
       ]
     },
     {
@@ -52,6 +64,8 @@
       "pages": [
         "index",
         "detail",
+        "evaluate",
+        "evaluate-detail",
         "submit"
       ]
     }
@@ -60,33 +74,7 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "随伴行",
     "navigationBarBackgroundColor": "#FFFFFF",
-    "backgroundColor": "#F5F5F5"
-  },
-  "tabBar": {
-    "color": "#1A1A1A",
-    "selectedColor": "#7363FF",
-    "backgroundColor": "#FFFFFF",
-    "borderStyle": "white",
-    "list": [
-      {
-        "pagePath": "pages/tabbar/home/index",
-        "text": "首页",
-        "iconPath": "static/icons/tabbar/home.png",
-        "selectedIconPath": "static/icons/tabbar/home-fill.png"
-      },
-      {
-        "pagePath": "pages/tabbar/friends/index",
-        "text": "服务",
-        "iconPath": "static/icons/tabbar/friends.png",
-        "selectedIconPath": "static/icons/tabbar/friends-fill.png"
-      },
-      {
-        "pagePath": "pages/tabbar/profile/index",
-        "text": "我的",
-        "iconPath": "static/icons/tabbar/profile.png",
-        "selectedIconPath": "static/icons/tabbar/profile-fill.png"
-      }
-    ]
+    "backgroundColor": "#F8F8F8"
   },
   "permission": {
     "scope.userLocation": {

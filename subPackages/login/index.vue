@@ -193,6 +193,11 @@ const getPhoneNumber = async (e) => {
       // 保存用户信息
       userStore.setUserInfo(result.data.data.token)
       
+      // 保存token
+    
+	        userStore.setToken(result.data.data.token.access_token)
+	    
+
       // 清除等级列表缓存，确保获取用户相关的等级信息
       levelStore.clearServiceLevels()
       
@@ -207,7 +212,8 @@ const getPhoneNumber = async (e) => {
       })
 
       // 延迟跳转到首页
-      setTimeout(() => {
+      setTimeout(() => { 
+		  
        uni.navigateBack({
        	delta: 1 // 返回的页面数，默认值为1，即返回上一级页面
        });

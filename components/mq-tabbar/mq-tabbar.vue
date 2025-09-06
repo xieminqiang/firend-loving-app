@@ -1,5 +1,5 @@
 <template>
-	<view class="mq_tabbar">
+	<view class="hm_tabbar">
 		<u-tabbar 
 			:value="currentTab" 
 			activeColor="#7363FF" 
@@ -34,12 +34,12 @@
 </template>
 
 <script setup>
-
+import { defineEmits } from 'vue'
 
 	const tabList = [
 			{
 				"name": "home",
-				"pagePath": "pages/tabbar/home/index-page",
+				"pagePath": "pages/tabbar/page/page",
 				"text": "首页",
 				"iconPath": "/static/icons/tabbar/home.png",
 				"selectedIconPath": "/static/icons/tabbar/home-fill.png"
@@ -62,17 +62,17 @@
 		}
 	})
 
-
+	// 定义emit事件，用于通知父组件tab切换
+	const emit = defineEmits(['tabChange'])
 
 	const handTab = (row) => {
-		uni.switchTab({
-			url: '/' + row.pagePath
-		})
+		// 不再跳转页面，而是发送事件通知父组件
+		emit('tabChange', row.name)
 	}
 </script>
 
 <style lang="scss" scoped>
-	.mq_tabbar {
+	.hm_tabbar {
 		.custom-tabbar {
 			background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
 			box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.08);

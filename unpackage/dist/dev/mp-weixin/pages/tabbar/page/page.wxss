@@ -1,0 +1,1 @@
+.home-container.data-v-bf699e6f{min-height:100vh;background:#f8f8f8;padding-bottom:120rpx}.home-tab-content.data-v-bf699e6f,.friends-tab-content.data-v-bf699e6f,.discover-tab-content.data-v-bf699e6f,.profile-tab-content.data-v-bf699e6f{height:100vh;overflow:hidden}@keyframes fadeIn-bf699e6f{0%{opacity:0;transform:translateY(20rpx)}to{opacity:1;transform:translateY(0)}}

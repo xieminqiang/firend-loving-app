@@ -1,0 +1,1 @@
+<view class="square"><square-nav u-i="102a3b38-0" bind:__l="__l"></square-nav><square-trends-item wx:if="{{b}}" bindplayVideo="{{a}}" u-i="102a3b38-1" bind:__l="__l" u-p="{{b}}"></square-trends-item></view>

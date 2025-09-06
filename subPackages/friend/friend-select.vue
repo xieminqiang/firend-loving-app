@@ -46,11 +46,11 @@
                   </view>
                 <view class="flex-between">
                  <view class="flex">
-                   <!-- <view>
+                  <view>
                     <image src="@/static/icons/friend/female.png" mode="aspectFit" class="gender-icon" v-if="p.gender === '女'" />
                     <image src="@/static/icons/friend/male.png" class="gender-icon" mode="aspectFit" v-else/>
                     </view>
-                     <view class="partner-meta">{{ p.age }}  ·  {{p.height }}cm  ·  {{ p.weight  }}kg</view> -->
+                     <view class="partner-meta">{{ p.age }}  ·  {{p.height }}cm  ·  {{ p.weight  }}kg</view>
   
                   </view>
                   <view class="partner-meta-distance" >
@@ -60,10 +60,10 @@
   
                 </view>
             
-            <!--    <view class="partner-tags">
+               <view class="partner-tags">
                   <text v-for="(tag, index) in p.visibleTags" :key="index" class="tag">{{ tag }}</text>
                   <text v-if="p.extraTags > 0" class="more-tags">+{{ p.extraTags }}</text>
-                </view> -->
+                </view>
                 <view class="partner-actions flex-between">
                   <view ></view>
                   <view class="schedule-btn" @click.stop="openServicePopup(p)">
@@ -140,6 +140,7 @@
   import { createOrder, orderParams } from '@/api/order.js'
   import { useLevelStore } from '@/stores/level.js'
   import { useCityStore } from '@/stores/city.js'
+  import { useUserStore } from '@/stores/user.js'
   import CitySelector from '@/components/common/CitySelector.vue'
   import CityPicker from '@/components/common/CityPicker.vue'
   
@@ -161,6 +162,28 @@
   
   // 获取全局城市store
   const cityStore = useCityStore()
+  
+  // 用户状态管理
+  const userStore = useUserStore()
+  
+  // 登录状态判断
+  const isLoggedIn = computed(() => {
+    return userStore.userInfo && Object.keys(userStore.userInfo).length > 0
+  })
+  
+  // 用户信息
+  const userInfo = computed(() => {
+    if (isLoggedIn.value) {
+      return userStore.userInfo
+    }
+  })
+  
+  // 导航到登录页面
+  const navigateToLogin = () => {
+    uni.navigateTo({
+      url: '/subPackages/login/index'
+    })
+  }
   
   // 城市相关数据 - 使用全局store
   const cityList = computed(() => cityStore.cityList)
@@ -248,6 +271,17 @@
   const goToSubmit = (item) => {
     console.log('选择服务:', item)
     closeServicePopup()
+    
+    // 检查登录状态
+    if (!isLoggedIn.value) {
+      uni.showToast({
+        title: '请先登录',
+        icon: 'none',
+        duration: 2000
+      })
+      navigateToLogin()
+      return
+    }
     
     // 构建跳转URL，包含所有必要参数
     let url = `/subPackages/order/submit?service_id=${item.service_id}&price_template_id=${item.price_template_id || ''}&companion_id=${currentPartner.value.id}&level_order=${currentPartner.value.level_order || ''}&nickname=${currentPartner.value.name}`

@@ -1,2 +1,0 @@
-"use strict";const e=require("../../../../common/vendor.js"),_={__name:"index",setup(n){return e.ref({}),e.onMounted(()=>{e.index.__f__("log","at subPackages/settings/pages/privacy/index.vue:19","隐私设置页面加载完成")}),(t,r)=>({})}},a=e._export_sfc(_,[["__scopeId","data-v-a67ae61f"]]);wx.createPage(a);
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/subPackages/settings/pages/privacy/index.js.map

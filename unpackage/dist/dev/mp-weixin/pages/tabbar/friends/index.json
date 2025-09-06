@@ -1,9 +1,0 @@
-{
-  "navigationStyle": "custom",
-  "usingComponents": {
-    "uni-popup": "../../../uni_modules/uni-popup/components/uni-popup/uni-popup",
-    "hm-tabbar": "../../../components/hm-tabbar/hm-tabbar",
-    "city-selector": "../../../components/common/CitySelector",
-    "city-picker": "../../../components/common/CityPicker"
-  }
-}

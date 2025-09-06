@@ -4,13 +4,23 @@ import { useUserStore } from '@/stores/user.js'
 
 export default {
 	onLaunch: function() {
-		console.log('App Launch')
+	uni.hideTabBar({
+		complete: () => {
+			
+		}
+	});
+		console.log('App Launch') 
 		// 应用启动时清除等级列表缓存，确保获取最新数据
 		this.clearServiceLevels()
-		// 初始化时获取服务等级列表
+		// 初始化时获取服务等级列表 
 		this.initServiceLevels()
 	},
 	onShow: function() {
+		uni.hideTabBar({
+			complete: () => {
+					
+			}
+		});
 		console.log('App Show')
 		// 应用从后台恢复时，检查是否需要更新等级列表
 		this.checkAndUpdateServiceLevels() 

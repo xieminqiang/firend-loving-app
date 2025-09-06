@@ -95,7 +95,7 @@
                 <!-- 操作按钮 -->
                 <view class="order-actions">
                   <view 
-                    v-for="(action, actionIndex) in getOrderActions(order.status)" 
+                    v-for="(action, actionIndex) in getOrderActions(order.status, order)" 
                     :key="actionIndex"
                     class="action-btn"
                     :class="action.type"
@@ -126,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user.js'
 import { useCityStore } from '@/stores/city.js'
@@ -167,6 +167,19 @@ onUnmounted(() => {
   if (swiperChangeTimer) {
     clearTimeout(swiperChangeTimer)
   }
+  
+  // 移除事件监听器
+  uni.$off('orderStatusChanged')
+  uni.$off('orderOrderDeleted')
+})
+
+// 页面挂载时添加事件监听器
+onMounted(() => {
+  // 监听订单状态变化事件
+  uni.$on('orderStatusChanged', handleOrderStatusChanged)
+  
+  // 监听订单删除事件
+  uni.$on('orderOrderDeleted', handleOrderDeleted)
 })
 
 // 状态筛选标签
@@ -438,7 +451,7 @@ const getAmountLabel = (status) => {
 }
 
 // 获取订单操作按钮
-const getOrderActions = (status) => {
+const getOrderActions = (status, order = null) => {
   const actionMap = {
     1: [ // 待付款
       { text: '取消订单', action: 'cancel', type: 'secondary' },
@@ -457,11 +470,12 @@ const getOrderActions = (status) => {
       { text: '开始服务', action: 'start', type: 'start' }
     ],
     5: [ // 进行中
-      { text: '续钟', action: 'extend', type: 'primary' },
+      // { text: '续钟', action: 'extend', type: 'primary' },
       { text: '联系友伴', action: 'contact', type: 'secondary' }
     ],
     6: [ // 已完成
-      { text: '再次预约', action: 'rebook', type: 'primary' }
+      { text: order && order.is_comment === 1 ? '查看评价' : '去评价', action: order && order.is_comment === 1 ? 'viewComment' : 'evaluate', type: 'primary' },
+      { text: '再次预约', action: 'rebook', type: 'secondary' }
     ],
     7: [ // 已取消
       { text: '删除订单', action: 'delete', type: 'secondary' }
@@ -519,6 +533,12 @@ const handleOrderAction = (action, order) => {
       break
     case 'start':
       handleStartService(order)
+      break
+    case 'evaluate':
+      handleEvaluateOrder(order)
+      break
+    case 'viewComment':
+      handleViewComment(order)
       break
   }
 }
@@ -854,10 +874,19 @@ const handleRebookOrder = (order) => {
   }
 }
 
-// 评价订单
-const handleReviewOrder = (order) => {
+// 去评价订单
+const handleEvaluateOrder = (order) => {
+  // 跳转到评价页面，传递必要参数
   uni.navigateTo({
-    url: `/subPackages/order/review?orderId=${order.id}`
+    url: `/subPackages/order/evaluate?orderId=${order.id}&serviceName=${encodeURIComponent(order.service_name)}&serviceImage=${encodeURIComponent(order.service_image_url)}`
+  })
+}
+
+// 查看评价
+const handleViewComment = (order) => {
+  // 跳转到评价详情页面
+  uni.navigateTo({
+    url: `/subPackages/order/evaluate-detail?orderId=${order.id}`
   })
 }
 
@@ -910,6 +939,83 @@ const handleDeleteOrder = (order) => {
 const navigateToDetail = (orderId) => {
   uni.navigateTo({
     url: `/subPackages/order/detail?orderId=${orderId}`
+  })
+}
+
+// 处理订单状态变化事件
+const handleOrderStatusChanged = (data) => {
+  console.log('收到订单状态变化事件:', data)
+  
+  // 更新对应状态的订单列表
+  const { type, orderId, status } = data
+  
+  if (type === 'cancel') {
+    // 订单被取消，需要从当前状态列表中移除
+    // 并添加到已取消状态列表中
+    updateOrderStatus(orderId, status)
+  }
+}
+
+// 处理订单删除事件
+const handleOrderDeleted = (data) => {
+  console.log('收到订单删除事件:', data)
+  
+  const { orderId, status } = data
+  
+  // 从所有状态列表中移除该订单
+  removeOrderFromAllStatus(orderId)
+}
+
+// 更新订单状态
+const updateOrderStatus = (orderId, newStatus) => {
+  // 从所有状态列表中查找并移除该订单
+  let foundOrder = null
+  
+  Object.keys(orderListData.value).forEach(statusKey => {
+    const orderIndex = orderListData.value[statusKey].findIndex(order => order.id === orderId)
+    if (orderIndex !== -1) {
+      foundOrder = orderListData.value[statusKey][orderIndex]
+      orderListData.value[statusKey].splice(orderIndex, 1)
+    }
+  })
+  
+  // 如果找到了订单，根据新状态添加到对应列表
+  if (foundOrder) {
+    foundOrder.status = newStatus
+    
+    // 根据新状态添加到对应列表
+    if (newStatus === 7) { // 已取消
+      orderListData.value.cancelled.unshift(foundOrder)
+    } else if (newStatus === 8) { // 已退款
+      orderListData.value.refunded.unshift(foundOrder)
+    } else if (newStatus === 9) { // 退款中
+      orderListData.value.refunding.unshift(foundOrder)
+    }
+    
+    // 更新缓存
+    updateOrderListCache()
+  }
+}
+
+// 从所有状态列表中移除订单
+const removeOrderFromAllStatus = (orderId) => {
+  Object.keys(orderListData.value).forEach(statusKey => {
+    const orderIndex = orderListData.value[statusKey].findIndex(order => order.id === orderId)
+    if (orderIndex !== -1) {
+      orderListData.value[statusKey].splice(orderIndex, 1)
+    }
+  })
+  
+  // 更新缓存
+  updateOrderListCache()
+}
+
+// 更新订单列表缓存
+const updateOrderListCache = () => {
+  Object.keys(orderListData.value).forEach(statusKey => {
+    if (orderListCache.value[statusKey]) {
+      orderListCache.value[statusKey].list = [...orderListData.value[statusKey]]
+    }
   })
 }
 

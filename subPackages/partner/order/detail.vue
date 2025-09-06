@@ -105,7 +105,7 @@
     <view class="action-buttons">
       <view class="action-container">
         <view 
-          v-for="(action, index) in getOrderActions(orderDetail.status)" 
+          v-for="(action, index) in getOrderActions(orderDetail.status, orderDetail)" 
           :key="index"
           class="action-btn"
           :class="action.type"
@@ -208,7 +208,7 @@ const getStatusText = (status) => {
 }
 
 // 获取订单操作按钮
-const getOrderActions = (status) => {
+const getOrderActions = (status, order) => {
   const actionMap = {
     2: [ // 已支付待确认
       { text: '拒绝', action: 'reject', type: 'secondary' },
@@ -226,7 +226,7 @@ const getOrderActions = (status) => {
       { text: '结束服务', action: 'end', type: 'primary' }
     ],
     6: [ // 已完成
-      { text: '查看评价', action: 'review', type: 'secondary' },
+      ...(order.is_comment === 1 ? [{ text: '查看评价', action: 'review', type: 'secondary' }] : []),
       { text: '删除订单', action: 'delete', type: 'secondary' }
     ],
     7: [ // 已取消
@@ -557,7 +557,7 @@ const handleEndService = (order) => {
 // 查看评价
 const handleViewReview = (order) => {
   uni.navigateTo({
-    url: `/subPackages/partner/review?orderId=${order.id}`
+    url: `/subPackages/partner/order/partner-evaluate?orderId=${order.id}&companion_id=${companionId.value}`
   })
 }
 

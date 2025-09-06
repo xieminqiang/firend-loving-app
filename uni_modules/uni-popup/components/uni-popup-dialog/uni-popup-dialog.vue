@@ -267,7 +267,7 @@
 		display: flex;
 		/* #endif */
 		flex-direction: row;
-		border-top-color: #f5f5f5;
+		border-top-color: #F8F8F8;
 		border-top-style: solid;
 		border-top-width: 1px;
 	}
