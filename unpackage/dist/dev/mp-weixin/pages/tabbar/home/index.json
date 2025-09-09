@@ -1,7 +1,6 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
-    "u-popup": "../../../uni_modules/uview-plus/components/u-popup/u-popup",
     "hm-tabbar": "../../../components/hm-tabbar/hm-tabbar",
     "home-component": "./components/home",
     "friends-component": "./components/friends",

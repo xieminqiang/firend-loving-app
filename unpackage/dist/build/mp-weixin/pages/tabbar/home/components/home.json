@@ -1,6 +1,7 @@
 {
   "component": true,
   "usingComponents": {
+    "u-tabs": "../../../../uni_modules/uview-plus/components/u-tabs/u-tabs",
     "city-selector": "../../../../components/common/CitySelector",
     "city-picker": "../../../../components/common/CityPicker"
   }

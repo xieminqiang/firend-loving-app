@@ -197,18 +197,28 @@
 	
 	// 点击视频播放
 	const playVideoFullscreen = (videoPath) => {
-		try {
-			console.log('尝试播放视频:', videoPath)
-			// 触发事件，让父组件处理弹框
-			emit('playVideo', videoPath)
-		} catch (error) {
-			console.error('视频播放失败:', error)
-			uni.showToast({
-				title: '视频播放失败',
-				icon: 'none',
-				duration: 1000
-			})
-		}
+		uni.navigateTo({
+			url: '/subPackages/dt/video-show',
+			animationType: 'zoom-fade-out',
+			animationDuration: 200,
+			success(res) {
+				res.eventChannel.emit('videoUrl', {
+					data: videoPath
+				})
+			}
+		})
+		// try {
+		// 	console.log('尝试播放视频:', videoPath)
+		// 	// 触发事件，让父组件处理弹框
+		// 	emit('playVideo', videoPath)
+		// } catch (error) {
+		// 	console.error('视频播放失败:', error)
+		// 	uni.showToast({
+		// 		title: '视频播放失败',
+		// 		icon: 'none',
+		// 		duration: 1000
+		// 	})
+		// }
 	}
 	
 

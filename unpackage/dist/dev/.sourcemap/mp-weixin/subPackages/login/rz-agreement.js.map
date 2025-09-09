@@ -1,0 +1,1 @@
+{"version":3,"file":"rz-agreement.js","sources":["subPackages/login/rz-agreement.vue?type=page"],"sourcesContent":["import MiniProgramPage from '/Users/xiaoqiang/Documents/friemd/firend-loving-app/subPackages/login/rz-agreement.vue'\nwx.createPage(MiniProgramPage)"],"names":["MiniProgramPage"],"mappings":"kKACA,GAAG,WAAWA,CAAe"}

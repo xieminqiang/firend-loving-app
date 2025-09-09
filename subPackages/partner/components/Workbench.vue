@@ -78,7 +78,7 @@
           <view class="schedule-content">
             <text class="schedule-desc">{{ todaySchedule }}</text>
             <view class="schedule-actions">
-              <view class="action-btn schedule-btn">设置时间</view>
+              <view class="schedule-btn">设置时间</view>
             </view>
           </view>
         </view>
@@ -401,6 +401,10 @@ const toggleStatus = async () => {
     content: newStatus ? '上线后将开始接收订单，确认上线吗？' : '下线后将停止接收订单，确认下线吗？',
     success: async (res) => {
       if (res.confirm) {
+        // 如果是上线操作，先请求订阅消息权限
+        if (newStatus) {
+          await requestSubscribeMessage()
+        }
         await updateOnlineStatus(newStatus)
       }
     }
@@ -975,6 +979,100 @@ const handleEndService = (order) => {
       }
     }
   })
+}
+
+// 请求订阅消息权限
+const requestSubscribeMessage = async () => {
+  const tmplId = 'vrMAJmeAOA0j3yRGX6AjNCOvfgzlJp8T1wWLucyCwKc'
+  
+  try {
+    console.log('开始请求订阅消息权限')
+    
+    const res = await new Promise((resolve, reject) => {
+      uni.requestSubscribeMessage({
+        tmplIds: [tmplId],
+        success: (result) => {
+          console.log('订阅消息请求结果:', result)
+          resolve(result)
+        },
+        fail: (error) => {
+          console.error('订阅消息请求失败:', error)
+          reject(error)
+        }
+      })
+    })
+    
+    // 处理订阅结果
+    if (res[tmplId] === 'accept') {
+      console.log('用户同意订阅消息')
+      uni.showToast({
+        title: '已开启接单提醒',
+        icon: 'success'
+      })
+    } else if (res[tmplId] === 'reject') {
+      console.log('用户拒绝订阅消息')
+      // 引导用户去设置页面重新授权
+      uni.showModal({
+        title: '接单提醒权限',
+        content: '为了您能及时接收新订单通知，是否去设置页面重新授权？',
+        confirmText: '去设置',
+        cancelText: '暂不开启',
+        success: (modalRes) => {
+          if (modalRes.confirm) {
+            // 打开设置页面
+            uni.openSetting({
+              success: (settingRes) => {
+                // 检查用户是否开启了订阅消息权限
+                if (settingRes.authSetting['scope.subscribeMessage']) {
+                  // 用户同意订阅，再次请求
+                  uni.requestSubscribeMessage({
+                    tmplIds: [tmplId],
+                    success: (subscribeRes) => {
+                      console.log('重新授权成功:', subscribeRes)
+                      uni.showToast({
+                        title: '已开启接单提醒',
+                        icon: 'success'
+                      })
+                    },
+                    fail: (err) => {
+                      console.log('重新授权失败:', err)
+                    }
+                  })
+                } else {
+                  uni.showToast({
+                    title: '未开启接单提醒',
+                    icon: 'none'
+                  })
+                }
+              },
+              fail: (err) => {
+                console.error('打开设置页面失败:', err)
+              }
+            })
+          } else {
+            uni.showToast({
+              title: '未开启接单提醒',
+              icon: 'none'
+            })
+          }
+        }
+      })
+    } else {
+      // 其他情况（如用户点击了关闭按钮等）
+      console.log('用户未明确选择订阅消息')
+      uni.showToast({
+        title: '未开启接单提醒',
+        icon: 'none'
+      })
+    }
+  } catch (error) {
+    console.error('订阅消息请求异常:', error)
+    // 即使订阅失败也不影响上线流程
+    uni.showToast({
+      title: '订阅消息请求失败',
+      icon: 'none'
+    })
+  }
 }
 
 // 视频上传相关方法
@@ -1806,13 +1904,61 @@ const handleScheduleDataUpdated = async (data) => {
   border-radius: 99999rpx;
   font-size: 26rpx;
   font-weight: 500;
-
-
+  transition: all 0.3s ease;
+  border: 1rpx solid transparent;
   box-sizing: border-box;
   height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 120rpx;
+  position: relative;
+}
+
+.action-btn.primary {
+  background: #7363FF;
+  color: #FFFFFF;
+  border-color: #7363FF;
+}
+
+.action-btn.primary:active {
+  background: #6354e6;
+  transform: scale(0.96);
+}
+
+.action-btn.secondary {
+  background: #FFFFFF;
+  color: #666666;
+  border-color: #e9ecef;
+}
+
+.action-btn.secondary:active {
+  background: #f8f9fa;
+  transform: scale(0.96);
+}
+
+.action-btn.depart {
+  background: #4CAF50;
+  color: #FFFFFF;
+  border-color: #4CAF50;
+}
+
+.action-btn.depart:active {
+  background: #45a049;
+  transform: scale(0.96);
+}
+
+.action-btn.info {
+  background: transparent;
+  color: #999999;
+  border-color: transparent;
+  cursor: default;
+  padding: 16rpx 0;
+}
+
+.action-btn.info:active {
+  background: transparent;
+  transform: none;
 }
 
 

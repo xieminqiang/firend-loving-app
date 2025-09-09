@@ -175,6 +175,7 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { getServiceInfo, calculateDistance, getCompanionAvailableSchedule, createOrderV2, orderParams } from '@/api/order.js'
+import { sendSubscribeMessage, getCompanionWxOpenId } from '@/api/user.js'
 
 // 页面参数
 const params = ref({})
@@ -203,6 +204,12 @@ const selectedLocation = ref(null)
 // 服务信息
 const serviceInfo = ref({
 
+})
+
+// 友伴师微信信息
+const companionWxInfo = ref({
+  wx_open_id: '',
+  nickname: ''
 })
 
 // 计算总价
@@ -246,6 +253,37 @@ const loadServiceInfo = async () => {
       title: error.message || '加载服务信息失败',
       icon: 'none'
     })
+  }
+}
+
+// 获取友伴师微信 openid
+const loadCompanionWxInfo = async () => {
+  try {
+    const { companion_id } = params.value
+    
+    if (!companion_id) {
+      console.warn('缺少友伴师ID参数')
+      return
+    }
+    
+    const response = await getCompanionWxOpenId({
+      companion_id: Number(companion_id)
+    })
+    
+    console.log('友伴师微信信息:', response.data)
+    
+    if (response.data && response.data.code === 0) {
+      const data = response.data.data
+      companionWxInfo.value = {
+        wx_open_id: data.wx_open_id || '',
+        nickname: data.nickname || ''
+      }
+      console.log('友伴师微信openid:', data.wx_open_id)
+    } else {
+      console.error('获取友伴师微信信息失败:', response.data?.message)
+    }
+  } catch (error) {
+    console.error('获取友伴师微信信息失败:', error)
   }
 }
 
@@ -453,6 +491,147 @@ const viewBillingRules = () => {
   })
 }
 
+// 请求订阅消息权限
+const requestSubscribeMessage = async () => {
+  const tmplIds = [
+    'vrMAJmeAOA0j3yRGX6AjNEJxqaJ2mvERTFlV89fK3GA',
+    'zovIGlvjM10gOUEZjOB-lOQwISsM0PLqfMtIJPbWf4Y'
+  ]
+  
+  try {
+    console.log('开始请求订阅消息权限')
+    
+    const res = await new Promise((resolve, reject) => {
+      uni.requestSubscribeMessage({
+        tmplIds: tmplIds,
+        success: (result) => {
+          console.log('订阅消息请求结果:', result)
+          resolve(result)
+        },
+        fail: (error) => {
+          console.error('订阅消息请求失败:', error)
+          reject(error)
+        }
+      })
+    })
+    
+    // 处理订阅结果
+    let acceptedCount = 0
+    let rejectedCount = 0
+    let allAccepted = true
+    
+    tmplIds.forEach(tmplId => {
+      if (res[tmplId] === 'accept') {
+        acceptedCount++
+      } else if (res[tmplId] === 'reject') {
+        rejectedCount++
+        allAccepted = false
+      } else {
+        // 用户点击了关闭按钮或其他情况，视为未授权
+        allAccepted = false
+      }
+    })
+    
+    if (acceptedCount > 0) {
+      console.log('用户同意订阅消息')
+      uni.showToast({
+        title: '已开启订单提醒',
+        icon: 'success'
+      })
+    }
+    
+    if (rejectedCount > 0) {
+      console.log('用户拒绝订阅消息')
+      // 引导用户去设置页面重新授权
+      return new Promise((resolve) => {
+        uni.showModal({
+          title: '订单提醒权限',
+          content: '为了您能及时接收订单状态通知，是否去设置页面重新授权？',
+          confirmText: '去设置',
+          cancelText: '暂不开启',
+          success: (modalRes) => {
+            if (modalRes.confirm) {
+              // 打开设置页面
+              uni.openSetting({
+                success: (settingRes) => {
+                  // 检查用户是否开启了订阅消息权限
+                  if (settingRes.authSetting['scope.subscribeMessage']) {
+                    // 用户同意订阅，再次请求
+                    uni.requestSubscribeMessage({
+                      tmplIds: tmplIds,
+                      success: (subscribeRes) => {
+                        console.log('重新授权成功:', subscribeRes)
+                        // 检查重新授权的结果
+                        let reAcceptedCount = 0
+                        let reAllAccepted = true
+                        tmplIds.forEach(tmplId => {
+                          if (subscribeRes[tmplId] === 'accept') {
+                            reAcceptedCount++
+                          } else {
+                            reAllAccepted = false
+                          }
+                        })
+                        
+                        if (reAcceptedCount > 0) {
+                          uni.showToast({
+                            title: '已开启订单提醒',
+                            icon: 'success'
+                          })
+                        }
+                        
+                        resolve(reAllAccepted)
+                      },
+                      fail: (err) => {
+                        console.log('重新授权失败:', err)
+                        resolve(false)
+                      }
+                    })
+                  } else {
+                    uni.showToast({
+                      title: '未开启订单提醒',
+                      icon: 'none'
+                    })
+                    resolve(false)
+                  }
+                },
+                fail: (err) => {
+                  console.error('打开设置页面失败:', err)
+                  resolve(false)
+                }
+              })
+            } else {
+              uni.showToast({
+                title: '未开启订单提醒',
+                icon: 'none'
+              })
+              resolve(false)
+            }
+          }
+        })
+      })
+    }
+    
+    if (acceptedCount === 0 && rejectedCount === 0) {
+      // 其他情况（如用户点击了关闭按钮等）
+      console.log('用户未明确选择订阅消息')
+      uni.showToast({
+        title: '未开启订单提醒',
+        icon: 'none'
+      })
+      return false
+    }
+    
+    return allAccepted
+  } catch (error) {
+    console.error('订阅消息请求异常:', error)
+    uni.showToast({
+      title: '订阅消息请求失败',
+      icon: 'none'
+    })
+    return false
+  }
+}
+
 // 提交订单
 const submitOrder = async () => {
   // 验证地址是否已选择
@@ -469,6 +648,20 @@ const submitOrder = async () => {
     uni.showToast({
       title: '请先选择服务时间',
       icon: 'none'
+    })
+    return
+  }
+  
+  // 先请求订阅消息权限
+  const subscribeResult = await requestSubscribeMessage()
+  
+  // 检查订阅消息授权结果，如果有模板未授权成功，则阻止支付
+  if (subscribeResult === false) {
+    uni.showModal({
+      title: '提示',
+      content: '为了确保您能及时接收订单状态通知，请先开启订阅消息权限后再提交订单',
+      showCancel: false,
+      confirmText: '我知道了'
     })
     return
   }
@@ -527,17 +720,55 @@ const submitOrder = async () => {
           uni.requestPayment({
             provider: 'wxpay',
             ...paramsResponse.data.data.pay_params,
-            success: (res) => {
+            success: async (res) => {
               console.log('支付成功', res);
               uni.showToast({
                 title: '支付成功',
                 icon: 'success',
               });
-              // 支付成功后跳转到订单列表，传递刷新参数
+              
+              // 发送订阅消息
+              try {
+                // 检查是否有友伴师的微信openid
+                if (!companionWxInfo.value.wx_open_id) {
+                  console.warn('友伴师微信openid为空，跳过订阅消息发送')
+                  return
+                }
+                
+                const subscribeData = {
+                  to_user: companionWxInfo.value.wx_open_id, // 使用真实的友伴师openid
+                  template_id: "vrMAJmeAOA0j3yRGX6AjNCOvfgzlJp8T1wWLucyCwKc",
+                 
+                  page: `subPackages/partner/order/detail?orderId=${response.data.data.order_id}&companion_id=${params.value.companion_id}`,
+                  data: {
+                    phrase4: {
+                      value: "待接单"
+                    },
+                    thing3: {
+                      value: serviceInfo.value?.service?.name || "服务"
+                    },
+                    character_string10: {
+                      value: serviceDate + " " + serviceTimeSlot
+                    },
+                    character_string1: {
+                      value: paramsResponse.data.data.order_no
+                    },
+                    thing15: {
+                      value: selectedAddress.value
+                    }
+                  }
+                }
+                
+                await sendSubscribeMessage(subscribeData)
+                console.log('订阅消息发送成功，发送给友伴师:', companionWxInfo.value.nickname)
+              } catch (error) {
+                console.error('发送订阅消息失败:', error)
+                // 订阅消息发送失败不影响主流程，只记录错误
+              }
+              
+              // 支付成功后返回上一层
               setTimeout(() => {
-                uni.navigateTo({
-                  url: `/subPackages/order/index?refresh=true`
-                })
+                uni.navigateBack()
               }, 1500)
             },
             fail: (err) => {
@@ -582,6 +813,9 @@ onMounted(() => {
   
   // 加载服务信息
   loadServiceInfo()
+  
+  // 获取友伴师微信信息
+  loadCompanionWxInfo()
   
   // 调用友伴师可用时间安排接口
   if (params.value.companion_id) {

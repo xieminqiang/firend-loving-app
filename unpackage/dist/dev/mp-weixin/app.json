@@ -10,7 +10,8 @@
       "pages": [
         "index",
         "policy",
-        "agreement"
+        "agreement",
+        "rz-agreement"
       ]
     },
     {
@@ -30,7 +31,8 @@
     {
       "root": "subPackages/release",
       "pages": [
-        "index"
+        "index",
+        "video-show"
       ]
     },
     {

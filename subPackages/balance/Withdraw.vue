@@ -50,7 +50,7 @@
       content="您的提现请求已成功提交。提现状态会在后台处理后更新，请稍后查看账户余额或联系客服确认。"
       closeOnClickOverlay
       showCancelButton
-      @close="() => showWithdraw = false"
+      @close="handleWithdrawConfirm"
     >
       <template #confirmButton>
         <u-button
@@ -197,6 +197,8 @@ const callWechatTransfer = (result) => {
         //   title: '转账发起失败',
         //   icon: 'none'
         // })
+        // 发送事件通知父页面刷新待确认提现列表
+        uni.$emit('refreshPendingWithdrawList')
         uni.navigateBack({
               delta: 1
          })
@@ -242,9 +244,12 @@ const withdrawAll = () => {
 // 提现成功弹框确认
 const handleWithdrawConfirm = () => {
   showWithdraw.value = false
-  uni.navigateBack({
+
+  setTimeout(() => {
+    uni.navigateBack({
     delta: 1
-  })
+   })
+  }, 1000)
 }
 
 // 跳转到提现记录页面

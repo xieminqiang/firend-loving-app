@@ -25,17 +25,18 @@
 	
 	const toRelease = async () => {
 		uni.navigateTo({
-			url: '/subPackages/release/index'
+			url: '/subPackages/dt/index'
 		})
 	}
 </script>
 
 <style lang="scss">
 	.square-nav {
-		padding: 80rpx 24rpx 0 24rpx;
+		padding: 80rpx 24rpx 20rpx 24rpx;
 		display: flex;
 		justify-content: space-between;
         margin-right: 220rpx;
+
 		// background-color: #ffffff;
 		.title {
 			font-size: 44rpx;

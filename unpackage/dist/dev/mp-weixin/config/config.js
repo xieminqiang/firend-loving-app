@@ -1,2 +1,2 @@
-"use strict";const t={development:{baseUrl:"http://192.168.1.15:9901/love/v1"},production:{baseUrl:"https://api.suibanxing.cn/love/v1"}};exports.config=t;
+"use strict";const n={development:{baseUrl:"https://api.suibanxing.cn/love/v1"},production:{baseUrl:"https://api.suibanxing.cn/love/v1"}};exports.config=n;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/config/config.js.map

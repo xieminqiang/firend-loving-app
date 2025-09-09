@@ -45,15 +45,16 @@
 			<!-- 照片 -->
 			<view >
 				<PictureDisplay v-if="item.moments_info?.file_list" :list="item.moments_info?.file_list"
-					:topicList="item.moments_info?.topic_list" @playVideo="handlePlayVideo"></PictureDisplay>
+					:topicList="item.moments_info?.topic_list" ></PictureDisplay>
 			</view>
 		</view>
 
 		<!-- 底部 -->
 		<view class="foot">
-			<view class="" @tap="shareToggle(item)">
+			<!-- <view class="" @tap="shareToggle(item)">
 				<image src="@/static/square/share@3x.png" mode="widthFix" class="foot-image"></image>
-			</view>
+			</view> -->
+			 <view></view>
 			<view class="foot-right">
 				<!-- 点赞 -->
 				<view class="icon-item">
@@ -71,10 +72,10 @@
 					<view class="icon-title">{{ item.moments_info.comments_num || 0 }}</view>
 				</view>
 				<!-- 打招呼 -->
-				<view class="icon-item" @tap="sayHello(item)">
+			<!-- 	<view class="icon-item" @tap="sayHello(item)">
 					<image src="~@/static/square/em@3x.png" mode="widthFix" class="foot-image"></image>
 					<view class="icon-title">打招呼</view>
-				</view>
+				</view> -->
 			</view>
 		</view>
 	</view>
@@ -145,11 +146,6 @@
 		}
 	}
 
-	// 处理视频播放
-	const handlePlayVideo = (videoPath) => { 
-		console.log('播放视频1:', videoPath)
-		emit('playVideo', videoPath)
-	}
 
 	// 去评论
 	const toRecord = (item) => {
@@ -351,7 +347,7 @@
 
 <style lang="scss" scoped>
 	.square-show {
-		margin: 0 24rpx 70rpx;
+		margin: 0 24rpx 40rpx;
 
 		.top {
 			padding-top: 20rpx;
@@ -418,7 +414,7 @@
 		}
 
 		.copywriting {
-			padding-left: 100rpx;
+			padding-left: 90rpx;
 			padding-top: 20rpx;
 			padding-right: 20rpx;
 			font-size: 24rpx;
@@ -428,11 +424,11 @@
 		}
 
 		.foot {
-			margin-top: 38rpx;
+			margin-top: 20rpx;
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			margin-left: 100rpx;
+			margin-left: 90rpx;
 
 			.foot-image {
 				width: 44rpx;

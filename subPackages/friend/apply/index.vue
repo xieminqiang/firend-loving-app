@@ -167,7 +167,7 @@
               >
                 <view class="add-content">
                   <view class="add-icon-circle">
-                    <view class="add-plus">+</view>
+                    <image src="@/static/icons/common/add_icon.png" class="add-icon" mode="aspectFit" />
                   </view>
                   <text class="add-text">添加照片</text>
                 </view>
@@ -817,9 +817,8 @@ const toggleAgreement = () => {
 
 // 查看协议
 const viewAgreement = () => {
-  uni.showToast({
-    title: '协议功能待开发',
-    icon: 'none'
+  uni.navigateTo({
+    url: '/subPackages/login/rz-agreement'
   })
 }
 
@@ -1556,10 +1555,7 @@ const removeTag = (tag) => {
   border-color: #7363FF;
   background: rgba(115, 99, 255, 0.05);
   
-  .add-icon-circle {
-    transform: scale(1.1);
-    box-shadow: 0 6rpx 20rpx rgba(115, 99, 255, 0.4);
-  }
+
 }
 
 .add-content {
@@ -1569,21 +1565,17 @@ const removeTag = (tag) => {
 }
 
 .add-icon-circle {
-  width: 60rpx;
-  height: 60rpx;
-  background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
-  border-radius: 50%;
-  @include flex-center;
-  margin-bottom: 12rpx;
-  box-shadow: 0 4rpx 16rpx rgba(115, 99, 255, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  width: 70rpx;
+  height: 70rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.add-plus {
-  font-size: 32rpx;
-  color: white;
-  font-weight: 300;
-  line-height: 1;
+.add-icon {
+  width: 32rpx;
+  height: 32rpx;
+  opacity: 0.9;
 }
 
 .add-text {
@@ -2290,15 +2282,12 @@ const removeTag = (tag) => {
 .add-icon {
   width: 40rpx;
   height: 40rpx;
-  background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
-  border-radius: 50%;
+
+
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 12rpx;
-  font-size: 24rpx;
-  color: white;
-  font-weight: 600;
+
 }
 
 .add-text {

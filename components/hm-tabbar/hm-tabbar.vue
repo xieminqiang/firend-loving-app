@@ -23,29 +23,29 @@ import { defineEmits } from 'vue'
 				"name": "home",
 				"pagePath": "pages/tabbar/home/index",
 				"text": "首页",
-				"iconPath": "/static/icons/tabbar/home.png",
-				"selectedIconPath": "/static/icons/tabbar/home-fill.png"
+				"iconPath": "https://sbx-server.oss-cn-shenzhen.aliyuncs.com/img/cum/tabbar/suqare.png",
+				"selectedIconPath": "https://sbx-server.oss-cn-shenzhen.aliyuncs.com/img/cum/tabbar/square_active.gif"
 			},
 			{
 				"name": "friends",
 				"pagePath": "pages/tabbar/friends/index",
 				"text": "友伴",
-				"iconPath": "/static/icons/tabbar/friends.png",
-				"selectedIconPath": "/static/icons/tabbar/friends-fill.png"
+				"iconPath": "https://sbx-server.oss-cn-shenzhen.aliyuncs.com/img/cum/tabbar/message.png",
+				"selectedIconPath": "https://sbx-server.oss-cn-shenzhen.aliyuncs.com/img/cum/tabbar/message-active.gif"
 			},
 			{
 				"name": "discover",
 				"pagePath": "pages/tabbar/discover/index",
 				"text": "发现",
-				"iconPath": "/static/icons/tabbar/discover.png",
-				"selectedIconPath": "/static/icons/tabbar/discover-fill.png"
+				"iconPath": "https://sbx-server.oss-cn-shenzhen.aliyuncs.com/img/cum/tabbar/find.png",
+				"selectedIconPath": "https://sbx-server.oss-cn-shenzhen.aliyuncs.com/img/cum/tabbar/find_active.gif"
 			},
 			{
 				"name": "profile",
 				"pagePath": "pages/tabbar/profile/index",
 				"text": "我的",
-				"iconPath": "/static/icons/tabbar/profile.png",
-				"selectedIconPath": "/static/icons/tabbar/profile-fill.png"
+				"iconPath": "https://sbx-server.oss-cn-shenzhen.aliyuncs.com/img/cum/tabbar/my.png",
+				"selectedIconPath": "https://sbx-server.oss-cn-shenzhen.aliyuncs.com/img/cum/tabbar/my_active.gif"
 			}
 		]
 
@@ -71,8 +71,8 @@ import { defineEmits } from 'vue'
 		}
 	
 		.u-page__item__slot-icon {
-			width: 40rpx;
-			height: 40rpx;
+			width: 50rpx;
+			height: 50rpx;
 		}
 	
 		:deep(.u-tabbar) {

@@ -47,6 +47,13 @@
 						"navigationBarTitleText": ""
 					}
 				} 
+				, 
+				{
+					"path": "rz-agreement",
+					"style": {
+						"navigationBarTitleText": ""
+					}
+				} 
 			]
 		},
 		{
@@ -84,10 +91,16 @@
 			]
 		},
 		{
-			"root": "subPackages/release",
+			"root": "subPackages/dt",
 			"pages": [
 				{
 					"path": "index",
+					"style": {
+							"navigationStyle": "custom"
+					}
+				} ,
+				{
+					"path": "video-show",
 					"style": {
 							"navigationStyle": "custom"
 					}

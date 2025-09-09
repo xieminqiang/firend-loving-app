@@ -1,6 +1,10 @@
 {
   "component": true,
   "usingComponents": {
-    "hm-tabbar": "../../../../components/hm-tabbar/hm-tabbar"
+    "u-list-item": "../../../../uni_modules/uview-plus/components/u-list-item/u-list-item",
+    "u-list": "../../../../uni_modules/uview-plus/components/u-list/u-list",
+    "uni-transition": "../../../../uni_modules/uni-transition/components/uni-transition/uni-transition",
+    "square-nav": "./cpns/square-nav",
+    "square-item": "./cpns/square-item"
   }
 }

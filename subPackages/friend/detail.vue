@@ -1,5 +1,5 @@
 <template>
-    <scroll-view class="personal-data-container" scroll-y="true">
+    <scroll-view class="personal-data-container" scroll-y="true" @scroll="handleScroll">
       <!-- 优化后的头部信息区 -->
       <view class="profile-header-block">
         <view class="header-row">
@@ -60,16 +60,26 @@
         </view>
       </view>
       <!-- 顶部tab栏和内容区 -->
-     <view class="profile-tabs">
-        <view
-          v-for="(tab, idx) in tabs"
-          :key="tab"
-          :class="['profile-tab', { active: activeTab === idx }]"
-          @click="switchTab(idx)"
-        >
-          <text>{{ tab }}</text>
-          <view v-if="activeTab === idx" class="tab-underline"></view>
-        </view>
+     <view class="profile-tabs" :class="{ 'sticky-tabs': isTabsSticky }">
+        <u-tabs
+          :list="tabsList"
+          :current="activeTab"
+          @change="handleTabChange"
+          lineWidth="60"
+          lineHeight="2"
+          :lineColor="`linear-gradient(90deg, rgba(115, 99, 255, 1) 0%, rgba(255, 105, 222, 1) 100%)`"
+          :activeStyle="{
+            color: '#7363FF',
+            fontWeight: '500',
+            fontSize: '28rpx'
+          }"
+          :inactiveStyle="{
+            color: '#1A1A1A',
+            fontWeight: '400',
+            fontSize: '28rpx'
+          }"
+          itemStyle="padding: 16rpx 50rpx; height: auto; border-radius: 30rpx;"
+        ></u-tabs>
       </view>
       <view class="profile-tab-content">
         <!-- 提供项目 -->
@@ -121,10 +131,6 @@
                 
                 <!-- 底部 -->
                 <view class="foot">
-                  <view class="foot-set" @tap="setTrends(item)">
-                    <image src="@/static/my/more@3x.png" mode="widthFix" class="foot-image"></image>
-                    <view class="foot-status">{{ item.moments_info?.moments_status?.title }}</view>
-                  </view>
                   <view class="foot-right">
                     <!-- 点赞 -->
                     <view class="icon-item">
@@ -153,23 +159,50 @@
         </view>
         <!-- 客户评价 -->
         <view v-show="activeTab === 2">
-          <view v-if="comments.length > 0">
-            <view v-for="(comment, idx) in comments" :key="idx" class="comment-card">
+          <view v-if="commentsLoading" class="loading-state">
+            <text class="loading-text">加载中...</text>
+          </view>
+          <view v-else-if="commentsList.length > 0" class="comments-container">
+            <view v-for="comment in commentsList" :key="comment.id" class="comment-card">
+              <!-- 用户信息头部 -->
               <view class="comment-header">
-                <image :src="comment.avatar" class="comment-avatar" mode="aspectFill" />
-                <view class="comment-user">
-                  <text class="comment-name">{{ comment.name }}</text>
-                  <view class="comment-stars">
-                    <text v-for="n in 5" :key="n" :class="['star', { filled: n <= comment.stars }]">★</text>
-                    <text class="comment-rate">{{ comment.stars >= 4 ? '好评' : '中评' }}</text>
+                <view class="user-info">
+                  <u-avatar 
+                    :src="comment.is_anonymous ? '' : (proxy.$imgBaseUrl + comment.user_img)" 
+                    size="40"
+                    shape="circle"
+                  />
+                  <view class="user-details">
+                    <text class="user-name">
+                      {{ comment.is_anonymous ? '匿名用户' : comment.user_nickname }}
+                    </text>
+                    <view class="rating-section">
+                      <view class="stars">
+                        <text v-for="n in 5" :key="n" :class="['star', { filled: n <= comment.rating }]">★</text>
+                      </view>
+                     
+                    </view>
                   </view>
                 </view>
+                <text class="comment-date">{{ formatCommentDate(comment.comment_time) }}</text>
               </view>
-              <view class="comment-tags">
-                <text v-for="tag in comment.tags" :key="tag" class="comment-tag">{{ tag }}</text>
+              
+              
+              <!-- 评论内容 -->
+              <view class="comment-content">{{ comment.comment }}</view>
+              
+              <!-- 评论图片 -->
+              <view v-if="comment.comment_images && comment.comment_images.length > 0" class="comment-images">
+                <view 
+                  v-for="(image, imgIdx) in comment.comment_images" 
+                  :key="imgIdx" 
+                  class="comment-image-item"
+                  @click="previewCommentImage(imgIdx, comment.comment_images)"
+                >
+                  <image :src="proxy.$imgBaseUrl + image" class="comment-image" mode="aspectFill" />
+                </view>
               </view>
-              <view class="comment-content">{{ comment.content }}</view>
-              <view class="comment-date">{{ comment.date }}</view>
+              
             </view>
           </view>
           <view v-else class="empty-state-profile">
@@ -180,12 +213,32 @@
       </view> 
        <view style="height: 50rpx;"></view>
     </scroll-view>
+
+    <!-- 视频播放弹框 -->
+    <u-popup :show="popupShow" mode="center" :safeAreaInsetBottom="false">
+      <view class="video-popup-content">
+        <video 
+          class="video-player" 
+          :src="currentVideoPath" 
+          :controls="false" 
+          :show-center-play-btn="false"
+          :show-fullscreen-btn="false"
+          :show-progress="true"
+          :enable-progress-gesture="true"
+          autoplay>
+        </video>
+        <!-- 关闭按钮 -->
+        <view class="close-btn" @tap="closeVideoPopup">
+          <image src="/static/find/close2.png" mode="widthFix" class="close-icon"></image>
+        </view>
+      </view>
+    </u-popup>
   </template>
   
   <script setup>
-import { ref, computed, onMounted, getCurrentInstance } from 'vue'
+import { ref, computed, onMounted, onUnmounted, getCurrentInstance } from 'vue'
 import { getCityServices } from '@/api/friends.js'
-import { getMomentsByCompanion, praiseMoment } from '@/api/discover.js'
+import { getMomentsByCompanion, praiseMoment, getCompanionCommentList } from '@/api/discover.js'
 import { useLevelStore } from '@/stores/level.js'
 import { useUserStore } from '@/stores/user.js'
 import PictureDisplay from '@/components/common/PictureDisplay.vue'
@@ -223,6 +276,47 @@ import PictureDisplay from '@/components/common/PictureDisplay.vue'
 
   const tabs = ['提供项目', 'TA的动态', '客户评价']
   const activeTab = ref(0)
+  
+  // u-tabs 需要的数据格式
+  const tabsList = computed(() => {
+    return tabs.map(tab => ({
+      name: tab
+    }))
+  })
+  
+  // u-tabs 切换处理函数
+  const handleTabChange = (item) => {
+    // u-tabs 传递的是对象，包含 name, rect, index 等属性
+    let index, newTab
+    
+    if (typeof item === 'object' && item !== null) {
+      // 如果是对象，使用 index 属性
+      index = item.index
+      newTab = item.name
+    } else if (typeof item === 'number') {
+      // 如果是数字，直接使用
+      index = item
+      newTab = tabs[index]
+    } else {
+      console.error('Invalid tab change item:', item)
+      return
+    }
+    
+    // 添加边界检查
+    if (index < 0 || index >= tabs.length) {
+      console.error('Invalid tab index:', index)
+      return
+    }
+    
+    if (!newTab) {
+      console.error('Tab not found for index:', index, 'item:', item)
+      return
+    }
+    
+    console.log('Tab changed to:', newTab, 'index:', index)
+    activeTab.value = index
+  }
+  
   function switchTab(idx) {
     activeTab.value = idx
   }
@@ -232,6 +326,15 @@ const banners = ref([])
 const services = ref([])
 const momentsList = ref([])
 const momentsLoading = ref(false)
+const commentsList = ref([])
+const commentsLoading = ref(false)
+
+// 视频播放弹框相关状态
+const popupShow = ref(false)
+const currentVideoPath = ref('')
+
+// 吸顶相关状态
+const isTabsSticky = ref(false)
 
   // 计算当前等级信息
   const currentLevel = computed(() => {
@@ -241,9 +344,37 @@ const momentsLoading = ref(false)
     return levelStore.sortedServiceLevels.find(level => level.level_order === user.value.level_order)
   })
 
-  const comments = [
-
-  ]
+  // 获取友伴师评论列表
+  const getCommentsData = async () => {
+    if (!params.value.id) return
+    
+    try {
+      commentsLoading.value = true
+      const requestParams = {
+        companion_id: parseInt(params.value.id),
+        page: 1,
+         rating: 5,
+        page_size: 20
+      }
+      
+      const response = await getCompanionCommentList(requestParams)
+      console.log('评论列表响应:', response)
+      
+      if (response.data && response.data.code === 0) {
+        const data = response.data.data
+        if (data && data.list) {
+          commentsList.value = data.list
+          console.log('评论列表数据:', commentsList.value)
+        }
+      } else {
+        console.error('获取评论列表失败:', response.data?.message || '未知错误')
+      }
+    } catch (error) {
+      console.error('获取评论列表异常:', error)
+    } finally {
+      commentsLoading.value = false
+    }
+  }
 
   // 跳转到提交订单页面
   // 传递参数说明：
@@ -286,7 +417,7 @@ const getCityServicesData = async () => {
     const response = await getCityServices(requestParams)
       
       console.log('城市服务信息响应:', response)
-      
+       getHeaderBgHeight() 
       if (response.data && response.data.code === 0) {
         // 处理返回的数据
         const data = response.data.data
@@ -340,7 +471,7 @@ const getCityServicesData = async () => {
       const requestParams = {
         companion_id: parseInt(params.value.id),
         page: 1,
-        page_size: 10
+        page_size: 50
       }
       
       const response = await getMomentsByCompanion(requestParams)
@@ -405,7 +536,14 @@ const getCityServicesData = async () => {
   // 处理视频播放
   const handlePlayVideo = (videoPath) => { 
     console.log('播放视频:', videoPath)
-    // 可以在这里添加视频播放逻辑
+    currentVideoPath.value = videoPath
+    popupShow.value = true
+  }
+
+  // 关闭视频弹框
+  const closeVideoPopup = () => {
+    popupShow.value = false
+    currentVideoPath.value = ''
   }
 
   // 点赞处理
@@ -474,12 +612,66 @@ const getCityServicesData = async () => {
     })
   }
 
-  // 设置动态
-  const setTrends = (item) => {
-    // 可以在这里添加设置动态的逻辑
-    console.log('设置动态:', item)
+  // 格式化评论日期
+  const formatCommentDate = (dateString) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = now - date
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+    
+    if (diffDays === 0) {
+      return '今天'
+    } else if (diffDays === 1) {
+      return '昨天'
+    } else if (diffDays < 7) {
+      return `${diffDays}天前`
+    } else {
+      return dateString.split(' ')[0] // 返回日期部分
+    }
   }
 
+  // 预览评论图片
+  const previewCommentImage = (index, images) => {
+    const imageUrls = images.map(img => proxy.$imgBaseUrl + img)
+    uni.previewImage({
+      urls: imageUrls,
+      current: index,
+      indicator: 'number',
+      loop: true,
+      show: true,
+      success: function(res) {
+        console.log('评论图片预览成功', res);
+      },
+      fail: function(err) {
+        console.error('评论图片预览失败', err);
+      }
+    });
+  }
+
+  // 滚动监听处理
+  const handleScroll = (e) => {
+    const scrollTop = e.detail.scrollTop
+
+    	if (scrollTop >= headerBgHeight.value ) {
+	 isTabsSticky.value = true;
+	} else {
+		 isTabsSticky.value= false;
+	}
+  }
+
+const headerBgHeight = ref(0)
+	const getHeaderBgHeight = () => {
+		uni.createSelectorQuery()
+			.select('.profile-tabs') // 选择器
+			.boundingClientRect(rect => {
+				if (rect) {
+					headerBgHeight.value = rect.top
+				
+				}
+			})
+			.exec()
+	}
 
   onMounted(async () => {
   // 确保服务等级列表已加载
@@ -505,6 +697,17 @@ const getCityServicesData = async () => {
   if (params.value.id) {
     getMomentsData()
   }
+  
+  // 调用评论列表接口
+  if (params.value.id) {
+    getCommentsData()
+  }
+  
+  // 不需要延迟获取位置，使用固定值更可靠
+})
+
+onUnmounted(() => {
+  // 清理工作
 })
   </script>
   
@@ -712,14 +915,11 @@ const getCityServicesData = async () => {
   .service-list {
     display: flex;
     flex-direction: column;
-    gap: 24rpx;
+    gap: 20rpx;
   }
   .service-item {
     display: flex;
-    background: #faf9ff;
-    border-radius: 18rpx;
-    box-shadow: 0 2rpx 8rpx rgba(115, 99, 255, 0.06);
-    padding: 18rpx;
+   
     align-items: center;
   }
   .service-img {
@@ -739,8 +939,9 @@ const getCityServicesData = async () => {
     margin-bottom: 8rpx;
   }
   .service-title {
-    font-size: 28rpx;
-    font-weight: 600;
+    font-size: 24rpx;
+ color: #1a1a1a;
+    font-weight: 500;
   }
   .service-hot {
     font-size: 20rpx;
@@ -754,25 +955,17 @@ const getCityServicesData = async () => {
   }
   .service-tag {
     font-size: 18rpx;
-    background: linear-gradient(135deg, rgba(108, 117, 125, 0.08) 0%, rgba(248, 249, 250, 0.6) 100%);
-    color: #495057;
-    padding: 2rpx 10rpx;
+    color: #1a1a1a;
+    padding: 2rpx 12rpx;
     border-radius: 16rpx;
     font-weight: 600;
     border: 1rpx solid rgba(108, 117, 125, 0.12);
-    backdrop-filter: blur(8rpx);
-    -webkit-backdrop-filter: blur(8rpx);
-    transition: all 0.3s;
+
   }
-  .service-tag:active {
-    transform: scale(0.95);
-    background: linear-gradient(135deg, rgba(255, 105, 222, 0.1) 0%, rgba(255, 255, 255, 0.8) 100%);
-    color: #FF69DE;
-    border-color: rgba(255, 105, 222, 0.2);
-  }
+
   .service-bottom-row {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
   }
   .service-price {
@@ -801,46 +994,33 @@ const getCityServicesData = async () => {
     opacity: 0.85;
   }
   .profile-tabs {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
-    border-radius: 24rpx;
-    margin: 0rpx 24rpx 0 24rpx;
-    box-shadow: 0 4rpx 24rpx rgba(115,99,255,0.06);
-    padding: 0 8rpx;
- 
-  }
-  .profile-tab {
-    flex: 1;
-    text-align: center;
-    font-size: 30rpx;
-    color: #888;
-    font-weight: 500;
+    margin: 12rpx 32rpx 8rpx;
     position: relative;
-    padding: 24rpx 0 18rpx 0;
-    transition: color 0.2s;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   
   }
-  .profile-tab.active {
-    color: #7363FF;
-    font-weight: 700;
-  }
-  .tab-underline {
-    position: absolute;
-    left: 25%;
-    bottom: 10rpx;
-    width: 50%;
-    height: 6rpx;
-    background: linear-gradient(90deg, #7363FF 0%, #FF69DE 100%);
-    border-radius: 3rpx;
+  
+  .profile-tabs.sticky-tabs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    margin: 0;
+    padding: 12rpx 32rpx 8rpx;
+    background: #fff;
+  
   }
   .profile-tab-content {
     min-height: 320rpx;
     background: #fff;
     border-radius: 24rpx;
-    margin: 0 24rpx 24rpx 24rpx;
-    box-shadow: 0 4rpx 24rpx rgba(115,99,255,0.06);
-    padding: 24rpx 0 0 0;
+    margin: 30rpx 24rpx 24rpx 24rpx;
+    box-sizing: border-box;
+    
   }
   .empty-state-profile {
     display: flex;
@@ -864,77 +1044,116 @@ const getCityServicesData = async () => {
     font-weight: 600;
     margin-bottom: 16rpx;
   }
+  /* 评论容器 */
+  .comments-container {
+    padding: 0rpx;
+  }
+  
   .comment-card {
     background: #fff;
     border-radius: 24rpx;
-    box-shadow: 0 4rpx 24rpx rgba(115,99,255,0.06);
-    margin-bottom: 28rpx;
-    padding: 32rpx 28rpx 18rpx 28rpx;
+    margin-bottom: 20rpx;
+    padding: 28rpx;
+    border: 1rpx solid rgba(115, 99, 255, 0.08);
   }
+  
+  /* 评论头部 */
   .comment-header {
     display: flex;
-    align-items: center;
-    margin-bottom: 12rpx;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16rpx;
   }
-  .comment-avatar {
-    width: 64rpx;
-    height: 64rpx;
-    border-radius: 50%;
-    margin-right: 18rpx;
-    background: #f5f6ff;
-  }
-  .comment-user {
-    flex: 1;
+  
+  .user-info {
     display: flex;
-    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
   }
-  .comment-name {
+  
+  .comment-avatar {
+    margin-right: 18rpx;
+    flex-shrink: 0;
+  }
+  
+  .user-details {
+    flex: 1;
+    min-width: 0;
+    margin-left: 20rpx;
+  }
+  
+  .user-name {
     font-size: 28rpx;
     color: #222;
     font-weight: 600;
+
+    display: block;
   }
-  .comment-stars {
+  
+  .rating-section {
     display: flex;
     align-items: center;
-    margin-top: 2rpx;
+    gap: 12rpx;
   }
+  
+  .stars {
+    display: flex;
+    align-items: center;
+  }
+  
   .star {
     font-size: 26rpx;
     color: #e0e0e0;
     margin-right: 2rpx;
   }
+  
   .star.filled {
     color: #FFB400;
   }
-  .comment-rate {
+  
+  .rating-text {
     font-size: 22rpx;
     color: #7363FF;
-    margin-left: 10rpx;
     font-weight: 500;
   }
-  .comment-tags {
-    display: flex;
-    gap: 12rpx;
-    margin-bottom: 8rpx;
-  }
-  .comment-tag {
+  
+  .comment-date {
     font-size: 22rpx;
-    background: linear-gradient(135deg, #f5f6ff 0%, #f8f9fb 100%);
-    color: #7363FF;
-    padding: 4rpx 16rpx;
-    border-radius: 16rpx;
-    font-weight: 500;
+    color: #999;
+    flex-shrink: 0;
+    margin-left: 16rpx;
   }
+  
+  
+  /* 评论内容 */
   .comment-content {
     font-size: 26rpx;
     color: #333;
-    margin-bottom: 8rpx;
+    line-height: 1.6;
+    margin-bottom: 16rpx;
   }
-  .comment-date {
-    font-size: 22rpx;
-    color: #bbb;
-    text-align: right;
+  
+  /* 评论图片 */
+  .comment-images {
+    display: flex;
+    gap: 12rpx;
+    margin-bottom: 16rpx;
+    flex-wrap: wrap;
   }
+  
+  .comment-image-item {
+    width: 120rpx;
+    height: 120rpx;
+    border-radius: 12rpx;
+    overflow: hidden;
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  }
+  
+  .comment-image {
+    width: 100%;
+    height: 100%;
+  }
+  
   .bottom-fixed-btn {
     position: fixed;
     left: 0;
@@ -965,7 +1184,7 @@ const getCityServicesData = async () => {
   }
   .moment-item {
     display: flex;
-    padding: 40rpx 0 20rpx;
+    padding: 20rpx 0 20rpx 0rpx;
     border-bottom: 1rpx solid #f0f0f0;
   }
   .moment-item:last-child {
@@ -1002,24 +1221,15 @@ const getCityServicesData = async () => {
     overflow: hidden;
   }
   .foot {
-    margin-top: 38rpx;
+    margin-top: 20rpx;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     margin-left: 0;
   }
   .foot-image {
     width: 44rpx;
     height: 44rpx;
-  }
-  .foot-set {
-    display: flex;
-    align-items: center;
-  }
-  .foot-status {
-    margin-left: 14rpx;
-    font-size: 20rpx;
-    color: #ccc;
   }
   .foot-right {
     display: flex;
@@ -1038,5 +1248,58 @@ const getCityServicesData = async () => {
   .icon-item-center {
     margin-left: 50rpx;
     margin-right: 20rpx;
+  }
+
+  /* 视频播放弹框样式 */
+  .video-popup-content {
+    width: 100vw;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .video-player {
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+    border: none;
+    outline: none;
+    display: block;
+  }
+
+  .close-btn {
+    position: absolute;
+    bottom: 40rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 80rpx;
+    height: 80rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 1);
+    border-radius: 50%;
+  }
+
+  .close-icon {
+    width: 40rpx;
+    height: 40rpx;
+  }
+
+  /* 确保u-popup没有默认样式 */
+  :deep(.u-popup__content) {
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+  }
+
+  /* 确保视频元素没有默认样式 */
+  :deep(video) {
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    vertical-align: top !important;
   }
   </style> 

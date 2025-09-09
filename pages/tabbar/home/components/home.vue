@@ -138,7 +138,7 @@
   </template>
   
   <script setup>
-  import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+  import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
   import { getHotRecommendServices } from '@/api/home.js'
   import { useCityStore } from '@/stores/city.js'
   import CitySelector from '@/components/common/CitySelector.vue'
@@ -295,17 +295,22 @@
 	  const response = await getHotRecommendServices(requestParams)
 	  
 	  if (response.data && response.data.code === 0 && response.data.data && response.data.data.list) {
-		// 转换API数据格式为模板需要的格式
-		const newData = response.data.data.list.map(item => ({
-		  id: item.id,
-		  name: item.name,
-		  desc: item.description,
-		  tags: item.tags || [],
-		  img: item.image_url || '/static/images/service-default.png',
-		  min_price: item.min_price || 0,
-		  unit: item.unit || '次', // 添加单位字段
-		  price_template_id: item.price_template_id // 添加价格模板ID
-		}))
+		// 转换API数据格式为模板需要的格式，并过滤掉id为3和5的服务
+		const originalCount = response.data.data.list.length
+		const newData = response.data.data.list
+		  .filter(item => item.id !== 3 && item.id !== 5) // 过滤掉id为3和5的服务
+		  .map(item => ({
+			id: item.id,
+			name: item.name,
+			desc: item.description,
+			tags: item.tags || [],
+			img: item.image_url || '/static/images/service-default.png',
+			min_price: item.min_price || 0,
+			unit: item.unit || '次', // 添加单位字段
+			price_template_id: item.price_template_id // 添加价格模板ID
+		  }))
+		
+		console.log(`${tab}服务数据过滤: 原始${originalCount}条，过滤后${newData.length}条`)
 		
 		// 只有在强制刷新时才替换数据，否则保留现有数据
 		if (forceRefresh) {
@@ -385,16 +390,22 @@
 	  const response = await getHotRecommendServices(requestParams)
 	  
 	  if (response.data && response.data.code === 0 && response.data.data && response.data.data.list) {
-		const newData = response.data.data.list.map(item => ({
-		  id: item.id,
-		  name: item.name,
-		  desc: item.description,
-		  tags: item.tags || [],
-		  img: item.image_url || '/static/images/service-default.png',
-		  min_price: item.min_price || 0,
-		  unit: item.unit || '次',
-		  price_template_id: item.price_template_id
-		}))
+		// 转换API数据格式并过滤掉id为3和5的服务
+		const originalCount = response.data.data.list.length
+		const newData = response.data.data.list
+		  .filter(item => item.id !== 3 && item.id !== 5) // 过滤掉id为3和5的服务
+		  .map(item => ({
+			id: item.id,
+			name: item.name,
+			desc: item.description,
+			tags: item.tags || [],
+			img: item.image_url || '/static/images/service-default.png',
+			min_price: item.min_price || 0,
+			unit: item.unit || '次',
+			price_template_id: item.price_template_id
+		  }))
+		
+		console.log(`${tab}加载更多数据过滤: 原始${originalCount}条，过滤后${newData.length}条`)
 		
 		// 追加新数据
 		const existingIds = new Set(allServiceItems.value[tab].map(item => item.id))
@@ -636,15 +647,6 @@
 	await loadMoreData(tab)
   }
   
-  // 监听城市变化，自动刷新数据
-  watch(() => cityStore.currentCityCode, async (newCityCode, oldCityCode) => {
-	// 只有当城市代码真正发生变化时才刷新数据
-	if (newCityCode && newCityCode !== oldCityCode) {
-	  console.log('城市发生变化，自动刷新数据:', newCityCode)
-	  loadAllServicesData()
-	}
-  })
-
   // 自定义城市选择
   const showCityPicker = ref(false)
   
@@ -682,10 +684,7 @@
 	border-radius: 0 0 32rpx 32rpx;
 	position: relative;
 	overflow: hidden;
-
-
 	box-sizing: border-box;
-	
 	
   }
   
@@ -981,9 +980,33 @@
 	padding: 12rpx 24rpx;
 	font-size: 24rpx;
 	font-weight: 700;
+	box-shadow: 0 8rpx 24rpx rgba(130, 160, 216, 0.25);
+	transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	border: none;
+	position: relative;
+	overflow: hidden;
+	letter-spacing: 0.5rpx;
 	
-
-
+	&::before {
+	  content: '';
+	  position: absolute;
+	  top: 0;
+	  left: -100%;
+	  width: 100%;
+	  height: 100%;
+	  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+	  transition: left 0.6s;
+	}
+	
+	&:active {
+	  transform: translateY(-2rpx) scale(1.02);
+	  box-shadow: 0 12rpx 32rpx rgba(130, 160, 216, 0.35);
+	  background: linear-gradient(135deg, $primary-hover 0%, $primary-color 100%);
+	}
+	
+	&:active::before {
+	  left: 100%;
+	}
   }
   
   

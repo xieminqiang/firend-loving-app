@@ -121,8 +121,19 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { getCompanionOrderDetail } from '@/api/order.js'
-
+import { 
+  getCompanionOrderDetail,
+  acceptCompanionOrder,
+  rejectCompanionOrder,
+  arrivedCompanionOrder,
+  departCompanionOrder,
+  startCompanionService,
+  endCompanionService,
+  deleteCompanionOrder
+} from '@/api/order.js'
+import { useUserStore } from '@/stores/user.js'
+// 用户状态管理
+const userStore = useUserStore()
 // 订单详情数据
 const orderDetail = ref({})
 const orderId = ref(null)
@@ -132,11 +143,25 @@ const companionId = ref(null)
 
 // 页面加载
 onLoad((options) => {
+  // 检查登录状态
+  if (!userStore.userInfo || Object.keys(userStore.userInfo).length === 0 || !userStore.token) {
+    uni.showToast({
+      title: '请先登录',
+      icon: 'none'
+    })
+    setTimeout(() => {
+      uni.navigateTo({
+        url: '/subPackages/login/index'
+      })
+    }, 1500)
+    return
+  }
+  
   if (options.orderId) {
     orderId.value = options.orderId
   }
   if (options.companion_id) {
-    companionId.value = options.companion_id
+      companionId.value = options.companion_id
   }
   loadOrderDetail()
 })
@@ -321,16 +346,24 @@ const handleAcceptOrder = (order) => {
             title: '处理中...'
           })
           
-          // 这里调用接单API
-          uni.showToast({
-            title: '接单成功',
-            icon: 'success'
+          const response = await acceptCompanionOrder({ 
+            order_id: order.id,
+            companion_id: Number(companionId.value)
           })
           
-          // 刷新订单详情
-          setTimeout(() => {
-            loadOrderDetail()
-          }, 1500)
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '接单成功',
+              icon: 'success'
+            })
+            
+            // 刷新订单详情
+            setTimeout(() => {
+              loadOrderDetail()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '接单失败')
+          }
         } catch (error) {
           console.error('接单失败:', error)
           uni.showToast({
@@ -359,16 +392,24 @@ const handleRejectOrder = (order) => {
             title: '处理中...'
           })
           
-          // 这里调用拒绝订单API
-          uni.showToast({
-            title: '已拒绝订单',
-            icon: 'success'
+          const response = await rejectCompanionOrder({ 
+            order_id: order.id,
+            companion_id: Number(companionId.value)
           })
           
-          // 刷新订单详情
-          setTimeout(() => {
-            loadOrderDetail()
-          }, 1500)
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '已拒绝订单',
+              icon: 'success'
+            })
+            
+            // 刷新订单详情
+            setTimeout(() => {
+              loadOrderDetail()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '拒绝订单失败')
+          }
         } catch (error) {
           console.error('拒绝订单失败:', error)
           uni.showToast({
@@ -397,16 +438,24 @@ const handleArrived = (order) => {
             title: '更新中...'
           })
           
-          // 这里调用确认到达API
-          uni.showToast({
-            title: '已确认到达',
-            icon: 'success'
+          const response = await arrivedCompanionOrder({ 
+            order_id: order.id,
+            companion_id: Number(companionId.value)
           })
           
-          // 刷新订单详情
-          setTimeout(() => {
-            loadOrderDetail()
-          }, 1500)
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '已确认到达',
+              icon: 'success'
+            })
+            
+            // 刷新订单详情
+            setTimeout(() => {
+              loadOrderDetail()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '确认到达失败')
+          }
         } catch (error) {
           console.error('确认到达失败:', error)
           uni.showToast({
@@ -454,16 +503,24 @@ const handleDepart = (order) => {
             title: '更新中...'
           })
           
-          // 这里调用确认出发API
-          uni.showToast({
-            title: '已确认出发',
-            icon: 'success'
+          const response = await departCompanionOrder({ 
+            order_id: order.id,
+            companion_id: Number(companionId.value)
           })
           
-          // 刷新订单详情
-          setTimeout(() => {
-            loadOrderDetail()
-          }, 1500)
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '已确认出发',
+              icon: 'success'
+            })
+            
+            // 刷新订单详情
+            setTimeout(() => {
+              loadOrderDetail()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '确认出发失败')
+          }
         } catch (error) {
           console.error('确认出发失败:', error)
           uni.showToast({
@@ -492,16 +549,24 @@ const handleStartService = (order) => {
             title: '更新中...'
           })
           
-          // 这里调用开始服务API
-          uni.showToast({
-            title: '服务已开始',
-            icon: 'success'
+          const response = await startCompanionService({ 
+            order_id: order.id,
+            companion_id: Number(companionId.value)
           })
           
-          // 刷新订单详情
-          setTimeout(() => {
-            loadOrderDetail()
-          }, 1500)
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '服务已开始',
+              icon: 'success'
+            })
+            
+            // 刷新订单详情
+            setTimeout(() => {
+              loadOrderDetail()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '开始服务失败')
+          }
         } catch (error) {
           console.error('开始服务失败:', error)
           uni.showToast({
@@ -530,16 +595,24 @@ const handleEndService = (order) => {
             title: '更新中...'
           })
           
-          // 这里调用结束服务API
-          uni.showToast({
-            title: '服务已结束',
-            icon: 'success'
+          const response = await endCompanionService({ 
+            order_id: order.id,
+            companion_id: Number(companionId.value)
           })
           
-          // 刷新订单详情
-          setTimeout(() => {
-            loadOrderDetail()
-          }, 1500)
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '服务已结束',
+              icon: 'success'
+            })
+            
+            // 刷新订单详情
+            setTimeout(() => {
+              loadOrderDetail()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '结束服务失败')
+          }
         } catch (error) {
           console.error('结束服务失败:', error)
           uni.showToast({
@@ -582,16 +655,24 @@ const handleDeleteOrder = (order) => {
             title: '删除中...'
           })
           
-          // 这里调用删除订单API
-          uni.showToast({
-            title: '订单已删除',
-            icon: 'success'
+          const response = await deleteCompanionOrder({ 
+            order_id: order.id,
+            companion_id: Number(companionId.value)
           })
           
-          // 返回上一页
-          setTimeout(() => {
-            uni.navigateBack()
-          }, 1500)
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '订单已删除',
+              icon: 'success'
+            })
+            
+            // 返回上一页
+            setTimeout(() => {
+              uni.navigateBack()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '删除订单失败')
+          }
         } catch (error) {
           console.error('删除订单失败:', error)
           uni.showToast({

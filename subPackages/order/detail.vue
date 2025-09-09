@@ -172,6 +172,20 @@ const progressSteps = ref([
 
 // 页面加载
 onLoad((options) => {
+  // 检查登录状态
+  if (!userStore.userInfo || Object.keys(userStore.userInfo).length === 0 || !userStore.token) {
+    uni.showToast({
+      title: '请先登录',
+      icon: 'none'
+    })
+    setTimeout(() => {
+      uni.navigateTo({
+        url: '/subPackages/login/index'
+      })
+    }, 1500)
+    return
+  }
+  
   if (options.orderId) {
     orderId.value = options.orderId
     loadOrderDetail()

@@ -299,3 +299,34 @@ export const getBalanceLogs = (params) => {
     data: params
   })
 }
+
+/**
+ * 发送订阅消息
+ * @param {Object} data - 订阅消息数据
+ * @param {string} data.to_user - 接收用户的openid
+ * @param {string} data.template_id - 模板ID
+ * @param {string} data.page - 跳转页面路径
+ * @param {Object} data.data - 模板数据
+ * @returns {Promise} 返回发送结果
+ */
+export const sendSubscribeMessage = (data) => {
+  return http({
+    url: '/front/user/subscribe/send',
+    method: 'POST',
+    data
+  })
+}
+
+/**
+ * 获取友伴师微信 openid
+ * @param {Object} params - 请求参数
+ * @param {number} params.companion_id - 友伴师ID
+ * @returns {Promise} 返回友伴师微信信息
+ */
+export const getCompanionWxOpenId = (params) => {
+  return http({
+    url: '/front/companion/wx-openid',
+    method: 'GET',
+    data: params
+  })
+}

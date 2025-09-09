@@ -41,9 +41,6 @@
         <!-- 右侧箭头 -->
         <image src="@/static/icons/common/arrow-right.png" class="profile-arrow" mode="aspectFit" />
       </view>
-      
-
-      
       <!-- 功能列表 -->
               <view class="function-list">
                   <view class="function-item" @click="handleFunctionClick('balance')">
@@ -66,8 +63,7 @@
     </view>
     
     <!-- 发动态入口 -->
-   
-      <view class="release-content" @click="toRelease">
+      <view class="release-content" @click="toRelease" v-if="applicationInfo && applicationInfo.can_accept_orders == 'Y'">
         <image src="@/static/icons/partner/add_dt.png" class="release-icon" mode="aspectFit" />
         <text class="release-text">分享你的动态</text>
       </view>

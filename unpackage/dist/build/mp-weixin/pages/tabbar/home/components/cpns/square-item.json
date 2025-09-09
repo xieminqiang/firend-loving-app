@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "u-avatar": "../../../../../uni_modules/uview-plus/components/u-avatar/u-avatar",
+    "picture-display": "../../../../../components/common/PictureDisplay"
+  }
+}

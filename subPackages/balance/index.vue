@@ -151,7 +151,7 @@ const goToWithdraw = () => {
   // 检查是否有待确认的提现记录
   if (pendingWithdrawList.value.length > 0) {
     // 如果有待确认记录，显示弹框
-    showPendingWithdraw.value = true
+      showPendingWithdraw.value = true
   } else {
     // 没有待确认记录，直接跳转到提现页面
     uni.navigateTo({
@@ -273,7 +273,10 @@ onMounted(() => {
 }) 
 
 onShow(() => {
-  fetchPendingWithdrawList() 
+
+  setTimeout(() => {
+    fetchPendingWithdrawList() 
+  }, 1000)
   fetchBalanceDetail()
 })
 

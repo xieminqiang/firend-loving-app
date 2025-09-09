@@ -768,7 +768,7 @@
             
             const response = await startCompanionService({ 
               order_id: order.id,
-              companion_id: companionId.value
+              companion_id: Number(companionId.value)
             })
             
             if (response.data.code === 0) {
@@ -812,7 +812,7 @@
             
             const response = await endCompanionService({ 
               order_id: order.id,
-              companion_id: companionId.value
+              companion_id: Number(companionId.value)
             })
             
             if (response.data.code === 0) {

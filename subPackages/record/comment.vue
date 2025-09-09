@@ -29,9 +29,9 @@
 				</view>
 				
 				<!-- 立即邀约按钮 -->
-				<view class="invite-btn" @tap="handleInvite()">
+				<!-- <view class="invite-btn" @tap="handleInvite()">
 					立即邀约
-				</view>
+				</view> -->
 			</view>
 		</view>
 
@@ -56,10 +56,10 @@
 							<image v-if="momentsInfoComment.is_praised" src="@/static/square/active-love.png" class="action-icon"></image>
 							<text class="action-text">{{ momentsInfoComment.praise_num || 0 }}</text>
 						</view>
-						<view class="action-item" @tap="handleSayHello(userInfoComment.user_id)">
+					<!-- 	<view class="action-item" @tap="handleSayHello(userInfoComment.user_id)">
 							<image src="@/static/square/em@3x.png" class="action-icon"></image>
 							<text class="action-text">打招呼</text>
-						</view>
+						</view> -->
 					</view>
 				</view>
 				<!-- 评论区 -->
@@ -332,43 +332,10 @@
 		}
 	}
 
-	// 使用模拟评论数据（备用）
+	
 	const useMockCommentData = () => {
-		// 模拟评论数据
-		commentListData.value = [
-			{
-				comments_id: '1',
-				user_id: '2',
-				nick_name: '评论用户1',
-				head_img: '/static/images/empty.png',
-				content: '这是一条测试评论',
-				content_time: '2024-01-01 12:00',
-				comments_list: [
-					{
-						comments_id: '1-1',
-						user_id: '3',
-						nick_name: '回复用户1',
-						reply_nick_name: '评论用户1',
-						head_img: '/static/images/empty.png',
-						content: '这是一条回复',
-						content_time: '2024-01-01 12:05'
-					}
-				],
-				has_more: false
-			},
-			{
-				comments_id: '2',
-				user_id: '4',
-				nick_name: '评论用户2',
-				head_img: '/static/images/empty.png',
-				content: '这是另一条测试评论',
-				content_time: '2024-01-01 12:10',
-				comments_list: [],
-				has_more: false
-			}
-		]
-
-		totalComment.value = 2
+		commentListData.value = []
+		totalComment.value = 0
 		commentDataLoaded.value = true
 	}
 
@@ -385,7 +352,7 @@
 		showOneReply.value = true
 	}
 
-	// 发布评论
+	// 发布
 	const handleReleaseComment = async () => {
 		showOneReply.value = false
 		

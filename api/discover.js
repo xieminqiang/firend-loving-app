@@ -144,3 +144,19 @@ export const getMomentsByCompanion = (params) => {
 	})
 }
 
+/**
+ * 获取友伴师评论列表
+ * @param {Object} params - 请求参数
+ * @param {number} params.companion_id - 友伴师ID
+ * @param {number} params.page - 页码
+ * @param {number} params.page_size - 每页数量
+ * @returns {Promise} 返回友伴师评论列表数据
+ */
+export const getCompanionCommentList = (params) => {
+	return http({
+		url: '/front/companion/comment/list',
+		method: 'POST',
+		data: params
+	})
+}
+

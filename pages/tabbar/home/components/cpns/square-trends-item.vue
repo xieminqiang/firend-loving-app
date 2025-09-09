@@ -38,7 +38,8 @@
 		watch
 	} from 'vue'
 	import {
-		onLoad,
+		onLoad, 
+		onShow
 	} from '@dcloudio/uni-app'
 	import { getMomentsList } from '@/api/discover.js'
 	import squareItem from './square-item'
@@ -81,6 +82,12 @@
 		console.log('获取数据888')
 		_freshing.value = false;  
 		pageParams.value.page = 1
+		// 重新获取数据
+	
+	})
+
+	onShow(() => {
+		console.log('onShow')
 		// 重新获取数据
 		getMomentsListData(1)
 	})
@@ -146,16 +153,16 @@
 	}
 
 	//监听listType变化，重新获取数据
-	watch(() => props.listType, (newVal, oldVal) => {
-		console.log('listType变化:', oldVal, '->', newVal)
-		console.log('newVal获取数据获取数据获取数据', newVal)
-		if (newVal) {
-			// 重置分页参数
-			pageParams.value.page = 1
-			// 重新获取数据
-			getMomentsListData(1)
-		}
-	}, { immediate: true })
+	// watch(() => props.listType, (newVal, oldVal) => {
+	// 	console.log('listType变化:', oldVal, '->', newVal)
+	// 	console.log('newVal获取数据获取数据获取数据', newVal)
+	// 	if (newVal) {
+	// 		// 重置分页参数
+	// 		pageParams.value.page = 1
+	// 		// 重新获取数据
+	// 		getMomentsListData(1)
+	// 	}
+	// }, { immediate: true })
 
 	const handleScroll = (e) => {
 		oldScrollTop.value = e.detail.scrollTop

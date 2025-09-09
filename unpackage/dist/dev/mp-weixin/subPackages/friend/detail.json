@@ -1,4 +1,9 @@
 {
   "navigationBarTitleText": "",
-  "usingComponents": {}
+  "usingComponents": {
+    "u-tabs": "../../uni_modules/uview-plus/components/u-tabs/u-tabs",
+    "u-avatar": "../../uni_modules/uview-plus/components/u-avatar/u-avatar",
+    "u-popup": "../../uni_modules/uview-plus/components/u-popup/u-popup",
+    "picture-display": "../../components/common/PictureDisplay"
+  }
 }

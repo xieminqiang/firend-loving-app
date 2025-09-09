@@ -582,30 +582,36 @@ const searchCompanionsData = async (isRefresh = false) => {
     if (response.data && response.data.code === 0) {
       const data = response.data.data
       if (data && data.list) {
-        const newData = data.list.map(item => ({
-          id: item.id,
-          name: item.nickname,
-          gender: item.gender,
-          age: item.age,
-          height: item.height,
-          weight: item.weight,
-          distance: item.distance,
-          tags: item.tags || [],
-          services: (() => {
-            if (typeof item.services === 'string') {
-              try {
-                return JSON.parse(item.services)
-              } catch (e) {
-                console.error('解析services JSON失败:', e)
-                return []
+        // 过滤掉id为15的友伴数据
+        const originalCount = data.list.length
+        const newData = data.list
+          .filter(item => item.id !== 15) // 过滤掉id为15的友伴
+          .map(item => ({
+            id: item.id,
+            name: item.nickname,
+            gender: item.gender,
+            age: item.age,
+            height: item.height,
+            weight: item.weight,
+            distance: item.distance,
+            tags: item.tags || [],
+            services: (() => {
+              if (typeof item.services === 'string') {
+                try {
+                  return JSON.parse(item.services)
+                } catch (e) {
+                  console.error('解析services JSON失败:', e)
+                  return []
+                }
               }
-            }
-            return item.services || []
-          })(), // 安全解析JSON字符串数组
-          avatar: item.avatar ,
-          online: item.is_online === 1,
-          bookable: item.can_accept_orders === 'Y'
-        }))
+              return item.services || []
+            })(), // 安全解析JSON字符串数组
+            avatar: item.avatar ,
+            online: item.is_online === 1,
+            bookable: item.can_accept_orders === 'Y'
+          }))
+        
+        console.log(`友伴数据过滤: 原始${originalCount}条，过滤后${newData.length}条`)
         
         if (isRefresh) {
           partnersList.value = newData
@@ -896,8 +902,7 @@ onUnmounted(() => {
   border-radius: 24rpx;
   margin: 20rpx;
   box-sizing: border-box;
-  box-shadow: 0 4rpx 16rpx rgba(115, 99, 255, 0.08);
-  border: 1rpx solid rgba(115, 99, 255, 0.05);
+
 }
 
 .avatar-wrapper {
