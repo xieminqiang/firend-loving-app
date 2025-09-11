@@ -420,7 +420,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
 import { createCompanionApplication, getServicesByCities, getPersonalityTags, getPopularPersonalityTags } from '@/api/user.js'
 import { getCityList } from '@/api/home.js'
 import { uploadFile, getUploadResult } from '@/api/file.js'
@@ -428,6 +428,9 @@ import { useUserStore } from '@/stores/user.js'
 
 // 用户store
 const userStore = useUserStore()
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
 
 // 下拉刷新状态
 const isRefreshing = ref(false)
@@ -778,8 +781,17 @@ const getFileInfo = (filePath) => {
 // 预览照片
 const previewPhoto = (index) => {
   uni.previewImage({
-    urls: photos.value,
-    current: index
+    urls: photos.value.map(photo => proxy.$imgBaseUrl + photo),
+    current: proxy.$imgBaseUrl + photos.value[index],
+    indicator: 'number',
+    loop: true,
+    show: true,
+    success: function(res) {
+      console.log('图片预览成功', res);
+    },
+    fail: function(err) {
+      console.error('图片预览失败', err);
+    }
   })
 }
 

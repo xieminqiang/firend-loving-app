@@ -54,6 +54,11 @@
           <text class="function-text">我的订单</text>
           <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
         </view>
+        <view class="function-item" @click="handleFunctionClick('publish')">
+          <image src="@/static/icons/partner/me_dt.png" class="function-icon-img" mode="aspectFit" />
+          <text class="function-text">我的发布</text>
+          <image src="@/static/icons/common/arrow-right.png" class="setting-arrow" mode="aspectFit" />
+        </view>
         <view class="function-item" @click="handleFunctionClick('level')">
           <image src="@/static/icons/profile/dengji.png" class="function-icon-img" mode="aspectFit" />
           <text class="function-text">友伴等级说明</text>
@@ -170,6 +175,11 @@ const handleFunctionClick = (functionName) => {
         url: `/subPackages/partner/order/index?companion_id=${props.applicationInfo?.id || ''}`
       })
       break
+    case 'publish':
+      uni.navigateTo({
+        url: `/subPackages/partner/components/dyn?companion_id=${props.applicationInfo?.id || ''}`
+      })
+      break
     case 'level':
       uni.navigateTo({
         url: '/subPackages/partner/level/index'
@@ -198,7 +208,7 @@ const handleVideoUploadSuccess = (data) => {
 // 跳转到发动态页面
 const toRelease = async () => {
   uni.navigateTo({
-    url: '/subPackages/release/index'
+    url: '/subPackages/dt/index'
   })
 }
 

@@ -109,8 +109,8 @@
 	const getUserLocation = () => {
 		return new Promise((resolve) => {
 			locationLoading.value = true
-			uni.getLocation({
-				type: 'gcj02',
+			uni.getLocation({ 
+				 type: 'wgs84',
 				success: (res) => {
 					console.log('获取位置成功:', res)
 					userLocation.value = {

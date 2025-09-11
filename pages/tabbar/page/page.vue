@@ -173,9 +173,9 @@ defineExpose({
 
 <style lang="scss" scoped>
 .home-container {
-	min-height: 100vh;
-	background: #f8f8f8;
-	padding-bottom: 120rpx; // 为底部tabbar留出空间
+height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 
 // 为不同tab内容添加不同的样式

@@ -1,1 +1,1 @@
-<view class="index-page data-v-1cf27b2a"></view>
+<view class="index-page data-v-1cf27b2a"><view class="logo-container data-v-1cf27b2a"><image src="{{a}}" class="logo data-v-1cf27b2a" mode="aspectFill"></image><text class="logo-text data-v-1cf27b2a">随伴行</text></view></view>

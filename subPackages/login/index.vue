@@ -32,7 +32,7 @@
       <!-- Logo和标题区域 -->
       <view class="header-section">
         <view class="logo-container">
-          <image :src="$imgBaseUrl +'/img/20250812/fa380b9964f9fabea946752d163ad1a1/c2bde904-004a-414d-84eb-a95da538b9f7.png'" class="logo" mode="aspectFill"></image>
+          <image :src="$imgBaseUrl +'/img/cum/logo_small.jpeg'" class="logo" mode="aspectFill"></image>
           <view class="logo-glow"></view>
         </view>
         <view class="title-container">

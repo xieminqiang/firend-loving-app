@@ -2012,7 +2012,7 @@ const handleScheduleDataUpdated = async (data) => {
 
 .empty-text {
   font-size: 28rpx;
-  color: #1A1A1A;
+  color: #666666;
   font-weight: 500;
   display: block;
   margin-bottom: 8rpx;

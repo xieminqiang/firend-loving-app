@@ -21,18 +21,18 @@
       ]
     },
     {
+      "root": "subPackages/dt",
+      "pages": [
+        "index",
+        "video-show"
+      ]
+    },
+    {
       "root": "subPackages/settings",
       "pages": [
         "pages/index/index",
         "pages/index/edit",
         "pages/about/index"
-      ]
-    },
-    {
-      "root": "subPackages/release",
-      "pages": [
-        "index",
-        "video-show"
       ]
     },
     {
@@ -50,7 +50,8 @@
         "order/index",
         "order/partner-evaluate",
         "components/DataSelect",
-        "order/detail"
+        "order/detail",
+        "components/dyn"
       ]
     },
     {

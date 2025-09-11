@@ -1,2 +1,2 @@
 "use strict";const e=require("../../common/vendor.js"),s=require("../../common/assets.js"),l={__name:"video-show",setup(u){const n=e.ref(""),t=e.ref(e.getCurrentInstance().proxy);e.onLoad(()=>{t.value.getOpenerEventChannel().on("videoUrl",function(o){n.value=o.data})});const c=()=>{n.value="",e.index.navigateBack({delta:1})};return(a,o)=>e.e({a:n.value},n.value?{b:n.value,c:e.o((...r)=>a.fullscreenchange&&a.fullscreenchange(...r)),d:s._imports_8,e:e.o(c)}:{})}};wx.createPage(l);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/subPackages/release/video-show.js.map
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/subPackages/dt/video-show.js.map

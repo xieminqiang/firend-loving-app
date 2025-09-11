@@ -155,7 +155,7 @@ export function getAddressFromLocation(latitude, longitude, forceRefresh = false
 export function getCurrentLocationAddress(forceRefresh = false) {
   return new Promise((resolve, reject) => {
     uni.getLocation({
-      type: 'gcj02',
+      type: 'wgs84',
       success: (res) => {
         console.log('获取位置成功:', res)
         const { latitude, longitude } = res

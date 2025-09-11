@@ -40,7 +40,7 @@ export const useCityStore = defineStore('city', () => {
   const getUserLocation = () => {
     return new Promise((resolve, reject) => {
       uni.getLocation({
-        type: 'gcj02',
+        type: 'wgs84',
         success: (res) => {
           console.log('获取位置成功:', res)
           userLocation.value = {

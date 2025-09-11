@@ -494,8 +494,8 @@ const viewBillingRules = () => {
 // 请求订阅消息权限
 const requestSubscribeMessage = async () => {
   const tmplIds = [
-    'vrMAJmeAOA0j3yRGX6AjNEJxqaJ2mvERTFlV89fK3GA',
-    'zovIGlvjM10gOUEZjOB-lOQwISsM0PLqfMtIJPbWf4Y'
+    'zovIGlvjM10gOUEZjOB-lOQwISsM0PLqfMtIJPbWf4Y',
+    'vrMAJmeAOA0j3yRGX6AjNEJxqaJ2mvERTFlV89fK3GA'
   ]
   
   try {

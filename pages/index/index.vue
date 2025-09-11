@@ -1,6 +1,9 @@
 <template>
 	<view class="index-page">
-	
+		<view class="logo-container">
+			<image :src="$imgBaseUrl +'/img/cum/logo_small_01.jpeg'" class="logo" mode="aspectFill"></image>
+			<text class="logo-text">随伴行</text>
+		</view>
 	</view>
 </template>
 
@@ -66,15 +69,16 @@ onShow(() => {
 	
 	const currentVersion = accountInfo.miniProgram.envVersion 
 		console.log('当前小程序版本号:', currentVersion)
-	 if (currentVersion == "release" || currentVersion == "develop") {
-		 callFirstSwitch()
-	 } else { 
-		  userStore.setSwitch(2) 
-		 uni.reLaunch({
-		 	url: '/pages/tabbar/page/page'
-		 })
+		callFirstSwitch()
+	 // if (currentVersion == "release" || currentVersion == "develop") {
+		//  callFirstSwitch()
+	 // } else { 
+		//   userStore.setSwitch(2) 
+		//  uni.reLaunch({
+		//  	url: '/pages/tabbar/page/page'
+		//  })
 		
-	 }
+	 // }
 })
 // 页面加载时调用
 onMounted(() => {  
@@ -101,6 +105,49 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .index-page {
+	position: relative;
+	width: 100%;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
 
+	
+	&::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-image: url('https://sbx-server.oss-cn-shenzhen.aliyuncs.com/img/cum/home_bg.png');
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+		z-index: -1;
+	} 
+	.logo-container {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		margin-top: -200rpx;
+	}
+	.logo {
+		width: 140rpx;
+		height: 140rpx;
+		border-radius: 20rpx;
+		margin-bottom: 20rpx;
+	}
+	.logo-text {
+	
+		font-size: 32rpx;
+		font-weight: bold;
+		text-align: center;
+		color: transparent;
+		background-clip: text;
+		background-image: linear-gradient(180deg, rgba(115, 99, 255, 1) 0%, rgba(255, 105, 222, 1) 100%);
+	}
 }
 </style>

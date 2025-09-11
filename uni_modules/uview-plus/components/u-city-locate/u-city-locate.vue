@@ -111,7 +111,7 @@
 			// 定位操作
 			location(){
 				let That = this;
-				uni.getLocation({
+				uni.getLocation({ 
 				    type: this.locationType,
 					geocode:true,
 				    success(res){

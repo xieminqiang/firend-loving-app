@@ -17,10 +17,9 @@
       <scroll-view 
       class="scroll-container" 
       scroll-y="true" 
-      refresher-enabled="true"
-      refresher-triggered="refreshing"
-      @refresherrefresh="onRefresh"
-      @refresherrestore="onRefreshRestore"
+   
+  
+  
     >
 
 
@@ -308,10 +307,9 @@ defineExpose({
 
 
 .page{
-  background: $bg-color-secondary;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 .main-content {
 		flex: 1;

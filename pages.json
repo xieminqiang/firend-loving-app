@@ -66,7 +66,25 @@
 					}
 				}
 			]
-		},
+		}, 
+		{
+			"root": "subPackages/dt",
+			"pages": [
+				{
+					"path": "index",
+					"style": {
+						"navigationStyle": "custom"
+					}
+				} ,
+				{
+					"path": "video-show",
+					"style": {
+							"navigationStyle": "custom"
+					}
+				}
+				
+			]
+		}, 
 		{
 			"root": "subPackages/settings",
 			"pages": [
@@ -90,24 +108,7 @@
 				}
 			]
 		},
-		{
-			"root": "subPackages/dt",
-			"pages": [
-				{
-					"path": "index",
-					"style": {
-							"navigationStyle": "custom"
-					}
-				} ,
-				{
-					"path": "video-show",
-					"style": {
-							"navigationStyle": "custom"
-					}
-				}
-				
-			]
-		}, 
+
 		{
 			"root": "subPackages/record",
 			"pages": [
@@ -163,6 +164,13 @@
 					"path": "order/detail",
 					"style": {
 						"navigationBarTitleText": "订单详情"
+					}
+				},
+				
+				{
+					"path": "components/dyn",
+					"style": {
+						"navigationBarTitleText": "我的发布"
 					}
 				}
 			]

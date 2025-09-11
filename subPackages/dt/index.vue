@@ -1,5 +1,5 @@
 <template>
-	<view class="release">
+	<view class="release" v-if="userStore.switch == 1">
 		<view class="release-nav">
 			<view @tap="toBack">
 				<u-icon color="#000" size="24" name="close"></u-icon>
@@ -152,7 +152,9 @@
 		uploadFile,
 		getUploadResult
 	} from '@/api/file.js'
-	
+	import { useUserStore } from '@/stores/user.js'
+	// 用户状态管理
+	const userStore = useUserStore()
 	// 获取当前实例以访问全局属性
 	const { proxy } = getCurrentInstance()
 	
@@ -974,11 +976,10 @@
 		left: 0;
 		right: 0;
 		background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 248, 250, 0.95) 100%);
-		backdrop-filter: blur(20rpx);
-		-webkit-backdrop-filter: blur(20rpx);
-		padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+	
+		padding: 20rpx 20rpx calc(20rpx + env(safe-area-inset-bottom));
 		border-top: 1rpx solid rgba(115, 99, 255, 0.1);
-		box-shadow: 0 -4rpx 20rpx rgba(115, 99, 255, 0.1);
+	
 		z-index: 100;
 	}
 
@@ -990,22 +991,22 @@
 
 	.bottom-submit-btn {
 		width: 100%;
-		max-width: 600rpx;
+		max-width: 660rpx;
 		background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
 		border-radius: 24rpx;
 		padding: 20rpx 32rpx;
 		transition: all 0.3s ease;
-		box-shadow: 0 4rpx 12rpx rgba(115, 99, 255, 0.3);
+		
 		
 		&:active:not(.disabled) {
 			transform: scale(0.95);
-			box-shadow: 0 2rpx 8rpx rgba(115, 99, 255, 0.4);
+		
 		}
 		
 		&.disabled {
 			opacity: 0.6;
 			transform: none !important;
-			box-shadow: 0 2rpx 8rpx rgba(115, 99, 255, 0.2);
+		
 		}
 	}
 
