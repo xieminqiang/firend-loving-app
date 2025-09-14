@@ -475,7 +475,7 @@ const goToSubmit = (item) => {
 
 // 导航到详情页
 const navigateToDetail = (partnerId) => {
-  let url = '/subPackages/friend/detail?id=' + partnerId + '&city_code=' + cityStore.currentCityCode
+  let url = '/subPackages/py/detail?id=' + partnerId + '&city_code=' + cityStore.currentCityCode
   
   // 添加经纬度参数
   if (latitude.value && longitude.value) {

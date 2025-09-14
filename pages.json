@@ -32,7 +32,7 @@
 				{
 					"path": "index",
 					"style": {
-						"navigationStyle": "custom"
+							"navigationBarTitleText": "登录"
 					}
 				},
 				{
@@ -121,7 +121,7 @@
 			]
 		},
 		{
-			"root": "subPackages/partner",
+			"root": "subPackages/fpart",
 			"pages": [
 				{
 					"path": "index",
@@ -176,7 +176,7 @@
 			]
 		},
 		{
-			"root": "subPackages/friend",
+			"root": "subPackages/py",
 			"pages": [
 				{
 					"path": "apply/index",
@@ -267,7 +267,14 @@
 					"style": {
 						"navigationBarTitleText": "评价"
 					}
-				}, 
+				},  
+				{
+					"path": "refund",
+					"style": {
+						"navigationBarTitleText": "退款售后"
+					}
+				},  
+				
 				{
 					"path": "evaluate-detail",
 					"style": {

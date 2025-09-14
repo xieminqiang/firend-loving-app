@@ -1,43 +1,17 @@
 <template>
   <view class="container">
-    <!-- 状态栏占位 -->
-    <view class="status-bar"></view>
-    
-    <!-- 导航栏 -->
-    <view class="nav-bar">
-      <view class="nav-back" @click="handleBack">
-        <image src="@/static/icons/back-simple.png" class="back-icon" mode="aspectFit"></image>
-      </view>
-   
-      <view class="nav-placeholder"></view>
-    </view>
-
     <!-- 主要内容区域 -->
     <view class="content">
-      <!-- 装饰性元素 -->
-      <view class="decoration-elements">
-        <view class="floating-circle circle-1"></view>
-        <view class="floating-circle circle-2"></view>
-        <view class="floating-circle circle-3"></view>
-        <view class="floating-circle circle-4"></view>
-        <view class="floating-circle circle-5"></view>
-        <view class="floating-dots">
-          <view class="dot dot-1"></view>
-          <view class="dot dot-2"></view>
-          <view class="dot dot-3"></view>
-          <view class="dot dot-4"></view>
-        </view>
-      </view>
       
       <!-- Logo和标题区域 -->
       <view class="header-section">
         <view class="logo-container">
-          <image :src="$imgBaseUrl +'/img/cum/logo_small.jpeg'" class="logo" mode="aspectFill"></image>
-          <view class="logo-glow"></view>
+          <image :src="$imgBaseUrl +'/img/cum/logo_small_01.jpeg'" class="logo" mode="aspectFill"></image>
+         
         </view>
         <view class="title-container">
           <view class="main-title">欢迎来到随伴行</view>
-         <!-- <view class="subtitle">兴趣陪伴 · 情绪连接 · 温暖相遇</view> -->
+       
         </view>
       </view>
 
@@ -100,18 +74,14 @@ onLoad(async () => {
   }, 500)
 })
 
-// 返回按钮处理
-const handleBack = () => {
-  uni.navigateBack({
-    delta: 1
-  })
-}
 
 // 取消协议
 const handleCancel = () => {
   popup.value.close()
   setTimeout(() => {
-    handleBack()
+    uni.navigateBack({
+      delta: 1
+    })
   }, 300)
 }
 
@@ -239,63 +209,26 @@ const getPhoneNumber = async (e) => {
 // 通用布局样式
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
+  background: #FFFFFF;
   position: relative;
   overflow: hidden;
 }
 
-.status-bar {
-  height: var(--status-bar-height);
-}
-
-.nav-bar {
-  display: flex;
-  align-items: center;
-  height: 88rpx;
-  padding: 0 32rpx;
-  position: relative;
-  z-index: 100;
-}
-
-.nav-back {
-  width: 64rpx;
-  height: 64rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-
-  margin-top: 10px;
-}
-
-.back-icon {
-  width: 36rpx;
-  height: 36rpx;
-  filter: brightness(0) saturate(100%) invert(100%);
-}
-
-.nav-placeholder {
-  flex: 1;
-}
 
 .content {
   flex: 1;
   display: flex;
   flex-direction: column;
-
   align-items: center;
-  padding: 0 40rpx;
+  padding: 120rpx 40rpx 60rpx;
   position: relative;
-  min-height: calc(100vh - 140rpx);
-  margin-top: 80rpx;
-  padding-bottom: 60rpx;
+  min-height: 100vh;
 }
 
 .header-section {
   text-align: center;
   margin-bottom: 100rpx;
-  color: white;
+  color: #333;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -305,48 +238,29 @@ const getPhoneNumber = async (e) => {
 
 .logo-container {
   position: relative;
-  margin-bottom: 48rpx;
+
 }
 
 .logo {
   width: 140rpx;
   height: 140rpx;
-  border-radius: 50%;
-  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.2);
+
+
 }
 
-.logo-glow {
-  position: absolute;
-  top: -24rpx;
-  left: -24rpx;
-  right: -24rpx;
-  bottom: -24rpx;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: pulse 3s ease-in-out infinite;
-}
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.5;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.9;
-    transform: scale(1.08);
-  }
-}
+
 
 .title-container {
   text-align: center;
 }
 
 .main-title {
-  font-size: 52rpx;
+  font-size: 40rpx;
   font-weight: 700;
   margin-bottom: 20rpx;
-  text-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.3);
-  color: white;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  color: #1A1A1A;
   letter-spacing: 2rpx;
 }
 
@@ -355,176 +269,10 @@ const getPhoneNumber = async (e) => {
   opacity: 0.9;
   line-height: 1.6;
   max-width: 500rpx;
-  color: white;
+  color: #666;
   font-weight: 400;
 }
 
-.decoration-elements {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-  overflow: hidden;
-}
-
-.floating-circle {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8rpx);
-  -webkit-backdrop-filter: blur(8rpx);
-  border: 1rpx solid rgba(255, 255, 255, 0.1);
-}
-
-.circle-1 {
-  width: 160rpx;
-  height: 160rpx;
-  top: 8%;
-  right: -40rpx;
-  animation: float-1 8s ease-in-out infinite;
-}
-
-.circle-2 {
-  width: 120rpx;
-  height: 120rpx;
-  top: 25%;
-  left: -30rpx;
-  animation: float-2 6s ease-in-out infinite;
-}
-
-.circle-3 {
-  width: 200rpx;
-  height: 200rpx;
-  bottom: 30%;
-  right: -60rpx;
-  animation: float-3 10s ease-in-out infinite;
-}
-
-.circle-4 {
-  width: 80rpx;
-  height: 80rpx;
-  top: 50%;
-  left: 15%;
-  animation: float-4 7s ease-in-out infinite;
-}
-
-.circle-5 {
-  width: 100rpx;
-  height: 100rpx;
-  bottom: 15%;
-  left: -20rpx;
-  animation: float-5 9s ease-in-out infinite;
-}
-
-.floating-dots {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-}
-
-.dot {
-  position: absolute;
-  width: 8rpx;
-  height: 8rpx;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 50%;
-  animation: twinkle 3s ease-in-out infinite;
-}
-
-.dot-1 {
-  top: 15%;
-  left: 20%;
-  animation-delay: 0s;
-}
-
-.dot-2 {
-  top: 35%;
-  right: 25%;
-  animation-delay: 1s;
-}
-
-.dot-3 {
-  bottom: 25%;
-  left: 30%;
-  animation-delay: 2s;
-}
-
-.dot-4 {
-  bottom: 40%;
-  right: 15%;
-  animation-delay: 1.5s;
-}
-
-@keyframes float-1 {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-    opacity: 0.4;
-  }
-  50% {
-    transform: translateY(-30rpx) translateX(20rpx) rotate(180deg);
-    opacity: 0.8;
-  }
-}
-
-@keyframes float-2 {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-    opacity: 0.3;
-  }
-  50% {
-    transform: translateY(25rpx) translateX(-15rpx) rotate(-180deg);
-    opacity: 0.7;
-  }
-}
-
-@keyframes float-3 {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-    opacity: 0.2;
-  }
-  50% {
-    transform: translateY(-20rpx) translateX(-25rpx) rotate(120deg);
-    opacity: 0.6;
-  }
-}
-
-@keyframes float-4 {
-  0%, 100% {
-    transform: translateY(0) translateX(0) scale(1);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translateY(-40rpx) translateX(30rpx) scale(1.2);
-    opacity: 0.9;
-  }
-}
-
-@keyframes float-5 {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-    opacity: 0.3;
-  }
-  50% {
-    transform: translateY(35rpx) translateX(20rpx) rotate(-120deg);
-    opacity: 0.7;
-  }
-}
-
-@keyframes twinkle {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.5);
-  }
-}
 
 .login-section {
   width: 100%;
@@ -537,7 +285,7 @@ const getPhoneNumber = async (e) => {
 .login-button {
   width: 100%;
   height: 100rpx;
-  background: rgba(255, 255, 255, 0.25);
+  background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
   color: #FFFFFF;
   border-radius: 28rpx;
   font-size: 34rpx;
@@ -545,9 +293,8 @@ const getPhoneNumber = async (e) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(20rpx);
-  border: 2rpx solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.15);
+  border: none;
+  box-shadow: 0 12rpx 40rpx rgba(115, 99, 255, 0.3);
   transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -555,8 +302,8 @@ const getPhoneNumber = async (e) => {
 
 .login-button:active {
   transform: scale(0.98) translateY(2rpx);
-  background: rgba(255, 255, 255, 0.35);
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #5a52e6 0%, #e55ac7 100%);
+  box-shadow: 0 8rpx 24rpx rgba(115, 99, 255, 0.4);
 }
 
 .login-button::before {

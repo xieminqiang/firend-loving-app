@@ -11,9 +11,16 @@
 				@fullscreenchange="fullscreenchange"
 				></video>
 			
-			<!-- 关闭按钮 -->
-			<view class="close-btn" @click="closeVideo">
-				<image src="/static/find/close2.png" mode="widthFix" class="close-icon"></image>
+			<!-- 关闭按钮和提示文本容器 -->
+			<view class="close-container" @click="closeVideo">
+				<view class="close-btn" >
+					<image src="/static/find/close2.png" mode="widthFix" class="close-icon"></image>
+				</view>
+				
+				<!-- 左滑关闭提示文本 -->
+				<view class="swipe-hint">
+					<text class="swipe-text">左滑关闭</text>
+				</view>
 			</view>
 		</template>
 	</view>
@@ -77,18 +84,25 @@
 			height: 100%;
 		}
 
-		.close-btn {
+		.close-container {
 			position: fixed;
 			top: 40rpx;
-			left: 10rpx;
-			width: 100rpx;
+			left: 0px;
+		
+			display: flex;
+			align-items: center;
+			
+			z-index: 99999;
+		}
+
+		.close-btn {
+			width: 80rpx;
 			height: 100rpx;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			background: rgba(0, 0, 0, 0.6);
 			border-radius: 50%;
-			z-index: 99999;
 			pointer-events: auto;
 			backdrop-filter: blur(10px);
 			-webkit-backdrop-filter: blur(10px);
@@ -97,6 +111,19 @@
 				width: 40rpx;
 				height: 40rpx;
 				filter: brightness(0) invert(1);
+			}
+		}
+
+		.swipe-hint {
+			pointer-events: none;
+
+			.swipe-text {
+				color: rgba(255, 255, 255, 0.8);
+				font-size: 28rpx;
+				background: rgba(0, 0, 0, 0.6);
+			
+				backdrop-filter: blur(10px);
+				-webkit-backdrop-filter: blur(10px);
 			}
 		}
 	}

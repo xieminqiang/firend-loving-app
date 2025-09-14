@@ -413,12 +413,12 @@ const navigateToPartnerRegistration = () => {
   if (applicationInfo.value && applicationInfo.value.status === 'approved') {
     // 已通过，跳转到友伴端
     uni.navigateTo({
-      url: '/subPackages/partner/index'
+      url: '/subPackages/fpart/index'
     })
   } else {
     // 其他状态，跳转到友伴入驻申请页面
     uni.navigateTo({
-      url: '/subPackages/friend/apply/index'
+      url: '/subPackages/py/apply/index'
     })
   }
 }

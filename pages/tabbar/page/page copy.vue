@@ -215,7 +215,7 @@ const loadCityServicesData = async () => {
 const goToDetail = (item) => {  
 	console.log('跳转到服务详情页面，服务信息:', item)
 	uni.navigateTo({
-		url: `/subPackages/friend/fr_detail?service_id=${item.service_id}&price_template_id=${item.price_template_id || ''}&companion_id=${user.value.application_id || 15}&level_order=${user.value.level_order || ''}&nickname=${user.value.nickname || ''}&service_name=${encodeURIComponent(item.service_name)}&service_image_url=${encodeURIComponent(item.service_image_url)}&price=${item.price || 0}&unit=${item.unit || '小时'}&service_tags=${encodeURIComponent(JSON.stringify(item.service_tags || []))}`
+		url: `/subPackages/py/fr_detail?service_id=${item.service_id}&price_template_id=${item.price_template_id || ''}&companion_id=${user.value.application_id || 15}&level_order=${user.value.level_order || ''}&nickname=${user.value.nickname || ''}&service_name=${encodeURIComponent(item.service_name)}&service_image_url=${encodeURIComponent(item.service_image_url)}&price=${item.price || 0}&unit=${item.unit || '小时'}&service_tags=${encodeURIComponent(JSON.stringify(item.service_tags || []))}`
 	})
 }
 

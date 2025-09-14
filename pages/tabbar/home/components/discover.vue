@@ -1,36 +1,47 @@
 <template>
 	<view class="square" >
-		<square-nav></square-nav>
+		<!-- 未登录状态显示 -->
+		<view v-if="!isLoggedIn" class="login-required">
+			<image class="empty-icon" src="@/static/images/empty.png" mode="aspectFit"></image>
+			<text class="login-title">需要登录后才能使用，是否现在登录？</text>
+		
+			<button class="login-btn" @tap="navigateToLogin">立即登录</button>
+		</view>
 
-		<!-- 动态列表内容 -->
-		<scroll-view :scroll-top="scrollTop" scroll-y="true" class="scroll-Y" 
-			:refresher-triggered="triggered" :refresher-enabled="true" :scroll-with-animation="true" :show-scrollbar="true"
-			 :enable-back-to-top="true" @scroll="handleScroll" @scrolltolower="lower"
-			@refresherrefresh="onRefresh" @refresherrestore="onRestore"
-			>
-			<view class="scroll-Y-item">
-				<u-list height="100%">
-					<u-list-item v-for="(item, index) in momentsList" :key="index">
-						<square-item 
-							:item="item" 
-							:listType="listTypeDesc" 
-							:userLocation="userLocation"
-							:cityStore="cityStore"
-							@changeShowVip="handleSayHello" 
-							@playVideo="handlePlayVideo">
-						</square-item>
-					</u-list-item>  
-					<view style="height: 200rpx;"></view>
-				</u-list>
+		<!-- 已登录状态显示 -->
+		<view v-else class="logged-in-container">
+			<square-nav></square-nav>
+
+			<!-- 动态列表内容 -->
+			<scroll-view :scroll-top="scrollTop" scroll-y="true" class="scroll-Y" 
+				:refresher-triggered="triggered" :refresher-enabled="true" :scroll-with-animation="true" :show-scrollbar="true"
+				 :enable-back-to-top="true" @scroll="handleScroll" @scrolltolower="lower"
+				@refresherrefresh="onRefresh" @refresherrestore="onRestore"
+				>
+				<view class="scroll-Y-item">
+					<u-list height="100%">
+						<u-list-item v-for="(item, index) in momentsList" :key="index">
+							<square-item 
+								:item="item" 
+								:listType="listTypeDesc" 
+								:userLocation="userLocation"
+								:cityStore="cityStore"
+								@changeShowVip="handleSayHello" 
+								@playVideo="handlePlayVideo">
+							</square-item>
+						</u-list-item>  
+						<view style="height: 100rpx;"></view>
+					</u-list>
+				</view>
+			</scroll-view>
+
+			<!-- 回到顶部 -->
+			<view class="example" v-show="oldScrollTop > 1000" @tap="goTop">
+				<uni-transition ref="ani" custom-class="transition" mode-class="slide-right" class="goTopBox"
+					:show="oldScrollTop > 1000">
+					<image class="go-top-icon" src="@/static/square/go-top.png" mode=""></image>
+				</uni-transition>
 			</view>
-		</scroll-view>
-
-		<!-- 回到顶部 -->
-		<view class="example" v-show="oldScrollTop > 1000" @tap="goTop">
-			<uni-transition ref="ani" custom-class="transition" mode-class="slide-right" class="goTopBox"
-				:show="oldScrollTop > 1000">
-				<image class="go-top-icon" src="@/static/square/go-top.png" mode=""></image>
-			</uni-transition>
 		</view>
 	</view>
 </template>
@@ -39,7 +50,8 @@
 	import {
 		ref,
 		computed,
-		onMounted,
+		onMounted, 
+		onUnmounted,
 		nextTick,
 		watch
 	} from 'vue'
@@ -270,21 +282,7 @@
 	
 	// 检查登录状态并处理
 	const checkLoginStatus = () => {
-		if (!isLoggedIn.value) {
-			uni.showModal({
-				title: '提示',
-				content: '请先登录后再查看动态',
-				confirmText: '去登录',
-				cancelText: '取消',
-				success: (res) => {
-					if (res.confirm) {
-						navigateToLogin()
-					}
-				}
-			})
-			return false
-		}
-		return true
+		return isLoggedIn.value
 	}
 
 	// 滚动处理
@@ -314,7 +312,7 @@
 		if (_freshing.value) return;
 		
 		// 检查登录状态
-		if (!checkLoginStatus()) {
+		if (!isLoggedIn.value) {
 			triggered.value = false;
 			return;
 		}
@@ -337,7 +335,7 @@
 		console.log('discover组件初始化数据')
 		
 		// 检查登录状态
-		if (!checkLoginStatus()) {
+		if (!isLoggedIn.value) {
 			return
 		}
 		
@@ -363,10 +361,25 @@
 		})
 	}
 
+	// 监听登录成功事件
+	const handleLoginSuccess = async (data) => {
+		console.log('discover组件收到登录成功事件:', data)
+		// 登录成功后刷新数据
+		await initData()
+	}
+
 	// 组件挂载时初始化数据
 	onMounted(async() => {
 		console.log('discover组件挂载完成')
 		await initData()
+		
+		// 监听登录成功事件
+		uni.$on('loginSuccess', handleLoginSuccess)
+	})
+
+	// 组件卸载时移除事件监听
+	onUnmounted(() => {
+		uni.$off('loginSuccess', handleLoginSuccess)
 	})
 
 	// 监听组件是否可见，用于处理tab切换时的数据刷新
@@ -397,7 +410,7 @@
 		console.log('Tab切换:', item)
 		
 		// 检查登录状态
-		if (!checkLoginStatus()) {
+		if (!isLoggedIn.value) {
 			return
 		}
 		
@@ -520,12 +533,65 @@
 		overflow: hidden;
 	}
 
+	/* 已登录状态容器 */
+	.logged-in-container {
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+	}
+
 	.scroll-Y {
-		height: 100%;
-		overflow: hidden;
+		flex: 1;
+		height: 0; /* 配合flex: 1使用，确保正确计算高度 */
 	}
 
 	.scroll-Y-item {
 		padding-bottom: 100rpx;
+	}
+
+	/* 未登录状态样式 */
+	.login-required {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		height: 85vh;
+		
+		box-sizing: border-box;
+	}
+
+	.empty-icon {
+		width: 200rpx;
+		height: 200rpx;
+		margin-bottom: 40rpx;
+	}
+
+	.login-title {
+		font-size: 24rpx;
+		  font-weight: 400;
+		  color:#1A1A1A;
+	}
+
+
+
+	.login-btn {
+		width: 300rpx;
+		height: 80rpx;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: #ffffff;
+		font-size: 28rpx;
+		font-weight: 600;
+		border: none;
+		border-radius: 40rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 8rpx 20rpx rgba(102, 126, 234, 0.3);
+		margin-top:80rpx ;
+	}
+
+	.login-btn:active {
+		transform: scale(0.98);
+		box-shadow: 0 4rpx 10rpx rgba(102, 126, 234, 0.3);
 	}
 </style>

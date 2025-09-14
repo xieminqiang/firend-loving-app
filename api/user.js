@@ -330,3 +330,19 @@ export const getCompanionWxOpenId = (params) => {
     data: params
   })
 }
+
+/**
+ * 更新友伴师位置信息
+ * @param {Object} data - 位置信息数据
+ * @param {number} data.latitude - 纬度
+ * @param {number} data.longitude - 经度
+ * @param {string} data.location_text - 位置描述
+ * @returns {Promise} API响应
+ */
+export function updateCompanionLocation(data) {
+  return http({
+    url: '/front/companion/location',
+    method: 'POST',
+    data
+  })
+}

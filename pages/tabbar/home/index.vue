@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick} from 'vue'
+import { ref, reactive, onMounted, onUnmounted, nextTick} from 'vue'
 import hmTabbar from '@/components/hm-tabbar/hm-tabbar.vue'
 import HomeComponent from './components/home.vue'
 import FriendsComponent from './components/friends.vue'
@@ -75,10 +75,28 @@ const handleTabChange = async (tabName) => {
 }
 
 
+// 监听登录成功事件
+const handleLoginSuccess = async (data) => {
+	console.log('home页面收到登录成功事件:', data)
+	// 如果当前在discover tab，刷新discover组件数据
+	if (currentTab.value === 'discover' && discoverComponentRef.value) {
+		await nextTick()
+		discoverComponentRef.value.showComponent()
+	}
+}
+
 // 页面挂载时初始化
 onMounted(() => {
 	console.log('页面挂载完成，当前tab:', currentTab.value)
 	console.log('已访问的tab:', Array.from(visitedTabs))
+	
+	// 监听登录成功事件
+	uni.$on('loginSuccess', handleLoginSuccess)
+})
+
+// 页面卸载时移除事件监听
+onUnmounted(() => {
+	uni.$off('loginSuccess', handleLoginSuccess)
 })
 
 // 页面显示时（从其他页面返回时）

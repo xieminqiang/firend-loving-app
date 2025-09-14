@@ -230,7 +230,7 @@ const previewImage = () => {
 const bookService = () => {
   // 跳转到友伴选择页面，传递服务ID
   uni.navigateTo({
-    url: `/subPackages/friend/friend-select?service_id=${serviceDetail.value.id}`
+    url: `/subPackages/py/friend-select?service_id=${serviceDetail.value.id}`
   })
 }
 </script>

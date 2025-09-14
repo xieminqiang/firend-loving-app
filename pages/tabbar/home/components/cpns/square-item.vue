@@ -332,7 +332,7 @@
 
 	// 跳转到详情页面
 	const navigateToDetail = async (partnerId, cityCode, latitude = null, longitude = null) => {
-		let url = '/subPackages/friend/detail?id=' + partnerId + '&city_code=' + cityCode
+		let url = '/subPackages/py/detail?id=' + partnerId + '&city_code=' + cityCode
 		
 		// 添加经纬度参数
 		if (latitude && longitude) {

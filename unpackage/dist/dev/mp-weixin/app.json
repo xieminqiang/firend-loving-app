@@ -42,7 +42,7 @@
       ]
     },
     {
-      "root": "subPackages/partner",
+      "root": "subPackages/fpart",
       "pages": [
         "index",
         "DataEdetion/index",
@@ -55,7 +55,7 @@
       ]
     },
     {
-      "root": "subPackages/friend",
+      "root": "subPackages/py",
       "pages": [
         "apply/index",
         "detail",
@@ -80,6 +80,7 @@
         "index",
         "detail",
         "evaluate",
+        "refund",
         "evaluate-detail",
         "submit"
       ]

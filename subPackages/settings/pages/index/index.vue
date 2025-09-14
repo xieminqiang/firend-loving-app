@@ -256,17 +256,12 @@ const levelStore = useLevelStore()
 	const outLogin = () => {
 		uni.showModal({
 		  title: '提示',
-		  content: '确认退出账号？',
+		  content: '确认退出登录？',
 		  success: async function (res) {
 		    if (!res.confirm) {
 		      return;
 		    }
-		    
-		    // 清除用户信息
-		    userStore.clearUserInfo()
-		    
-		    // 清除等级列表缓存，确保下次登录时获取最新数据
-		    levelStore.clearServiceLevels()
+		   
 		    
 		    // 发送退出登录事件，通知其他页面刷新
 		    uni.$emit('logoutSuccess')
@@ -281,6 +276,11 @@ const levelStore = useLevelStore()
 		      uni.navigateBack({
 		        delta: 1
 		      });
+			   
+		    // 清除用户信息
+		    userStore.clearUserInfo()
+		    // 清除等级列表缓存，确保下次登录时获取最新数据
+		    levelStore.clearServiceLevels()
 		    }, 1000)
 		  },
 		});

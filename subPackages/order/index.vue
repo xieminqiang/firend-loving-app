@@ -130,7 +130,7 @@ import { ref, computed, watch, onUnmounted, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user.js'
 import { useCityStore } from '@/stores/city.js'
-import { getOrderList, cancelOrder, deleteOrder, applyRefund, applyRefundAfterDeparture, startService, orderParams } from '@/api/order.js'
+import { getOrderList, cancelOrder, deleteOrder, applyRefund, applyRefundAfterDeparture, startService, orderParams, getCompanionPhone } from '@/api/order.js'
 
 // 用户状态管理
 const userStore = useUserStore()
@@ -484,6 +484,7 @@ const getOrderActions = (status, order = null) => {
       { text: '删除订单', action: 'delete', type: 'secondary' }
     ],
     9: [ // 退款中
+
       { text: '联系客服', action: 'contact', type: 'primary' }
     ],
     10: [ // 超时取消
@@ -786,21 +787,54 @@ const handlePayOrder = async (order) => {
 }
 
 // 联系友伴师
-const handleContactPartner = (order) => {
+const handleContactPartner = async (order) => {
+  console.log(order)
   if (order.companion_id) {
-    uni.showModal({
-      title: '联系友伴师',
-      content: `是否拨打友伴师的电话？`,
-      confirmText: '拨打',
-      cancelText: '取消',
-      success: (res) => {
-        if (res.confirm) {
-          // 这里应该调用友伴师的电话
-          uni.makePhoneCall({
-            phoneNumber: '13800138000'
-          })
-        }
+    try {
+      // 显示加载提示
+      uni.showLoading({
+        title: '获取电话中...'
+      })
+      
+      // 调用获取友伴师电话API
+      const phoneData = {
+        companion_id: order.companion_id
       }
+      
+      const response = await getCompanionPhone(phoneData)
+      
+      if (response.data.code === 0) {
+        const phoneNumber = response.data.data.phone
+        uni.hideLoading()
+        
+        uni.showModal({
+          title: '联系友伴师',
+          content: `是否拨打友伴师的电话？\n${phoneNumber}`,
+          confirmText: '拨打',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              uni.makePhoneCall({
+                phoneNumber: phoneNumber
+              })
+            }
+          }
+        })
+      } else {
+        throw new Error(response.data.msg || '获取友伴师电话失败')
+      }
+    } catch (error) {
+      console.error('获取友伴师电话失败:', error)
+      uni.hideLoading()
+      uni.showToast({
+        title: error.message || '获取友伴师电话失败',
+        icon: 'none'
+      })
+    }
+  } else {
+    uni.showToast({
+      title: '友伴师信息不存在',
+      icon: 'none'
     })
   }
 }
@@ -861,7 +895,7 @@ const handleExtendOrder = (order) => {
 // 再次预约
 const handleRebookOrder = (order) => {
   if (order.companion_id) {
-    let url = '/subPackages/friend/detail?id=' + order.companion_id + '&city_code=' + cityStore.currentCityCode
+    let url = '/subPackages/py/detail?id=' + order.companion_id + '&city_code=' + cityStore.currentCityCode
     
     uni.navigateTo({
       url: url
@@ -1130,13 +1164,13 @@ const formatTime = (timeStr) => {
 }
 
 .empty-text {
-  font-size: 32rpx;
+  font-size: 28rpx;
   color: #999999;
   margin-bottom: 16rpx;
 }
 
 .empty-desc {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #cccccc;
 }
 

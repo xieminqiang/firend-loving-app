@@ -107,6 +107,12 @@
               </view>
               <text class="order-text">已完成</text>
             </view>
+            <view class="order-item" @click="navigateToRefund">
+              <view class="order-icon">
+                <image src="@/static/icons/profile/tk_order.png" class="order-icon-img" mode="aspectFit" />
+              </view>
+              <text class="order-text">退款售后</text>
+            </view>
           </view>
         </view>
         
@@ -422,18 +428,22 @@ const navigateToPromotion = () => {
     url: '/subPackages/profile/promotion/index'
   })
 }
-
+const navigateToRefund = () => {
+  uni.navigateTo({
+    url: '/subPackages/order/refund'
+  })
+}
 const navigateToPartnerRegistration = () => {
   // 根据申请状态跳转到不同页面
   if (applicationInfo.value && applicationInfo.value.status === 'approved') {
     // 已通过，跳转到友伴端
     uni.navigateTo({
-      url: '/subPackages/partner/index'
+      url: '/subPackages/fpart/index'
     })
   } else {
     // 其他状态，跳转到友伴入驻申请页面
     uni.navigateTo({
-      url: '/subPackages/friend/apply/index'
+      url: '/subPackages/py/apply/index'
     })
   }
 }
@@ -1017,8 +1027,8 @@ const formatPhone = (phone) => {
 /* 订单管理 - 简化设计 */
 .orders-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0 16rpx;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0 12rpx;
 }
 
 .order-item {

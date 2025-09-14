@@ -151,7 +151,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { getOrderDetail, orderParams, cancelOrder, deleteOrder } from '@/api/order.js'
+import { getOrderDetail, orderParams, cancelOrder, deleteOrder, applyRefund, applyRefundAfterDeparture, startService } from '@/api/order.js'
 import { useCityStore } from '@/stores/city.js'
 import { useUserStore } from '@/stores/user.js'
 // 用户状态管理
@@ -370,11 +370,23 @@ const handleOrderAction = (action, order) => {
       handlePayOrder(order)
       break
     case 'contact':
-      // 联系友伴功能已移除
-      uni.showToast({
-        title: '联系功能暂不可用',
-        icon: 'none'
-      })
+       console.log(order.companion)
+      if (order.companion.phone) {
+        uni.showModal({
+          title: '联系友伴师',
+          content: `是否拨打友伴师的电话？`,
+          confirmText: '拨打',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              // 这里应该调用友伴师的电话
+              uni.makePhoneCall({
+                phoneNumber: order.companion.phone
+              })
+            }
+          }
+        })
+      }
       break
     case 'extend':
       handleExtendOrder(order)
@@ -458,18 +470,158 @@ const handleCancelOrder = (order) => {
 
 // 申请退款
 const handleApplyRefund = (order) => {
+  // 根据订单状态选择不同的退款处理方式
+  if (order.status === 3) {
+    handleApplyRefundAfterDeparture(order)
+  } else if (order.status === 4) {
+    handleApplyRefundAfterArrival(order)
+  } else {
+    handleApplyRefundNormal(order)
+  }
+}
+
+// 普通申请退款
+const handleApplyRefundNormal = (order) => {
   uni.showModal({
     title: '申请退款',
     content: '确定要申请退款吗？',
+    confirmText: '继续退款',
+    cancelText: '取消',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          // 显示加载提示
+          uni.showLoading({
+            title: '申请中...'
+          })
+          
+          // 调用申请退款API
+          const refundData = {
+            order_id: order.id,
+            refund_reason: '用户申请退款'
+          }
+          
+          const response = await applyRefund(refundData)
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '退款申请已提交',
+              icon: 'success'
+            })
+            // 刷新订单详情
+            setTimeout(() => {
+              loadOrderDetail()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '申请退款失败')
+          }
+        } catch (error) {
+          console.error('申请退款失败:', error)
+          uni.showToast({
+            title: error.message || '申请退款失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
+      }
+    }
+  })
+}
+
+// 申请退款（出发后）
+const handleApplyRefundAfterDeparture = (order) => {
+  uni.showModal({
+    title: '申请退款',
+    content: '确定要申请退款吗？由于对方已出发，退款时将扣除来回程车费。',
+    confirmText: '继续退款',
+    cancelText: '取消',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          // 显示加载提示
+          uni.showLoading({
+            title: '申请中...'
+          })
+          
+          // 调用申请退款API（出发后）
+          const refundData = {
+            order_id: order.id,
+            refund_reason: '部分退款，扣除来回程车费'
+          }
+          
+          const response = await applyRefundAfterDeparture(refundData)
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '退款申请已提交',
+              icon: 'success'
+            })
+            // 刷新订单详情
+            setTimeout(() => {
+              loadOrderDetail()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '申请退款失败')
+          }
+        } catch (error) {
+          console.error('申请退款失败:', error)
+          uni.showToast({
+            title: error.message || '申请退款失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
+      }
+    }
+  })
+}
+
+// 申请退款（到达后）
+const handleApplyRefundAfterArrival = (order) => {
+  uni.showModal({
+    title: '申请退款',
+    content: '确定要申请退款吗？由于对方已到达，退款时将扣除友伴师来回程车费。',
     confirmText: '申请退款',
     cancelText: '取消',
-    success: (res) => {
+    success: async (res) => {
       if (res.confirm) {
-        // 这里调用申请退款API
-        uni.showToast({
-          title: '退款申请已提交',
-          icon: 'success'
-        })
+        try {
+          // 显示加载提示
+          uni.showLoading({
+            title: '申请中...'
+          })
+          
+          // 调用申请退款API（到达后）
+          const refundData = {
+            order_id: order.id,
+            refund_reason: '部分退款，扣除友伴师来回程车费'
+          }
+          
+          const response = await applyRefundAfterDeparture(refundData)
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '退款申请已提交',
+              icon: 'success'
+            })
+            // 刷新订单详情
+            setTimeout(() => {
+              loadOrderDetail()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '申请退款失败')
+          }
+        } catch (error) {
+          console.error('申请退款失败:', error)
+          uni.showToast({
+            title: error.message || '申请退款失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
       }
     }
   })
@@ -529,20 +681,57 @@ const handlePayOrder = async (order) => {
   }
 }
 
-// 开始服务
+// 开始计时服务
 const handleStartService = (order) => {
   uni.showModal({
     title: '开始服务',
     content: '确认友伴师已到达并开始服务吗？',
     confirmText: '开始服务',
     cancelText: '取消',
-    success: (res) => {
+    success: async (res) => {
       if (res.confirm) {
-        // 这里调用开始服务API
-        uni.showToast({
-          title: '服务已开始',
-          icon: 'success'
-        })
+        try {
+          // 显示加载提示
+          uni.showLoading({
+            title: '处理中...'
+          })
+          
+          // 调用开始计时API
+          const startData = {
+            order_id: order.id
+          }
+          
+          const response = await startService(startData)
+          
+          if (response.data.code === 0) {
+            uni.showToast({
+              title: '服务已开始',
+              icon: 'success'
+            })
+            
+            // 通知订单列表页面更新数据
+            uni.$emit('orderStatusChanged', {
+              type: 'start',
+              orderId: order.id,
+              status: 5 // 进行中状态
+            })
+            
+            // 刷新订单详情
+            setTimeout(() => {
+              loadOrderDetail()
+            }, 1500)
+          } else {
+            throw new Error(response.data.msg || '开始服务失败')
+          }
+        } catch (error) {
+          console.error('开始服务失败:', error)
+          uni.showToast({
+            title: error.message || '开始服务失败',
+            icon: 'none'
+          })
+        } finally {
+          uni.hideLoading()
+        }
       }
     }
   })
@@ -558,7 +747,7 @@ const handleExtendOrder = (order) => {
 // 再次预约
 const handleRebookOrder = (order) => {
   if (order.companion_id) {
-    let url = '/subPackages/friend/detail?id=' + order.companion_id + '&city_code=' + cityStore.currentCityCode
+    let url = '/subPackages/py/detail?id=' + order.companion_id + '&city_code=' + cityStore.currentCityCode
     
     uni.navigateTo({
       url: url

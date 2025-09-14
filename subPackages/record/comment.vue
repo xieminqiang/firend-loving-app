@@ -6,7 +6,7 @@
 				<view class="top-left">
 					<!-- 头像 -->
 					<view class="avatar" @click="toDetail()">
-						<u-avatar :src="$imgBaseUrl + userInfoComment.head_img" size="38" shape="circle"></u-avatar>
+						<u-avatar :src="$imgBaseUrl + userInfoComment.head_img" size="38" shape="circle" mode="aspectFill"></u-avatar>
 					</view>
 					<!-- 介绍 -->
 					<view class="info">
@@ -77,11 +77,11 @@
 							<!-- 一级评论 -->
 							<view class="main" @tap="reply(item)">
 								<view class="left" @tap.stop="toDetailItem(item)">
-									<u-avatar :src="$imgBaseUrl + item.head_img" size="32" shape="circle"></u-avatar>
+									<u-avatar :src="$imgBaseUrl + (momentsInfoComment.user_id === item.user_id ? userInfoComment.head_img : item.head_img)" size="32" shape="circle" mode="aspectFill"></u-avatar>
 								</view>
 								<view class="right">
 									<view class="username">
-										<text>{{item.nick_name}}</text>
+										<text>{{momentsInfoComment.user_id === item.user_id ? userInfoComment.nick_name : item.nick_name}}</text>
 									</view>
 									<view class="comment-content">
 										<text>{{item.content}}</text>
@@ -99,13 +99,13 @@
 							<view class="reply-list" v-for="it in item.comments_list" :key="it.comments_id">
 								<view class="reply-item" @tap="reply(it)">
 									<view class="left" @tap.stop="toDetailItem(it)">
-										<u-avatar :src="$imgBaseUrl + it.head_img" size="22" shape="circle"></u-avatar>
+										<u-avatar :src="$imgBaseUrl + (momentsInfoComment.user_id === it.user_id ? userInfoComment.head_img : it.head_img)" size="22" shape="circle"></u-avatar>
 									</view>
 									<view class="right">
 										<view class="username">
-											<text class="reply-username">{{it.nick_name}}</text>
-											<image src="@/static/square/reply@3x.png" mode=""></image>
-											<text class="main-username">{{it.reply_nick_name}}</text>
+											<text class="reply-username">{{momentsInfoComment.user_id === it.user_id ? userInfoComment.nick_name : it.nick_name}}</text>
+											<image src="@/static/square/reply@3x.png" mode="aspectFill"></image>
+											<text class="main-username">{{momentsInfoComment.user_id === it.reply_user_id ? userInfoComment.nick_name : it.reply_nick_name}}</text>
 										</view>
 										<view class="comment-content">
 											<text>{{it.content}}</text>
@@ -130,7 +130,7 @@
 				</view>
 			</scroll-view>
 			<view @touchmove.prevent class="chatting" @tap="handleShowOneReply">
-				<u-input :placeholder="replyCommentsName" border="surround" v-model="rplContent" @focus="handleFocus"
+				<u-input :placeholder="replyCommentsName" border="surround" :value="rplContent" @focus="handleFocus"
 					@blur="handleBlur" fontSize='24rpx' color='#1a1a1a' shape='circle' :adjustPosition="true" disabled
 					:customStyle="{
 							paddingLeft:'24rpx',
@@ -141,18 +141,60 @@
 		</view>
 	</view>
 
-	<!-- 一级评论回复 -->
-	<u-popup :show="showOneReply" round="10" @close="showOneReply = false">
-		<view @touchmove.prevent class="chatting">
-			<u-input :focus="showOneReply" :placeholder="replyCommentsName" border="surround" v-model="rplContent"
-				@focus="handleFocus" @blur="handleBlur" fontSize='24rpx' color='#1a1a1a' shape='circle'
-				:adjustPosition="true" :customStyle="{
-					paddingLeft:'24rpx',
-					background:'#F2F2F2'
-				}">
-			</u-input>
-			<view v-show="rplContent" class="send-btn-show" @tap="handleReleaseComment">
-				<text>发送</text>
+	<!-- 评论回复弹框 -->
+	<u-popup 
+		:show="showOneReply" 
+		round="10" 
+		@close="handleClosePopup"
+		:closeOnClickOverlay="true"
+		:closeOnClickModal="true"
+		:zIndex="999"
+		:overlay="true"
+		:overlayStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }"
+		:duration="300"
+		:mode="'bottom'"
+		:safeAreaInsetBottom="true"
+		:customStyle="{
+			transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+			transform: showOneReply ? 'translateY(0)' : 'translateY(100%)'
+		}"
+	>
+		<view @touchmove.prevent class="popup-container">
+			<!-- 拖拽指示条 -->
+			<view class="drag-indicator" @touchstart="handleDragStart" @touchmove="handleDragMove" @touchend="handleDragEnd"></view>
+			
+			<!-- 输入区域 -->
+			<view class="popup-input-area">
+				<view class="input-wrapper">
+					<u-input 
+						:focus="showOneReply && inputFocus" 
+						:placeholder="replyCommentsName" 
+						border="surround" 
+						v-model="rplContent"
+						@focus="handleInputFocus" 
+						@blur="handleInputBlur" 
+						@input="handleInputChange"
+						fontSize='24rpx' 
+						color='#1a1a1a' 
+						shape='circle'
+						:adjustPosition="true" 
+						:customStyle="{
+							paddingLeft:'24rpx',
+							background:'#F2F2F2',
+							transition: 'all 0.2s ease'
+						}"
+					>
+					</u-input>
+					
+					<!-- 发送按钮 -->
+					<view 
+						class="send-btn" 
+						:class="{ 'send-btn-active': rplContent.trim() }"
+						@tap="handleReleaseComment"
+					>
+						<text class="send-text">发送</text>
+					</view>
+				</view>
 			</view>
 		</view>
 	</u-popup>
@@ -218,6 +260,14 @@
 
 	// 一级评论框
 	const showOneReply = ref(false)
+	
+	// 输入框聚焦状态
+	const inputFocus = ref(false)
+	
+	// 拖拽相关状态
+	const dragStartY = ref(0)
+	const dragCurrentY = ref(0)
+	const isDragging = ref(false)
 
 	onLoad((options) => {
 		const eventChannel = $instance.value.getOpenerEventChannel();
@@ -267,16 +317,7 @@
 				
 				// 更新动态信息
 				if (data.moments_info) {
-					momentsInfoComment.value = {
-						moments_id: data.moments_info.moments_id,
-						content: data.moments_info.content,
-						file_list: data.moments_info.file_list || [],
-						topic_list: data.moments_info.topic_list || [],
-						is_praised: data.moments_info.is_praised,
-						praise_num: data.moments_info.praise_num,
-						comments_num: data.moments_info.comments_num,
-						is_liked: data.moments_info.is_liked
-					}
+					momentsInfoComment.value = data.moments_info
 				}
 				
 				// 获取评论列表
@@ -354,9 +395,14 @@
 
 	// 发布
 	const handleReleaseComment = async () => {
-		showOneReply.value = false
+
 		
-		if (!rplContent.value.trim()) {
+		
+		
+		// 更严格的验证逻辑
+		const trimmedContent = rplContent.value || ''
+		if (!trimmedContent) {
+			console.log('输入内容为空，显示错误提示')
 			uni.showToast({
 				title: '请输入评论内容',
 				icon: 'none',
@@ -401,7 +447,7 @@
 				
 				// 清空输入框
 				rplContent.value = ''
-				
+				handleClosePopup()
 				uni.showToast({
 					title: '评论成功!',
 					icon: 'none',
@@ -457,6 +503,59 @@
 	// 聚焦键盘
 	const handleFocus = (e) => {
 	}
+	
+	// 输入框聚焦
+	const handleInputFocus = (e) => {
+		inputFocus.value = true
+	}
+	
+	// 输入框失焦
+	const handleInputBlur = (e) => {
+		inputFocus.value = false
+	}
+	
+	// 输入框内容变化
+	const handleInputChange = (value) => {
+		console.log('handleInputChange 被调用，接收到的值:', value)
+		rplContent.value = value
+		console.log('rplContent 更新为:', rplContent.value)
+	}
+	
+	// 拖拽开始
+	const handleDragStart = (e) => {
+		isDragging.value = true
+		dragStartY.value = e.touches[0].clientY
+		dragCurrentY.value = e.touches[0].clientY
+	}
+	
+	// 拖拽移动
+	const handleDragMove = (e) => {
+		if (!isDragging.value) return
+		
+		dragCurrentY.value = e.touches[0].clientY
+		const deltaY = dragCurrentY.value - dragStartY.value
+		
+		// 只允许向下拖拽关闭
+		if (deltaY > 0) {
+			e.preventDefault()
+		}
+	}
+	
+	// 拖拽结束
+	const handleDragEnd = (e) => {
+		if (!isDragging.value) return
+		
+		const deltaY = dragCurrentY.value - dragStartY.value
+		
+		// 如果向下拖拽超过50px，则关闭弹框
+		if (deltaY > 50) {
+			handleClosePopup()
+		}
+		
+		isDragging.value = false
+		dragStartY.value = 0
+		dragCurrentY.value = 0
+	}
 
 	// 去详情
 	const toDetail = () => {
@@ -504,6 +603,20 @@
 	// 回复一级评论
 	const handleShowOneReply = () => {
 		showOneReply.value = true
+		// 延迟聚焦，确保弹框完全显示后再聚焦
+		setTimeout(() => {
+			inputFocus.value = true
+		}, 350)
+	}
+	
+	// 关闭弹框
+	const handleClosePopup = () => {
+		inputFocus.value = false
+		showOneReply.value = false
+		// 清空输入内容
+		rplContent.value = ''
+		replyCommentsId.value = ''
+		replyCommentsName.value = '友好发言，文明聊天'
 	}
 
 	const handleSayHello = (val) => {
@@ -672,7 +785,7 @@
 
 	// 跳转到详情页面
 	const navigateToDetail = async (partnerId, cityCode, latitude = null, longitude = null) => {
-		let url = '/subPackages/friend/detail?id=' + partnerId + '&city_code=' + cityCode
+		let url = '/subPackages/py/detail?id=' + partnerId + '&city_code=' + cityCode
 		
 		// 添加经纬度参数
 		if (latitude && longitude) {
@@ -1032,6 +1145,99 @@
 		.nav-com-image {
 			width: 48rpx;
 			height: 48rpx;
+		}
+	}
+
+	// 弹框容器样式
+	.popup-container {
+		background: #fff;
+		border-radius: 20rpx 20rpx 0 0;
+		overflow: hidden;
+		position: relative;
+	}
+
+	// 拖拽指示条
+	.drag-indicator {
+		width: 60rpx;
+		height: 6rpx;
+		background: #E5E5E5;
+		border-radius: 3rpx;
+		margin: 16rpx auto 24rpx;
+		transition: all 0.2s ease;
+		
+		&:active {
+			background: #C0C0C0;
+			transform: scale(1.1);
+		}
+	}
+
+	// 弹框输入区域
+	.popup-input-area {
+		padding: 0 24rpx 40rpx;
+		background: #fff;
+	}
+
+	.input-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 16rpx;
+		position: relative;
+	}
+
+	// 发送按钮样式
+	.send-btn {
+		width: 100rpx;
+		height: 56rpx;
+		border-radius: 36rpx;
+		background: #E5E5E5;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		transform: scale(0.9);
+		opacity: 0.6;
+		
+		.send-text {
+			font-size: 24rpx;
+			color: #999;
+			font-weight: 500;
+			transition: all 0.3s ease;
+		}
+		
+		&.send-btn-active {
+			background: linear-gradient(135deg, #7363FF 0%, #FF69DE 100%);
+			transform: scale(1);
+			opacity: 1;
+			box-shadow: 0 4rpx 12rpx rgba(115, 99, 255, 0.3);
+			
+			.send-text {
+				color: #fff;
+				font-weight: 600;
+			}
+		}
+		
+		&:active {
+			transform: scale(0.95);
+		}
+	}
+
+	// 弹框动画效果
+	:deep(.u-popup) {
+		.u-popup__content {
+			transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+		}
+		
+		.u-popup__overlay {
+			transition: all 0.3s ease !important;
+		}
+	}
+
+	// 输入框聚焦时的样式
+	:deep(.u-input) {
+		&.u-input--focus {
+			background: #fff !important;
+			box-shadow: 0 0 0 2rpx rgba(115, 99, 255, 0.2) !important;
+			transform: scale(1.02);
 		}
 	}
 </style>

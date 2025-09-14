@@ -175,7 +175,6 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { getServiceInfo, calculateDistance, getCompanionAvailableSchedule, createOrderV2, orderParams } from '@/api/order.js'
-import { sendSubscribeMessage, getCompanionWxOpenId } from '@/api/user.js'
 
 // 页面参数
 const params = ref({})
@@ -206,11 +205,6 @@ const serviceInfo = ref({
 
 })
 
-// 友伴师微信信息
-const companionWxInfo = ref({
-  wx_open_id: '',
-  nickname: ''
-})
 
 // 计算总价
 const totalPrice = computed(() => {
@@ -257,35 +251,6 @@ const loadServiceInfo = async () => {
 }
 
 // 获取友伴师微信 openid
-const loadCompanionWxInfo = async () => {
-  try {
-    const { companion_id } = params.value
-    
-    if (!companion_id) {
-      console.warn('缺少友伴师ID参数')
-      return
-    }
-    
-    const response = await getCompanionWxOpenId({
-      companion_id: Number(companion_id)
-    })
-    
-    console.log('友伴师微信信息:', response.data)
-    
-    if (response.data && response.data.code === 0) {
-      const data = response.data.data
-      companionWxInfo.value = {
-        wx_open_id: data.wx_open_id || '',
-        nickname: data.nickname || ''
-      }
-      console.log('友伴师微信openid:', data.wx_open_id)
-    } else {
-      console.error('获取友伴师微信信息失败:', response.data?.message)
-    }
-  } catch (error) {
-    console.error('获取友伴师微信信息失败:', error)
-  }
-}
 
 // 选择地址
 const selectAddress = () => {
@@ -655,16 +620,7 @@ const submitOrder = async () => {
   // 先请求订阅消息权限
   const subscribeResult = await requestSubscribeMessage()
   
-  // 检查订阅消息授权结果，如果有模板未授权成功，则阻止支付
-  if (subscribeResult === false) {
-    uni.showModal({
-      title: '提示',
-      content: '为了确保您能及时接收订单状态通知，请先开启订阅消息权限后再提交订单',
-      showCancel: false,
-      confirmText: '我知道了'
-    })
-    return
-  }
+  
   
   // 解析服务时间，提取日期和时间段
   // 格式可能是 "周一 2024-01-15 09:00" 或 "2024-01-15 09:00"
@@ -727,44 +683,6 @@ const submitOrder = async () => {
                 icon: 'success',
               });
               
-              // 发送订阅消息
-              try {
-                // 检查是否有友伴师的微信openid
-                if (!companionWxInfo.value.wx_open_id) {
-                  console.warn('友伴师微信openid为空，跳过订阅消息发送')
-                  return
-                }
-                
-                const subscribeData = {
-                  to_user: companionWxInfo.value.wx_open_id, // 使用真实的友伴师openid
-                  template_id: "vrMAJmeAOA0j3yRGX6AjNCOvfgzlJp8T1wWLucyCwKc",
-                 
-                  page: `subPackages/partner/order/detail?orderId=${response.data.data.order_id}&companion_id=${params.value.companion_id}`,
-                  data: {
-                    phrase4: {
-                      value: "待接单"
-                    },
-                    thing3: {
-                      value: serviceInfo.value?.service?.name || "服务"
-                    },
-                    character_string10: {
-                      value: serviceDate + " " + serviceTimeSlot
-                    },
-                    character_string1: {
-                      value: paramsResponse.data.data.order_no
-                    },
-                    thing15: {
-                      value: selectedAddress.value
-                    }
-                  }
-                }
-                
-                await sendSubscribeMessage(subscribeData)
-                console.log('订阅消息发送成功，发送给友伴师:', companionWxInfo.value.nickname)
-              } catch (error) {
-                console.error('发送订阅消息失败:', error)
-                // 订阅消息发送失败不影响主流程，只记录错误
-              }
               
               // 支付成功后返回上一层
               setTimeout(() => {
@@ -814,8 +732,6 @@ onMounted(() => {
   // 加载服务信息
   loadServiceInfo()
   
-  // 获取友伴师微信信息
-  loadCompanionWxInfo()
   
   // 调用友伴师可用时间安排接口
   if (params.value.companion_id) {

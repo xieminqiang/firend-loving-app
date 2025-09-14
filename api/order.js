@@ -174,6 +174,15 @@ export const getOrderCount = () => {
   })
 }
 
+// 获取退款订单列表
+export const getRefundOrderList = (params) => {
+  return http({
+    url: '/front/order/refund-list',
+    method: 'POST',
+    data: params
+  })
+}
+
 // 开始计时服务
 export const startService = (data) => {
   return http({
@@ -252,5 +261,14 @@ export const getOrderCommentList = (params) => {
     url: '/front/order/comment/order-list',
     method: 'POST',
     data: params
+  })
+}
+
+// 获取友伴师电话
+export const getCompanionPhone = (data) => {
+  return http({
+    url: '/front/companion/phone',
+    method: 'POST',
+    data
   })
 }
